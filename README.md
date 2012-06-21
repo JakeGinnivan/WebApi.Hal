@@ -5,7 +5,7 @@ Adds support for the Hal Media Type (and Hypermedia) to Asp.net Web Api
 
 HAL Specification
 =================
-http://stateless.co/hal_specification.html
+http://stateless.co/hal_specification.html  
 https://github.com/mikekelly/hal_specification
 
 Credits
