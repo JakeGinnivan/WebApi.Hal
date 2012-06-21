@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HalWebApi")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("WebApi.Hal")]
+[assembly: AssemblyDescription("Enabled Hypermedia support in Asp.net Web API using the HAL mediatype")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("HalWebApi")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2012")]
+[assembly: AssemblyCompany("Jake Ginnivan")]
+[assembly: AssemblyProduct("WebApi.Hal")]
+[assembly: AssemblyCopyright("Copyright © Jake Ginnvan 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
