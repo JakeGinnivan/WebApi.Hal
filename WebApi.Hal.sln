@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.Hal", "WebApi.Hal\WebApi.Hal.csproj", "{8A01C801-D7E6-4ACB-A843-7C3EFB7833F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.Hal.Web", "WebApi.Hal.Web\WebApi.Hal.Web.csproj", "{2C93BCF7-6A6B-40FE-80DD-8C9C10427F02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.Hal.Tests", "WebApi.Hal.Tests\WebApi.Hal.Tests.csproj", "{4678CA34-3289-4597-9B2C-93D7257A303A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C93BCF7-6A6B-40FE-80DD-8C9C10427F02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C93BCF7-6A6B-40FE-80DD-8C9C10427F02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C93BCF7-6A6B-40FE-80DD-8C9C10427F02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C93BCF7-6A6B-40FE-80DD-8C9C10427F02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4678CA34-3289-4597-9B2C-93D7257A303A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4678CA34-3289-4597-9B2C-93D7257A303A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4678CA34-3289-4597-9B2C-93D7257A303A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4678CA34-3289-4597-9B2C-93D7257A303A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A01C801-D7E6-4ACB-A843-7C3EFB7833F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A01C801-D7E6-4ACB-A843-7C3EFB7833F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A01C801-D7E6-4ACB-A843-7C3EFB7833F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A01C801-D7E6-4ACB-A843-7C3EFB7833F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
