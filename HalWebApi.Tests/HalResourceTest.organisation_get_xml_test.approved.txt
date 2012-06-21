@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resource rel="organisation" href="/api/organisations/1">
+  <Id>1</Id>
+  <Name>Org Name</Name>
+</resource>

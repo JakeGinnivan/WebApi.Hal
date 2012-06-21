@@ -1,0 +1,27 @@
+[Oo]bj/
+[Bb]in/
+*.user
+/TestResults
+*.vspscc
+*.vssscc
+deploy
+deploy/*
+*.suo
+*.cache
+packages/
+msbuild.log
+artifacts/log
+artifacts/
+post-build*
+_ReSharper.*
+deploy-to-ec2*
+publish/
+Build/
+*.received.txt
+TestResults/
+Src/UpgradeLog*.XML
+Src/_UpgradeReport_Files/
+*.orig
+*LAND ISLANDS.png
+Thumbs.db
+Documentation/_site

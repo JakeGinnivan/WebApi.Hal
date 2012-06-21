@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resource rel="organisations" href="/api/organisations">
+  <resource rel="organisation" href="/api/organisations/1">
+    <Id>1</Id>
+    <Name>Org1</Name>
+  </resource>
+  <resource rel="organisation" href="/api/organisations/2">
+    <Id>2</Id>
+    <Name>Org2</Name>
+  </resource>
+</resource>

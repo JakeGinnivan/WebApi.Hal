@@ -1,0 +1,29 @@
+{
+  "_links": {
+    "self": {
+      "href": "/api/organisations"
+    }
+  },
+  "_embedded": {
+    "organisations": [
+      {
+        "Id": 1,
+        "Name": "Org1",
+        "_links": {
+          "self": {
+            "href": "/api/organisations/1"
+          }
+        }
+      },
+      {
+        "Id": 2,
+        "Name": "Org2",
+        "_links": {
+          "self": {
+            "href": "/api/organisations/2"
+          }
+        }
+      }
+    ]
+  }
+}
