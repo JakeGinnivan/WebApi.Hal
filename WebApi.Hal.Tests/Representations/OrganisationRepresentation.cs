@@ -1,6 +1,6 @@
 ﻿namespace WebApi.Hal.Tests.Representations
 {
-    public class OrganisationRepresentation : HalResource
+    public class OrganisationRepresentation : Resource
     {
         public OrganisationRepresentation()
         {

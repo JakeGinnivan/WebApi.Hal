@@ -19,7 +19,7 @@ namespace WebApi.Hal.Tests
             // act
             try
             {
-                resourceLinker.CreateLinks(new List<HalResource>());
+                resourceLinker.CreateLinks(new List<Resource>());
             }
             catch (ArgumentException ex)
             {

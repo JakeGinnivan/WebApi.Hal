@@ -37,6 +37,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,7 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HalResource.cs" />
+    <Compile Include="Resource.cs" />
+    <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="IResourceLinker.cs" />
     <Compile Include="IResourceLinker`1.cs" />
     <Compile Include="JsonConverters\LinksConverter.cs" />

@@ -20,7 +20,7 @@ namespace WebApi.Hal
 
         public override object ReadFromStream(Type type, Stream stream, HttpContentHeaders contentHeaders, IFormatterLogger formatterLogger)
         {
-            if (!typeof(HalResource).IsAssignableFrom(type))
+            if (!typeof(Resource).IsAssignableFrom(type))
             {
                 return null;
             }
@@ -31,7 +31,7 @@ namespace WebApi.Hal
 
         public override void WriteToStream(Type type, object value, Stream stream, HttpContentHeaders contentHeaders)
         {
-            var resource = value as HalResource;
+            var resource = value as Resource;
             if (resource == null)
             {
                 return;
@@ -52,7 +52,7 @@ namespace WebApi.Hal
         /// <returns>returns deserialized object</returns>
         static object ReadHalResource(Type type, XElement xml)
         {
-            HalResource resource;
+            Resource resource;
 
             if (xml == null)
             {
@@ -71,14 +71,14 @@ namespace WebApi.Hal
                     resourceList.Add(resourceListItem);
                 }
 
-                resource = Activator.CreateInstance(type, new object[] { resourceList }) as HalResource;
+                resource = Activator.CreateInstance(type, new object[] { resourceList }) as Resource;
             }
             else
             {
-                resource = Activator.CreateInstance(type) as HalResource;
+                resource = Activator.CreateInstance(type) as Resource;
             }
 
-            // Second, set the well-known HAL properties ONLY if type of HalResource
+            // Second, set the well-known HAL properties ONLY if type of Resource
             CreateSelfHypermedia(type, xml, resource);
 
             // Third, read/set the rest of the properties
@@ -93,7 +93,7 @@ namespace WebApi.Hal
             return resource;
         }
 
-        static void SetProperties(Type type, XElement xml, HalResource resource)
+        static void SetProperties(Type type, XElement xml, Resource resource)
         {
             foreach (var property in type.GetPublicInstanceProperties())
             {
@@ -101,7 +101,7 @@ namespace WebApi.Hal
                 {
                     type.SetPropertyValue(property.Name, xml.Element(property.Name), resource);
                 }
-                else if (typeof(HalResource).IsAssignableFrom(property.PropertyType) &&
+                else if (typeof(Resource).IsAssignableFrom(property.PropertyType) &&
                          property.GetIndexParameters().Length == 0)
                 {
                     var resourceXml =
@@ -112,14 +112,14 @@ namespace WebApi.Hal
             }
         }
 
-        static void CreateSelfHypermedia(Type type, XElement xml, HalResource resource)
+        static void CreateSelfHypermedia(Type type, XElement xml, Resource resource)
         {
             type.GetProperty("Rel").SetValue(resource, xml.Attribute("rel").Value, null);
             type.SetPropertyValue("Href", xml.Attribute("href"), resource);
             type.SetPropertyValue("LinkName", xml.Attribute("name"), resource);
         }
 
-        static void WriteHalResource(HalResource resource, XmlWriter writer, string propertyName = null)
+        static void WriteHalResource(Resource resource, XmlWriter writer, string propertyName = null)
         {
             if (resource == null)
             {
@@ -139,7 +139,7 @@ namespace WebApi.Hal
             if (resource.GetType().IsGenericResourceList())
             {
                 var propertyValue = resource as IEnumerable;
-                foreach (HalResource item in propertyValue)
+                foreach (Resource item in propertyValue)
                 {
                     WriteHalResource(item, writer);
                 }
@@ -160,7 +160,7 @@ namespace WebApi.Hal
             writer.WriteEndElement();
         }
 
-        static void WriteResourceProperties(HalResource resource, XmlWriter writer)
+        static void WriteResourceProperties(Resource resource, XmlWriter writer)
         {
 // Only simple type and nested ApiResource type will be handled : for any other type, exception will be thrown
             // including List<ApiResource> as representation of List would require properties rel, href and linkname
@@ -175,11 +175,11 @@ namespace WebApi.Hal
                         writer.WriteElementString(property.Name, propertyString);
                     }
                 }
-                else if (typeof (HalResource).IsAssignableFrom(property.PropertyType) &&
+                else if (typeof (Resource).IsAssignableFrom(property.PropertyType) &&
                          property.GetIndexParameters().Length == 0)
                 {
                     var halResource = property.GetValue(resource, null);
-                    WriteHalResource((HalResource) halResource, writer, property.Name);
+                    WriteHalResource((Resource) halResource, writer, property.Name);
                 }
             }
         }
@@ -197,12 +197,12 @@ namespace WebApi.Hal
 
         public override bool CanReadType(Type type)
         {
-            return typeof(HalResource).IsAssignableFrom(type);
+            return typeof(Resource).IsAssignableFrom(type);
         }
 
         public override bool CanWriteType(Type type)
         {
-            return typeof(HalResource).IsAssignableFrom(type);
+            return typeof(Resource).IsAssignableFrom(type);
         }
     }
 }

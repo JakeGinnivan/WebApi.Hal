@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace WebApi.Hal
 {
-    public class ResourceList<T> : HalResource, IEnumerable<T> where T : HalResource
+    public class ResourceList<T> : Resource, IResourceList, IEnumerable<T> where T : Resource
     {
         private readonly List<T> resources;
 
@@ -54,5 +54,9 @@ namespace WebApi.Hal
         {
             return GetEnumerator();
         }
+    }
+
+    public interface IResourceList
+    {
     }
 }

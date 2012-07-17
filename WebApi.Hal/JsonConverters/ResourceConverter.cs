@@ -7,7 +7,7 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var resource = (HalResource)value;
+            var resource = (Resource)value;
 
             resource.Links.Add(new Link
                                    {
@@ -28,9 +28,17 @@ namespace WebApi.Hal.JsonConverters
 
         public override bool CanConvert(Type objectType)
         {
-            return typeof(HalResource).IsAssignableFrom(objectType) &&
-                   (!objectType.IsGenericType ||
-                    objectType.GetGenericTypeDefinition() != typeof(ResourceList<>));
+            return IsResource(objectType) && !IsResourceList(objectType);
+        }
+
+        static bool IsResourceList(Type objectType)
+        {
+            return typeof(IResourceList).IsAssignableFrom(objectType);
+        }
+
+        static bool IsResource(Type objectType)
+        {
+            return typeof(Resource).IsAssignableFrom(objectType);
         }
     }
 }

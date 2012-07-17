@@ -16,7 +16,7 @@ namespace WebApi.Hal
                 resourceLinkers.Add(type, resourceLinker);
         }
 
-        public void CreateLinks<T>(T resource)
+        public T CreateLinks<T>(T resource)
         {
             var type = typeof(T);
             if (!resourceLinkers.ContainsKey(type))
@@ -25,6 +25,7 @@ namespace WebApi.Hal
             var linker = (IResourceLinker<T>)resourceLinkers[type];
 
             linker.CreateLinks(resource, this);
+            return resource;
         }
 
         static string CreateExceptionMessage(Type type)

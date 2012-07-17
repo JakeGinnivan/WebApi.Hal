@@ -21,7 +21,7 @@ namespace WebApi.Hal
             if (type.IsGenericType && typeof(IList).IsAssignableFrom(type))
             {
                 var genericType = type.GetGenericArguments().Single();
-                return typeof(HalResource).IsAssignableFrom(genericType);
+                return typeof(Resource).IsAssignableFrom(genericType);
             }
 
             return false;
@@ -30,7 +30,7 @@ namespace WebApi.Hal
         public static bool IsGenericResourceList(this Type type)
         {
             var args = type.GetGenericArguments();
-            return args.Length == 1 && typeof(HalResource).IsAssignableFrom(type) && typeof(ResourceList<>).MakeGenericType(args).IsAssignableFrom(type);
+            return args.Length == 1 && typeof(Resource).IsAssignableFrom(type) && typeof(ResourceList<>).MakeGenericType(args).IsAssignableFrom(type);
         }
 
         public static PropertyInfo[] GetPublicInstanceProperties(this Type type)

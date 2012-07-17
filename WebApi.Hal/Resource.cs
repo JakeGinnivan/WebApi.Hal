@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace WebApi.Hal
 {
-    public abstract class HalResource
+    public abstract class Resource
     {
-        protected HalResource()
+        protected Resource()
         {
             Links = new List<Link>();
         }
