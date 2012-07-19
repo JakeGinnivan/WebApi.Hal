@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using WebApi.Hal.Web.Data;
-using System.Linq;
 using WebApi.Hal.Web.Models;
 
 namespace WebApi.Hal.Web.Controllers
