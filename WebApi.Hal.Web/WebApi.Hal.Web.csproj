@@ -143,6 +143,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\BeerListResource.cs" />
     <Compile Include="Controllers\BeerResource.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\BeersController.cs" />
