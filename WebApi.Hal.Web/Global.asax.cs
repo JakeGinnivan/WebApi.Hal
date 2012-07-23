@@ -8,6 +8,8 @@ using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
 using DbUp;
+using WebApi.Hal.Web.Api;
+using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.App_Start;
 using WebApi.Hal.Web.Controllers;
 using WebApi.Hal.Web.Data;

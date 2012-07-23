@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 using System.Linq;
 using WebApi.Hal.Web.Models;
 
-namespace WebApi.Hal.Web.Controllers
+namespace WebApi.Hal.Web.Api
 {
     public class BeersController : ApiController
     {

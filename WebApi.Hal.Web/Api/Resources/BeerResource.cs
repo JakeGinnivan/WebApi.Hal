@@ -1,4 +1,4 @@
-﻿namespace WebApi.Hal.Web.Controllers
+﻿namespace WebApi.Hal.Web.Api.Resources
 {
     public class BeerResource : Resource
     {
