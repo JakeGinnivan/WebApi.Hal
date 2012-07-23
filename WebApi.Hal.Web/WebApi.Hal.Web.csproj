@@ -143,10 +143,12 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Api\Resources\BeerListResource.cs" />
     <Compile Include="Api\Resources\BeerResource.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Api\BeersController.cs" />
     <Compile Include="Data\BeerDbContext.cs" />
+    <Compile Include="DbUpDatabaseInitializer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -214,6 +216,7 @@
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <EmbeddedResource Include="Data\Scripts\Script001.sql" />
+    <EmbeddedResource Include="Database\0001_InitialData.sql" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Properties\Settings.settings">
