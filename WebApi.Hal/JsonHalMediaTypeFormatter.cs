@@ -37,6 +37,4 @@ namespace WebApi.Hal
             return typeof(Resource).IsAssignableFrom(type);
         }
     }
-
-
 }

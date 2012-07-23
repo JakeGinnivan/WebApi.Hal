@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using WebApi.Hal.Web.Data;
-using System.Linq;
 using WebApi.Hal.Web.Models;
 
 namespace WebApi.Hal.Web.Controllers
@@ -42,8 +41,7 @@ namespace WebApi.Hal.Web.Controllers
                     new Link {Href = string.Format("/beers?page={0}", page+1), Rel = "next"}
                 }
             };
-            resourceLinker.CreateLinks(resourceList);
-            return resourceList;
+            return resourceLinker.CreateLinks(resourceList);
         }
 
         // GET api/beers/5
@@ -82,14 +80,6 @@ namespace WebApi.Hal.Web.Controllers
         // DELETE api/beers/5
         public void Delete(int id)
         {
-        }
-    }
-
-    public class BeerListResource : ResourceList<BeerResource>
-    {
-        public BeerListResource(List<BeerResource> beers) : base(beers)
-        {
-            
         }
     }
 }
