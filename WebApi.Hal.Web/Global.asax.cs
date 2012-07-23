@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using System.Data.Entity;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -7,7 +8,6 @@ using System.Web.Routing;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
-using DbUp;
 using WebApi.Hal.Web.App_Start;
 using WebApi.Hal.Web.Controllers;
 using WebApi.Hal.Web.Data;
@@ -41,19 +41,10 @@ namespace WebApi.Hal.Web
             resourceLinker.AddLinker(new BeerListLinker());
             ConfigureContainer(containerBuilder, resourceLinker);
 
-            EnsureDatabaseUpgraded();
+            Database.SetInitializer(new DbUpDatabaseInitializer(connectionString));
 
             container = containerBuilder.Build();
             GlobalConfiguration.Configuration.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-        }
-
-        void EnsureDatabaseUpgraded()
-        {
-            DeployChanges.To
-                .SqlDatabase(connectionString)
-                .WithScriptsEmbeddedInAssembly(typeof(WebApiApplication).Assembly)
-                .Build()
-                .PerformUpgrade();
         }
 
         private void ConfigureContainer(ContainerBuilder containerBuilder, ResourceLinker resourceLinker)

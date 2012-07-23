@@ -1,1 +1,1 @@
-No resource linker found for System.Collections.Generic.List<WebApi.Hal.HalResource>
+No resource linker found for System.Collections.Generic.List<WebApi.Hal.Resource>
