@@ -51,11 +51,11 @@ namespace WebApi.Hal.Web.Api
         {
             var beer = beerContext.Beers.Find(id);
 
-            return new BeerResource
+            return resourceLinker.CreateLinks(new BeerResource
             {
                 Id = beer.Id,
                 Name = beer.Name
-            };
+            });
         }
 
         // POST api/beers

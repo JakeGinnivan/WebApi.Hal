@@ -10,21 +10,27 @@ namespace WebApi.Hal
 {
     public class JsonHalMediaTypeFormatter : JsonMediaTypeFormatter
     {
+        readonly ResourceListConverter resourceListConverter = new ResourceListConverter();
+        readonly ResourceConverter resourceConverter = new ResourceConverter();
+        readonly LinksConverter linksConverter = new LinksConverter();
+
         public JsonHalMediaTypeFormatter()
         {
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/hal+json"));
-            SerializerSettings.Converters.Add(new LinksConverter());
-            SerializerSettings.Converters.Add(new ResourceListConverter());
-            SerializerSettings.Converters.Add(new ResourceConverter());
+            SerializerSettings.Converters.Add(linksConverter);
+            SerializerSettings.Converters.Add(resourceListConverter);
+            SerializerSettings.Converters.Add(resourceConverter);
         }
 
         public override Task WriteToStreamAsync(Type type, object value, Stream stream, HttpContentHeaders contentHeaders, TransportContext transportContext)
         {
-            var resource = value as Resource;
-            if (resource == null)
-                return base.WriteToStreamAsync(type, value, stream, contentHeaders, transportContext);
-
-            return base.WriteToStreamAsync(type, value, stream, contentHeaders, transportContext);
+            return base.WriteToStreamAsync(type, value, stream, contentHeaders, transportContext)
+                .ContinueWith(t=>
+                {
+                    SerializerSettings.Converters.Remove(linksConverter);
+                    SerializerSettings.Converters.Remove(resourceListConverter);
+                    SerializerSettings.Converters.Remove(resourceConverter);
+                });
         }
 
         public override bool CanReadType(Type type)

@@ -1,4 +1,6 @@
-﻿namespace WebApi.Hal.Web.Models
+﻿using WebApi.Hal.Web.Data;
+
+namespace WebApi.Hal.Web.Models
 {
     public class Beer
     {
@@ -13,5 +15,7 @@
 
         public int Id { get; protected set; }
         public string Name { get; set; }
+        public BeerStyle Style { get; set; }
+        public Brewery Brewery { get; set; }
     }
 }

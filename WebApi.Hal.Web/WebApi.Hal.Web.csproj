@@ -140,19 +140,33 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\BreweriesController.cs" />
+    <Compile Include="Api\Linkers\BreweryLinker.cs" />
+    <Compile Include="Api\Linkers\BreweryListLinker.cs" />
+    <Compile Include="Api\Resources\BeerStyleListResource.cs" />
+    <Compile Include="Api\Resources\BeerStyleResource.cs" />
+    <Compile Include="Api\Resources\BreweryListResource.cs" />
+    <Compile Include="Api\Resources\BreweryResource.cs" />
+    <Compile Include="Api\StylesController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Api\Resources\BeerListResource.cs" />
     <Compile Include="Api\Resources\BeerResource.cs" />
+    <Compile Include="Api\Linkers\BeerLinker.cs" />
+    <Compile Include="Api\Linkers\BeerListLinker.cs" />
+    <Compile Include="Api\Linkers\BeerStyleLinker.cs" />
+    <Compile Include="Api\Linkers\BeerStyleListLinker.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Api\BeersController.cs" />
     <Compile Include="Data\BeerDbContext.cs" />
+    <Compile Include="Data\Brewery.cs" />
     <Compile Include="DbUpDatabaseInitializer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Beer.cs" />
+    <Compile Include="Models\BeerStyle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -216,7 +230,7 @@
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <EmbeddedResource Include="Data\Scripts\Script001.sql" />
-    <EmbeddedResource Include="Database\0001_InitialData.sql" />
+    <EmbeddedResource Include="Data\Scripts\Script002_InitialData.sql" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Properties\Settings.settings">
@@ -297,7 +311,9 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Api\ResourceMappers\" />
     <Folder Include="App_Data\" />
+    <Folder Include="Database\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

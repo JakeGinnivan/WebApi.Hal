@@ -1,6 +1,8 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Microsoft.CSharp;
 
 namespace WebApi.Hal
@@ -31,6 +33,23 @@ namespace WebApi.Hal
         static string CreateExceptionMessage(Type type)
         {
             return string.Format("No resource linker found for {0}", new CSharpCodeProvider().GetTypeOutput(new CodeTypeReference(type)));
+        }
+
+        public void AddLinkersFromAssembly(Assembly assembly)
+        {
+            var linkerTypes = assembly.GetTypes()
+                .SelectMany(types => types.GetInterfaces()
+                    .Where(interfaces => interfaces.IsGenericType && interfaces.GetGenericTypeDefinition() == typeof(IResourceLinker<>))
+                    .Select(interfaces => new { Type = types, Interface = interfaces}))
+                    .Where(a=>a.Interface != null);
+
+            foreach (var linkerType in linkerTypes)
+            {
+                var resourceType = linkerType.Interface.GetGenericArguments()[0];
+
+                var instance = Activator.CreateInstance(linkerType.Type);
+                resourceLinkers.Add(resourceType, instance);
+            }
         }
     }
 }

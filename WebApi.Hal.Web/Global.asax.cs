@@ -8,10 +8,7 @@ using System.Web.Routing;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
-using WebApi.Hal.Web.Api;
-using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.App_Start;
-using WebApi.Hal.Web.Controllers;
 using WebApi.Hal.Web.Data;
 
 namespace WebApi.Hal.Web
@@ -39,8 +36,8 @@ namespace WebApi.Hal.Web
 
             var containerBuilder = new ContainerBuilder();
             var resourceLinker = new ResourceLinker();
-            resourceLinker.AddLinker(new BeerLinker());
-            resourceLinker.AddLinker(new BeerListLinker());
+            resourceLinker.AddLinkersFromAssembly(typeof(WebApiApplication).Assembly);
+
             ConfigureContainer(containerBuilder, resourceLinker);
 
             Database.SetInitializer(new DbUpDatabaseInitializer(connectionString));
@@ -63,29 +60,6 @@ namespace WebApi.Hal.Web
                 .Register(c=> new BeerDbContext(connectionString))
                 .As<IBeerContext>()
                 .InstancePerHttpRequest();
-        }
-    }
-
-    public class BeerListLinker : IResourceLinker<BeerListResource>
-    {
-        public void CreateLinks(BeerListResource resource, IResourceLinker resourceLinker)
-        {
-            resource.Href = "/beers";
-            resource.Rel = "beers";
-
-            foreach (var beer in resource)
-            {
-                resourceLinker.CreateLinks(beer);
-            }
-        }
-    }
-
-    public class BeerLinker : IResourceLinker<BeerResource>
-    {
-        public void CreateLinks(BeerResource resource, IResourceLinker resourceLinker)
-        {
-            resource.Href = string.Format("/beers/{0}", resource.Id);
-            resource.Rel = "beer";
         }
     }
 }
