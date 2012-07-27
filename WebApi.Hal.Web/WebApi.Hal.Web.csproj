@@ -53,6 +53,9 @@
     <Reference Include="Autofac.Integration.WebApi">
       <HintPath>..\packages\Autofac.WebApi.2.6.2.859\lib\NET40\Autofac.Integration.WebApi.dll</HintPath>
     </Reference>
+    <Reference Include="AutoMapper">
+      <HintPath>..\packages\AutoMapper.2.1.267\lib\net40\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="DbUp">
       <HintPath>..\packages\dbup.2.0.67\lib\NET35\DbUp.dll</HintPath>
     </Reference>
@@ -157,6 +160,7 @@
     <Compile Include="Api\Linkers\BeerListLinker.cs" />
     <Compile Include="Api\Linkers\BeerStyleLinker.cs" />
     <Compile Include="Api\Linkers\BeerStyleListLinker.cs" />
+    <Compile Include="AutomapperMappings.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Api\BeersController.cs" />
     <Compile Include="Data\BeerDbContext.cs" />
@@ -311,7 +315,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Api\ResourceMappers\" />
     <Folder Include="App_Data\" />
     <Folder Include="Database\" />
   </ItemGroup>

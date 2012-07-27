@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace WebApi.Hal.JsonConverters
@@ -8,7 +8,7 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var list = (Resource)value;
+            var list = (IResourceList)value;
 
             list.Links.Add(new Link
             {
@@ -24,12 +24,22 @@ namespace WebApi.Hal.JsonConverters
             writer.WriteStartObject();
             writer.WritePropertyName(list.Rel);
             writer.WriteStartArray();
-            foreach (Resource halResource in (IEnumerable)value)
+            foreach (Resource halResource in list)
             {
                 serializer.Serialize(writer, halResource);
             }
+
             writer.WriteEndArray();
             writer.WriteEndObject();
+
+            var listType = list.GetType();
+            var propertyInfos = typeof(ResourceList<>).GetProperties().Select(p => p.Name);
+            foreach (var property in listType.GetProperties().Where(p => !propertyInfos.Contains(p.Name)))
+            {
+                writer.WritePropertyName(property.Name.ToLower());
+                serializer.Serialize(writer, property.GetValue(value, null));
+            }
+
             writer.WriteEndObject();
         }
 

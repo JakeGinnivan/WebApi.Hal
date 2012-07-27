@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace WebApi.Hal
 {
-    public abstract class Resource
+    public abstract class Resource : IResource
     {
         protected Resource()
         {

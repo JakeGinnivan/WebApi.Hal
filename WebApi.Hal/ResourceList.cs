@@ -55,8 +55,4 @@ namespace WebApi.Hal
             return GetEnumerator();
         }
     }
-
-    public interface IResourceList
-    {
-    }
 }

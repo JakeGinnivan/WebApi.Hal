@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using AutoMapper;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 using WebApi.Hal.Web.Models;
@@ -13,8 +14,9 @@ namespace WebApi.Hal.Web.Api
     {
         readonly IResourceLinker resourceLinker;
         readonly IBeerContext beerContext;
+        const int PageSize = 5;
 
-        public BeersController(IResourceLinker resourceLinker, IBeerContext beerContext)
+        public BeersController(IResourceLinker resourceLinker, IBeerContext beerContext, IMappingEngine mappingEngine)
         {
             this.resourceLinker = resourceLinker;
             this.beerContext = beerContext;
@@ -28,20 +30,29 @@ namespace WebApi.Hal.Web.Api
 
         public BeerListResource GetPage(int page)
         {
-            var beers = beerContext.Beers.Take(20)
-                .Select(b=>new BeerResource
+            var beers = beerContext
+                .Beers
+                .OrderBy(b => b.Name)
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .Select(b=> new BeerResource
                 {
                     Id = b.Id,
-                    Name = b.Name
-                }).ToList();
+                    Name = b.Name,
+                    BreweryId = b.Brewery.Id,
+                    BreweryName = b.Brewery.Name,
+                    StyleId = b.Style.Id,
+                    StyleName = b.Style.Name
+                })
+                .ToList();
 
-            var resourceList = new BeerListResource(beers)
-            {
-                Links =
-                {
-                    new Link {Href = string.Format("/beers?page={0}", page+1), Rel = "next"}
-                }
-            };
+            var count = beerContext.Beers.Count();
+            var resourceList = new BeerListResource(beers) { Total = count, Page = page };
+
+            if (page > 1)
+                resourceList.Links.Add(new Link {Href = string.Format("/beers?page={0}", page - 1), Rel = "prev"});
+            if (count > page * PageSize)
+                resourceList.Links.Add(new Link { Href = string.Format("/beers?page={0}", page + 1), Rel = "next" });
 
             return resourceLinker.CreateLinks(resourceList);
         }

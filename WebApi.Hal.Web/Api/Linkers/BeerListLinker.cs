@@ -6,7 +6,7 @@ namespace WebApi.Hal.Web.Api.Linkers
     {
         public void CreateLinks(BeerListResource resource, IResourceLinker resourceLinker)
         {
-            resource.Href = "/beers";
+            resource.Href = resource.Page == 1 ? "/beers" : string.Format("/beers?page={0}", resource.Page);
             resource.Rel = "beers";
 
             foreach (var beer in resource)

@@ -13,7 +13,7 @@ namespace WebApi.Hal.Web.App_Start
             routes.MapHttpRoute(
                 name: "BeersFilterApi",
                 routeTemplate: "api/{controller}/{id}/beers",
-                defaults: new { id = RouteParameter.Optional, action = "GetBeers" }
+                defaults: new { id = RouteParameter.Optional, action = "AssociatedBeers" }
             );
 
             routes.MapHttpRoute(

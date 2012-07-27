@@ -4,7 +4,11 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Brewery { get; set; }
-        public string Style { get; set; }
+
+        public int BreweryId { get; set; }
+        public string BreweryName { get; set; }
+
+        public int StyleId { get; set; }
+        public string StyleName { get; set; }
     }
 }

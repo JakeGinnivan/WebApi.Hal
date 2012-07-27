@@ -52,8 +52,8 @@ namespace WebApi.Hal.Web.Api
                 {
                     Id = b.Id,
                     Name = b.Name,
-                    Style = b.Style.Name,
-                    Brewery = b.Brewery.Name,
+                    StyleName = b.Style.Name,
+                    BreweryName = b.Brewery.Name,
                     Links =
                     {
                         new Link{Rel = "style", Href = string.Format("/styles/{0}", b.Style.Id )},

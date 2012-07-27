@@ -8,6 +8,9 @@ namespace WebApi.Hal.Web.Api.Linkers
         {
             resource.Href = string.Format("/beers/{0}", resource.Id);
             resource.Rel = "beer";
+
+            resource.Links.Add(new Link { Rel = "style", Href = string.Format("/styles/{0}", resource.StyleId) });
+            resource.Links.Add(new Link { Rel = "brewery", Href = string.Format("/brewery/{0}", resource.BreweryId) });
         }
     }
 }
