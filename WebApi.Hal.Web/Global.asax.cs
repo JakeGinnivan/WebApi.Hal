@@ -10,6 +10,7 @@ using AutoMapper.Mappers;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
+using WebApi.Hal.Interfaces;
 using WebApi.Hal.Web.App_Start;
 using WebApi.Hal.Web.Data;
 

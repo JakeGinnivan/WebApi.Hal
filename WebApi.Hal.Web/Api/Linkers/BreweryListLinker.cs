@@ -1,3 +1,4 @@
+using WebApi.Hal.Interfaces;
 using WebApi.Hal.Web.Api.Resources;
 
 namespace WebApi.Hal.Web.Api.Linkers

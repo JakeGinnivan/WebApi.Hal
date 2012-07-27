@@ -47,12 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IResource.cs" />
-    <Compile Include="IResourceList.cs" />
+    <Compile Include="Interfaces\IResource.cs" />
+    <Compile Include="Interfaces\IResourceList.cs" />
     <Compile Include="Resource.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
-    <Compile Include="IResourceLinker.cs" />
-    <Compile Include="IResourceLinker`1.cs" />
+    <Compile Include="Interfaces\IResourceLinker.cs" />
+    <Compile Include="Interfaces\IResourceLinker`1.cs" />
     <Compile Include="JsonConverters\LinksConverter.cs" />
     <Compile Include="JsonConverters\ResourceConverter.cs" />
     <Compile Include="JsonConverters\ResourceListConverter.cs" />

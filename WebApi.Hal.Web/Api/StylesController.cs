@@ -3,8 +3,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using WebApi.Hal.Interfaces;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
+using WebApi.Hal.Web.Data.Queries;
 
 namespace WebApi.Hal.Web.Api
 {
@@ -12,11 +14,13 @@ namespace WebApi.Hal.Web.Api
     {
         readonly IBeerContext beerContext;
         readonly IResourceLinker resourceLinker;
+        IRepository repository;
 
-        public StylesController(IResourceLinker resourceLinker, IBeerContext beerContext)
+        public StylesController(IResourceLinker resourceLinker, IBeerContext beerContext, IRepository repository)
         {
             this.resourceLinker = resourceLinker;
             this.beerContext = beerContext;
+            this.repository = repository;
         }
 
         public BeerStyleListResource Get()
@@ -62,23 +66,18 @@ namespace WebApi.Hal.Web.Api
         [HttpGet]
         public BeerListResource AssociatedBeers(int id)
         {
-            var beers = beerContext
-                .Beers
-                .Where(b => b.Style.Id == id)
-                .OrderBy(b => b.Name)
-                .Select(b => new BeerResource
-                {
-                    Id = b.Id,
-                    Name = b.Name,
-                    BreweryId = b.Brewery.Id,
-                    BreweryName = b.Brewery.Name,
-                    StyleId = b.Style.Id,
-                    StyleName = b.Style.Name
-                })
-                .ToList();
+            return AssociatedBeers(id, 1);
+        }
 
-            int count = beerContext.Beers.Count();
-            var resourceList = new BeerListResource(beers) {Total = count};
+        [HttpGet]
+        public BeerListResource AssociatedBeers(int id, int page)
+        {
+            var beers = repository.Find(new GetBeersQuery(b => b.Style.Id == id), page, BeersController.PageSize);
+
+            var resourceList = new BeerListResource(beers.ToList())
+            {
+                Total = beers.TotalResults
+            };
 
             return resourceLinker.CreateLinks(resourceList);
         }

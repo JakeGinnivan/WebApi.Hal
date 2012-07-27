@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
-using AutoMapper;
+using WebApi.Hal.Interfaces;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
+using WebApi.Hal.Web.Data.Queries;
 using WebApi.Hal.Web.Models;
 
 namespace WebApi.Hal.Web.Api
@@ -14,12 +16,14 @@ namespace WebApi.Hal.Web.Api
     {
         readonly IResourceLinker resourceLinker;
         readonly IBeerContext beerContext;
-        const int PageSize = 5;
+        readonly IRepository repository;
+        public const int PageSize = 5;
 
-        public BeersController(IResourceLinker resourceLinker, IBeerContext beerContext, IMappingEngine mappingEngine)
+        public BeersController(IResourceLinker resourceLinker, IBeerContext beerContext, IRepository repository)
         {
             this.resourceLinker = resourceLinker;
             this.beerContext = beerContext;
+            this.repository = repository;
         }
 
         // GET api/beers
@@ -30,31 +34,43 @@ namespace WebApi.Hal.Web.Api
 
         public BeerListResource GetPage(int page)
         {
-            var beers = beerContext
-                .Beers
-                .OrderBy(b => b.Name)
-                .Skip((page - 1) * PageSize)
-                .Take(PageSize)
-                .Select(b=> new BeerResource
-                {
-                    Id = b.Id,
-                    Name = b.Name,
-                    BreweryId = b.Brewery.Id,
-                    BreweryName = b.Brewery.Name,
-                    StyleId = b.Style.Id,
-                    StyleName = b.Style.Name
-                })
-                .ToList();
+            var beers = repository.Find(new GetBeersQuery(), page, PageSize);
 
-            var count = beerContext.Beers.Count();
-            var resourceList = new BeerListResource(beers) { Total = count, Page = page };
+            var resourceList = new BeerListResource(beers.ToList()) { Total = beers.TotalResults, Page = page };
 
             if (page > 1)
                 resourceList.Links.Add(new Link {Href = string.Format("/beers?page={0}", page - 1), Rel = "prev"});
-            if (count > page * PageSize)
+            if (page < beers.TotalPages)
                 resourceList.Links.Add(new Link { Href = string.Format("/beers?page={0}", page + 1), Rel = "next" });
 
             return resourceLinker.CreateLinks(resourceList);
+        }
+
+        [HttpGet]
+        public BeerListResource Search(string searchTerm)
+        {
+            return Search(searchTerm, 1);
+        }
+
+        public BeerListResource Search(string searchTerm, int page)
+        {
+            var beers = repository.Find(new GetBeersQuery(b=>b.Name.Contains(searchTerm)), page, PageSize);
+
+            var encodedSearch = HttpUtility.UrlEncode(searchTerm);
+            var beersResource = new BeerListResource(beers.ToList())
+            {
+                Page = 1,
+                Total = beers.TotalResults,
+                Rel = "beerSearch",
+                Href = string.Format(page == 1 ? "/beers?searchTerm={0}" : "/beers?searchTerm={0}&page={1}", encodedSearch, page)
+            };
+
+            if (page > 1)
+                beersResource.Links.Add(new Link { Href = string.Format("/beers?searchTerm={0}&page={1}", encodedSearch, page - 1), Rel = "prev" });
+            if (page < beers.TotalPages)
+                beersResource.Links.Add(new Link { Href = string.Format("/beers?searchTerm={0}&page={1}", encodedSearch, page + 1), Rel = "next" });
+
+            return resourceLinker.CreateLinks(beersResource);
         }
 
         // GET api/beers/5

@@ -165,6 +165,12 @@
     <Compile Include="Api\BeersController.cs" />
     <Compile Include="Data\BeerDbContext.cs" />
     <Compile Include="Data\Brewery.cs" />
+    <Compile Include="Data\ICommand.cs" />
+    <Compile Include="Data\IPagedQuery`1.cs" />
+    <Compile Include="Data\IQuery`1.cs" />
+    <Compile Include="Data\IRepository.cs" />
+    <Compile Include="Data\PagedResult`1.cs" />
+    <Compile Include="Data\Queries\GetBeersQuery.cs" />
     <Compile Include="DbUpDatabaseInitializer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -315,6 +321,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Api\Mappers\" />
     <Folder Include="App_Data\" />
     <Folder Include="Database\" />
   </ItemGroup>

@@ -2,19 +2,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
     public class ResourceList<T> : Resource, IResourceList, IEnumerable<T> where T : Resource
     {
-        private readonly List<T> resources;
+        private readonly IList<T> resources;
 
         public ResourceList()
         {
             resources = new List<T>();
         }
 
-        public ResourceList(List<T> res)
+        public ResourceList(IList<T> res)
         {
             resources = res ?? new List<T>();
         }

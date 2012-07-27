@@ -1,4 +1,5 @@
-﻿using WebApi.Hal.Tests.Representations;
+﻿using WebApi.Hal.Interfaces;
+using WebApi.Hal.Tests.Representations;
 
 namespace WebApi.Hal.Tests.Linkers
 {

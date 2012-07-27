@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace WebApi.Hal
+namespace WebApi.Hal.Interfaces
 {
     public interface IResource
     {

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Newtonsoft.Json;
+using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal.JsonConverters
 {

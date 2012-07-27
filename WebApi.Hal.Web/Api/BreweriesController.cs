@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Web.Http;
+using WebApi.Hal.Interfaces;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 

@@ -1,4 +1,4 @@
-namespace WebApi.Hal
+namespace WebApi.Hal.Interfaces
 {
     public interface IResourceLinker
     {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
