@@ -9,6 +9,16 @@ namespace WebApi.Hal
     {
         readonly Dictionary<Type, object> resourceLinkers = new Dictionary<Type, object>();
 
+        public ResourceLinker() 
+        {
+
+        }
+
+        public ResourceLinker(Dictionary<Type, object> resourceLinkers)
+        {
+            this.resourceLinkers= resourceLinkers;
+        }
+
         public void AddLinker<T>(IResourceLinker<T> resourceLinker)
         {
             var type = typeof(T);
