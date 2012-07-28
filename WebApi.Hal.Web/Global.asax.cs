@@ -5,8 +5,6 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using AutoMapper;
-using AutoMapper.Mappers;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
@@ -41,10 +39,7 @@ namespace WebApi.Hal.Web
             var resourceLinker = new ResourceLinker();
             resourceLinker.AddLinkersFromAssembly(typeof(WebApiApplication).Assembly);
 
-            var configurationProvider = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());
-            var engine = new MappingEngine(configurationProvider);
-            AutomapperMappings.RegisterMaps(configurationProvider);
-            ConfigureContainer(containerBuilder, resourceLinker, engine);
+            ConfigureContainer(containerBuilder, resourceLinker);
 
             Database.SetInitializer(new DbUpDatabaseInitializer(connectionString));
 
@@ -52,12 +47,10 @@ namespace WebApi.Hal.Web
             GlobalConfiguration.Configuration.DependencyResolver = new AutofacWebApiDependencyResolver(container);
         }
 
-        private void ConfigureContainer(ContainerBuilder containerBuilder, ResourceLinker resourceLinker, IMappingEngine engine)
+        private void ConfigureContainer(ContainerBuilder containerBuilder, ResourceLinker resourceLinker)
         {
             // Register API controllers using assembly scanning.
             containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-
-            containerBuilder.RegisterInstance(engine);
 
             containerBuilder
                 .RegisterInstance(resourceLinker)
@@ -66,7 +59,12 @@ namespace WebApi.Hal.Web
 
             containerBuilder
                 .Register(c=> new BeerDbContext(connectionString))
-                .As<IBeerContext>()
+                .As<IBeerDbContext>()
+                .InstancePerHttpRequest();
+
+            containerBuilder
+                .RegisterType<BeerRepository>()
+                .As<IRepository>()
                 .InstancePerHttpRequest();
         }
     }

@@ -9,17 +9,17 @@ namespace WebApi.Hal.Web.Api
     public class BreweriesController : ApiController
     {
         readonly IResourceLinker resourceLinker;
-        readonly IBeerContext beerContext;
+        readonly IBeerDbContext beerDbContext;
 
-        public BreweriesController(IResourceLinker resourceLinker, IBeerContext beerContext)
+        public BreweriesController(IResourceLinker resourceLinker, IBeerDbContext beerDbContext)
         {
             this.resourceLinker = resourceLinker;
-            this.beerContext = beerContext;
+            this.beerDbContext = beerDbContext;
         }
 
         public BreweryListResource Get()
         {
-            var breweries = beerContext.Styles
+            var breweries = beerDbContext.Styles
                 .Select(s => new BreweryResource
                 {
                     Id = s.Id,
@@ -36,7 +36,7 @@ namespace WebApi.Hal.Web.Api
 
         public BreweryResource Get(int id)
         {
-            var brewery = beerContext.Breweries.Find(id);
+            var brewery = beerDbContext.Breweries.Find(id);
 
             return resourceLinker.CreateLinks(new BreweryResource
             {
@@ -47,7 +47,7 @@ namespace WebApi.Hal.Web.Api
 
         public BeerListResource GetBeers(int id)
         {
-            var beers = beerContext.Beers
+            var beers = beerDbContext.Beers
                 .Where(b => b.Brewery.Id == id)
                 .Select(b=> new BeerResource
                 {

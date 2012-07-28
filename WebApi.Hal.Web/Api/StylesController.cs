@@ -12,20 +12,20 @@ namespace WebApi.Hal.Web.Api
 {
     public class StylesController : ApiController
     {
-        readonly IBeerContext beerContext;
+        readonly IBeerDbContext beerDbContext;
         readonly IResourceLinker resourceLinker;
-        IRepository repository;
+        readonly IRepository repository;
 
-        public StylesController(IResourceLinker resourceLinker, IBeerContext beerContext, IRepository repository)
+        public StylesController(IResourceLinker resourceLinker, IBeerDbContext beerDbContext, IRepository repository)
         {
             this.resourceLinker = resourceLinker;
-            this.beerContext = beerContext;
+            this.beerDbContext = beerDbContext;
             this.repository = repository;
         }
 
         public BeerStyleListResource Get()
         {
-            List<BeerStyleResource> beerStyles = beerContext.Styles
+            List<BeerStyleResource> beerStyles = beerDbContext.Styles
                 .ToList()
                 .Select(s => new BeerStyleResource
                 {
@@ -33,7 +33,7 @@ namespace WebApi.Hal.Web.Api
                     Name = s.Name,
                     Links =
                     {
-                        new Link {Href = string.Format("styles/{0}/beers", s.Id), Rel = "beers"}
+                        LinkTemplates.BeerStyles.AssociatedBeers.CreateLink(_id=>s.Id)
                     }
                 })
                 .ToList();
@@ -43,7 +43,7 @@ namespace WebApi.Hal.Web.Api
 
         public HttpResponseMessage Get(int id)
         {
-            var beerStyle = beerContext.Styles.SingleOrDefault(s => s.Id == id);
+            var beerStyle = beerDbContext.Styles.SingleOrDefault(s => s.Id == id);
             if (beerStyle == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
@@ -53,13 +53,10 @@ namespace WebApi.Hal.Web.Api
                 Name = beerStyle.Name,
                 Links =
                 {
-                    new Link
-                    {
-                        Href = string.Format("styles/{0}/beers", beerStyle.Id),
-                        Rel = "beers"
-                    }
+                    LinkTemplates.BeerStyles.AssociatedBeers.CreateLink(_id=>beerStyle.Id)
                 }
             };
+
             return Request.CreateResponse(HttpStatusCode.OK, resourceLinker.CreateLinks(beerStyleResource));
         }
 

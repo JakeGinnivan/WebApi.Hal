@@ -38,9 +38,6 @@
     <Reference Include="ApprovalUtilities">
       <HintPath>..\packages\ApprovalTests.1.9\lib\ApprovalUtilities.dll</HintPath>
     </Reference>
-    <Reference Include="AutoMapper">
-      <HintPath>..\packages\AutoMapper.2.1.267\lib\net40\AutoMapper.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -65,7 +62,7 @@
     <Compile Include="HalResourceListTests.cs" />
     <Compile Include="Representations\OrganisationRepresentation.cs" />
     <Compile Include="ResourceLinkerTests.cs" />
-    <Compile Include="WebTests.cs" />
+    <Compile Include="UriBuilderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

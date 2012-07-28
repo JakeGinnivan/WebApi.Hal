@@ -7,8 +7,9 @@ namespace WebApi.Hal.Web.Api.Linkers
     {
         public void CreateLinks(BreweryResource resource, IResourceLinker resourceLinker)
         {
-            resource.Href = string.Format("/breweries/{0}", resource.Id);
-            resource.Rel = "brewery";
+            var selfLink = LinkTemplates.Breweries.Brewery.CreateLink(id => resource.Id);
+            resource.Href = selfLink.Href;
+            resource.Rel = selfLink.Rel;
         }
     }
 }

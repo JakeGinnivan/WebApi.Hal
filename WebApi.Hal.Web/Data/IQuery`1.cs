@@ -4,6 +4,6 @@ namespace WebApi.Hal.Web.Data
 {
     public interface IQuery<out TResult>
     {
-        IEnumerable<TResult> Execute(IBeerContext context);
+        IEnumerable<TResult> Execute(IBeerDbContext dbContext);
     }
 }

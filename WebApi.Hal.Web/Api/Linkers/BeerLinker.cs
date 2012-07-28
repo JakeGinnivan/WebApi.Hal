@@ -7,11 +7,12 @@ namespace WebApi.Hal.Web.Api.Linkers
     {
         public void CreateLinks(BeerResource resource, IResourceLinker resourceLinker)
         {
-            resource.Href = string.Format("/beers/{0}", resource.Id);
-            resource.Rel = "beer";
+            var selfLink = LinkTemplates.Beers.Beer.CreateLink(id => resource.Id);
+            resource.Href = selfLink.Href;
+            resource.Rel = selfLink.Rel;
 
-            resource.Links.Add(new Link { Rel = "style", Href = string.Format("/styles/{0}", resource.StyleId) });
-            resource.Links.Add(new Link { Rel = "brewery", Href = string.Format("/brewery/{0}", resource.BreweryId) });
+            resource.Links.Add(LinkTemplates.BeerStyles.Style.CreateLink(id => resource.StyleId));
+            resource.Links.Add(LinkTemplates.Breweries.Brewery.CreateLink(id => resource.BreweryId));
         }
     }
 }

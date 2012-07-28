@@ -7,11 +7,12 @@ namespace WebApi.Hal.Web.Api.Linkers
     {
         public void CreateLinks(BeerListResource resource, IResourceLinker resourceLinker)
         {
-            resource.Href = resource.Href ?? (resource.Page == 1 ? "/beers" : string.Format("/beers?page={0}", resource.Page));
-            resource.Rel = resource.Rel ?? "beers";
+            var selfLink = LinkTemplates.Beers.GetBeers.CreateLink(page => resource.Page);
+            resource.Href = resource.Href ?? selfLink.Href;
+            resource.Rel = resource.Rel ?? selfLink.Rel;
 
-            resource.Links.Add(new Link("page", "/beers?page={page}", isTemplated: true));
-            resource.Links.Add(new Link("search", "/beers?search={searchTerms}", isTemplated: true));
+            resource.Links.Add(new Link("page", LinkTemplates.Beers.GetBeers.Href));
+            resource.Links.Add(new Link("search", LinkTemplates.Beers.SearchBeers.Href));
 
             foreach (var beer in resource)
             {

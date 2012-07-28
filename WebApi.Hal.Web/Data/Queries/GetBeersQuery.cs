@@ -18,9 +18,9 @@ namespace WebApi.Hal.Web.Data.Queries
             this.where = where ?? (b=>true);
         }
 
-        public PagedResult<BeerResource> Execute(IBeerContext context, int skip, int take)
+        public PagedResult<BeerResource> Execute(IBeerDbContext dbContext, int skip, int take)
         {
-            var beers = context
+            var beers = dbContext
                 .Beers
                 .Where(where)
                 .OrderBy(b => b.Name)
@@ -37,7 +37,7 @@ namespace WebApi.Hal.Web.Data.Queries
                 })
                 .ToList();
 
-            var count = context.Beers
+            var count = dbContext.Beers
                 .Where(where)
                 .Count();
 
