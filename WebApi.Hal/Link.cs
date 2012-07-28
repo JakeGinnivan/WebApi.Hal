@@ -51,7 +51,8 @@ namespace WebApi.Hal
             foreach (var substitution in substitutions)
             {
                 var name = substitution.Method.GetParameters()[0].Name.Trim('_');
-                var substituionValue = HttpUtility.UrlEncode(substitution(null).ToString());
+                var value = substitution(null);
+                var substituionValue = value == null ? null : HttpUtility.UrlEncode(value.ToString());
                 href = href.Replace(string.Format("{{{0}}}", name), substituionValue);
             }
 

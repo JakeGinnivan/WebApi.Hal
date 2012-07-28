@@ -11,8 +11,10 @@ namespace WebApi.Hal.Web.Api.Linkers
             resource.Href = selfLink.Href;
             resource.Rel = selfLink.Rel;
 
-            resource.Links.Add(LinkTemplates.BeerStyles.Style.CreateLink(id => resource.StyleId));
-            resource.Links.Add(LinkTemplates.Breweries.Brewery.CreateLink(id => resource.BreweryId));
+            if (resource.StyleId != null)
+                resource.Links.Add(LinkTemplates.BeerStyles.Style.CreateLink(id => resource.StyleId));
+            if (resource.BreweryId != null)
+                resource.Links.Add(LinkTemplates.Breweries.Brewery.CreateLink(id => resource.BreweryId));
         }
     }
 }

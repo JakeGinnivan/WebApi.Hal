@@ -81,10 +81,10 @@ namespace WebApi.Hal.Web.Api
             {
                 Id = beer.Id,
                 Name = beer.Name,
-                BreweryId = beer.Brewery.Id,
-                BreweryName = beer.Brewery.Name,
-                StyleId = beer.Style.Id,
-                StyleName = beer.Style.Name
+                BreweryId = beer.Brewery == null ? (int?)null : beer.Brewery.Id,
+                BreweryName = beer.Brewery == null ? null : beer.Brewery.Name,
+                StyleId = beer.Style == null ? (int?)null : beer.Style.Id,
+                StyleName = beer.Style == null ? null : beer.Style.Name
             });
         }
 
