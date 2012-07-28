@@ -32,6 +32,7 @@ namespace WebApi.Hal.Tests
             // act
             using (var stream = new MemoryStream())
             {
+                mediaFormatter.WriteToStreamAsync(type, resource, stream, contentHeaders, null).Wait();
                 stream.Seek(0, SeekOrigin.Begin);
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 

@@ -13,7 +13,7 @@ namespace WebApi.Hal.Web
             this.connectionString = connectionString;
         }
 
-        public void InitializeDatabase(BeerDbContext dbContext)
+        public void InitializeDatabase(BeerDbContext context)
         {
             DeployChanges.To
                 .SqlDatabase(connectionString)
