@@ -55,13 +55,11 @@
   <ItemGroup>
     <Compile Include="HalResourceWithPeopleTest.cs" />
     <Compile Include="HalResourceTest.cs" />
-    <Compile Include="Linkers\OrganisationLinker.cs" />
-    <Compile Include="Linkers\OrganisationListLinker.cs" />
-    <Compile Include="Linkers\OrganisationWithPeopleLinker.cs" />
+    <Compile Include="Representations\OrganisationListRepresentation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HalResourceListTests.cs" />
     <Compile Include="Representations\OrganisationRepresentation.cs" />
-    <Compile Include="ResourceLinkerTests.cs" />
+    <Compile Include="Representations\OrganisationWithPeopleRepresentation.cs" />
     <Compile Include="UriBuilderTests.cs" />
   </ItemGroup>
   <ItemGroup>

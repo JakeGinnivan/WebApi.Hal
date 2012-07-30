@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Web.Http;
-using WebApi.Hal.Interfaces;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 
@@ -8,19 +7,17 @@ namespace WebApi.Hal.Web.Api
 {
     public class BreweriesController : ApiController
     {
-        readonly IResourceLinker resourceLinker;
         readonly IBeerDbContext beerDbContext;
 
-        public BreweriesController(IResourceLinker resourceLinker, IBeerDbContext beerDbContext)
+        public BreweriesController(IBeerDbContext beerDbContext)
         {
-            this.resourceLinker = resourceLinker;
             this.beerDbContext = beerDbContext;
         }
 
-        public BreweryListResource Get()
+        public BreweryListRepresentation Get()
         {
             var breweries = beerDbContext.Styles
-                .Select(s => new BreweryResource
+                .Select(s => new BreweryRepresentation
                 {
                     Id = s.Id,
                     Name = s.Name,
@@ -31,25 +28,25 @@ namespace WebApi.Hal.Web.Api
                 })
                 .ToList();
 
-            return resourceLinker.CreateLinks(new BreweryListResource(breweries));
+            return new BreweryListRepresentation(breweries);
         }
 
-        public BreweryResource Get(int id)
+        public BreweryRepresentation Get(int id)
         {
             var brewery = beerDbContext.Breweries.Find(id);
 
-            return resourceLinker.CreateLinks(new BreweryResource
+            return new BreweryRepresentation
             {
                 Id = brewery.Id,
                 Name = brewery.Name
-            });
+            };
         }
 
-        public BeerListResource GetBeers(int id)
+        public BeerListRepresentation GetBeers(int id)
         {
             var beers = beerDbContext.Beers
                 .Where(b => b.Brewery.Id == id)
-                .Select(b=> new BeerResource
+                .Select(b=> new BeerRepresentation
                 {
                     Id = b.Id,
                     Name = b.Name,
@@ -62,7 +59,7 @@ namespace WebApi.Hal.Web.Api
                     }
                 }).ToList();
 
-            return resourceLinker.CreateLinks(new BeerListResource(beers));
+            return new BeerListRepresentation(beers);
         }
     }
 }

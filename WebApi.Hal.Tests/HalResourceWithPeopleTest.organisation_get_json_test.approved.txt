@@ -2,11 +2,11 @@
   "Id": 1,
   "Name": "Org Name",
   "_links": {
-    "people": {
-      "href": "/api/organisations/1/people"
-    },
     "self": {
       "href": "/api/organisations/1"
+    },
+    "people": {
+      "href": "/api/organisations/1/people"
     }
   }
 }

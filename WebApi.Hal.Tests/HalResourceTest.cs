@@ -2,7 +2,6 @@
 using System.Net.Http;
 using ApprovalTests;
 using ApprovalTests.Reporters;
-using WebApi.Hal.Tests.Linkers;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
 
@@ -15,9 +14,6 @@ namespace WebApi.Hal.Tests
         public HalResourceTest()
         {
             resource = new OrganisationRepresentation(1, "Org Name");
-            var linker = new ResourceLinker();
-            linker.AddLinker(new OrganisationLinker());
-            linker.CreateLinks(resource);
         }
 
         [Fact]

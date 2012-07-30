@@ -1,6 +1,6 @@
 ﻿namespace WebApi.Hal.Tests.Representations
 {
-    public class OrganisationRepresentation : Resource
+    public class OrganisationRepresentation : Representation
     {
         public OrganisationRepresentation()
         {
@@ -14,5 +14,11 @@
 
         public int Id { get; set; }
         public string Name { get; set; }
+
+        protected override void CreateHypermedia()
+        {
+            Rel = "organisation";
+            Href = string.Format("/api/organisations/{0}", Id);
+        }
     }
 }

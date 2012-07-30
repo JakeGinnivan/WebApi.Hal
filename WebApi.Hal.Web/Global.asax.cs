@@ -8,7 +8,6 @@ using System.Web.Routing;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
-using WebApi.Hal.Interfaces;
 using WebApi.Hal.Web.App_Start;
 using WebApi.Hal.Web.Data;
 
@@ -36,10 +35,8 @@ namespace WebApi.Hal.Web
             GlobalConfiguration.Configuration.Formatters.Add(new XmlHalMediaTypeFormatter());
 
             var containerBuilder = new ContainerBuilder();
-            var resourceLinker = new ResourceLinker();
-            resourceLinker.AddLinkersFromAssembly(typeof(WebApiApplication).Assembly);
 
-            ConfigureContainer(containerBuilder, resourceLinker);
+            ConfigureContainer(containerBuilder);
 
             Database.SetInitializer(new DbUpDatabaseInitializer(connectionString));
 
@@ -47,15 +44,10 @@ namespace WebApi.Hal.Web
             GlobalConfiguration.Configuration.DependencyResolver = new AutofacWebApiDependencyResolver(container);
         }
 
-        private void ConfigureContainer(ContainerBuilder containerBuilder, ResourceLinker resourceLinker)
+        private void ConfigureContainer(ContainerBuilder containerBuilder)
         {
             // Register API controllers using assembly scanning.
             containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-
-            containerBuilder
-                .RegisterInstance(resourceLinker)
-                .As<IResourceLinker>()
-                .SingleInstance();
 
             containerBuilder
                 .Register(c=> new BeerDbContext(connectionString))

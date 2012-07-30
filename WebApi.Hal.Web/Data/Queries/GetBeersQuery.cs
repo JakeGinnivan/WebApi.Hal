@@ -9,7 +9,7 @@ namespace WebApi.Hal.Web.Data.Queries
     /// <summary>
     /// Gets a list of beers, with no hypermedia on the resource
     /// </summary>
-    public class GetBeersQuery : IPagedQuery<BeerResource>
+    public class GetBeersQuery : IPagedQuery<BeerRepresentation>
     {
         readonly Expression<Func<Beer, bool>> where;
 
@@ -18,7 +18,7 @@ namespace WebApi.Hal.Web.Data.Queries
             this.where = where ?? (b=>true);
         }
 
-        public PagedResult<BeerResource> Execute(IBeerDbContext dbContext, int skip, int take)
+        public PagedResult<BeerRepresentation> Execute(IBeerDbContext dbContext, int skip, int take)
         {
             var beers = dbContext
                 .Beers
@@ -26,7 +26,7 @@ namespace WebApi.Hal.Web.Data.Queries
                 .OrderBy(b => b.Name)
                 .Skip(skip)
                 .Take(take)
-                .Select(b => new BeerResource
+                .Select(b => new BeerRepresentation
                 {
                     Id = b.Id,
                     Name = b.Name,
@@ -41,7 +41,7 @@ namespace WebApi.Hal.Web.Data.Queries
                 .Where(where)
                 .Count();
 
-            return new PagedResult<BeerResource>(beers, count, skip, take);
+            return new PagedResult<BeerRepresentation>(beers, count, skip, take);
         }
     }
 }

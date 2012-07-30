@@ -15,6 +15,6 @@ namespace WebApi.Hal.Interfaces
         string LinkName { get; set; }
 
         [JsonProperty("_links")]
-        List<Link> Links { get; set; }
+        IList<Link> Links { get; set; }
     }
 }

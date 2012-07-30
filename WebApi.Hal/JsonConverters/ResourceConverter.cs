@@ -8,9 +8,9 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var resource = (Resource)value;
+            var resource = (Representation)value;
 
-            resource.Links.Add(new Link
+            resource.Links.Insert(0, new Link
                                    {
                                        Rel = "self",
                                        Href = resource.Href
@@ -34,12 +34,12 @@ namespace WebApi.Hal.JsonConverters
 
         static bool IsResourceList(Type objectType)
         {
-            return typeof(IResourceList).IsAssignableFrom(objectType);
+            return typeof(IRepresentationList).IsAssignableFrom(objectType);
         }
 
         static bool IsResource(Type objectType)
         {
-            return typeof(Resource).IsAssignableFrom(objectType);
+            return typeof(Representation).IsAssignableFrom(objectType);
         }
     }
 }

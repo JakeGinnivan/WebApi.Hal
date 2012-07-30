@@ -47,12 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\IRepresentationList.cs" />
     <Compile Include="Interfaces\IResource.cs" />
-    <Compile Include="Interfaces\IResourceList.cs" />
-    <Compile Include="Resource.cs" />
+    <Compile Include="HypermediaList.cs" />
+    <Compile Include="Representation.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
-    <Compile Include="Interfaces\IResourceLinker.cs" />
-    <Compile Include="Interfaces\IResourceLinker`1.cs" />
     <Compile Include="JsonConverters\LinksConverter.cs" />
     <Compile Include="JsonConverters\ResourceConverter.cs" />
     <Compile Include="JsonConverters\ResourceListConverter.cs" />
@@ -60,8 +59,7 @@
     <Compile Include="Link.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionExtensions.cs" />
-    <Compile Include="ResourceLinker.cs" />
-    <Compile Include="ResourceList.cs" />
+    <Compile Include="RepresentationList.cs" />
     <Compile Include="XmlHalMediaTypeFormatter.cs" />
   </ItemGroup>
   <ItemGroup>

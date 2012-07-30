@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
+using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
@@ -21,16 +22,10 @@ namespace WebApi.Hal
             if (type.IsGenericType && typeof(IList).IsAssignableFrom(type))
             {
                 var genericType = type.GetGenericArguments().Single();
-                return typeof(Resource).IsAssignableFrom(genericType);
+                return typeof(Representation).IsAssignableFrom(genericType);
             }
 
             return false;
-        }
-
-        public static bool IsGenericResourceList(this Type type)
-        {
-            var args = type.GetGenericArguments();
-            return args.Length == 1 && typeof(Resource).IsAssignableFrom(type) && typeof(ResourceList<>).MakeGenericType(args).IsAssignableFrom(type);
         }
 
         public static PropertyInfo[] GetPublicInstanceProperties(this Type type)

@@ -13,7 +13,8 @@ namespace WebApi.Hal
         {
             Rel = rel;
             Href = href;
-            IsTemplated = Regex.Match(href, @"{\w+}", RegexOptions.Compiled).Success;
+            if (href != null)
+                IsTemplated = Regex.Match(href, @"{\w+}", RegexOptions.Compiled).Success;
         }
 
         public string Rel { get; set; }

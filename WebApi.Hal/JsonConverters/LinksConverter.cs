@@ -8,7 +8,7 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var links = (List<Link>)value;
+            var links = (IList<Link>)value;
             writer.WriteStartObject();
 
             foreach (var link in links)
@@ -36,7 +36,7 @@ namespace WebApi.Hal.JsonConverters
 
         public override bool CanConvert(Type objectType)
         {
-            return typeof(List<Link>) == objectType;
+            return typeof(IList<Link>).IsAssignableFrom(objectType);
         }
     }
 }

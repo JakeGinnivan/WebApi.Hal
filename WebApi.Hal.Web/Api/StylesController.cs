@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using WebApi.Hal.Interfaces;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 using WebApi.Hal.Web.Data.Queries;
@@ -13,21 +12,19 @@ namespace WebApi.Hal.Web.Api
     public class StylesController : ApiController
     {
         readonly IBeerDbContext beerDbContext;
-        readonly IResourceLinker resourceLinker;
         readonly IRepository repository;
 
-        public StylesController(IResourceLinker resourceLinker, IBeerDbContext beerDbContext, IRepository repository)
+        public StylesController(IBeerDbContext beerDbContext, IRepository repository)
         {
-            this.resourceLinker = resourceLinker;
             this.beerDbContext = beerDbContext;
             this.repository = repository;
         }
 
-        public BeerStyleListResource Get()
+        public BeerStyleListRepresentation Get()
         {
-            List<BeerStyleResource> beerStyles = beerDbContext.Styles
+            var beerStyles = beerDbContext.Styles
                 .ToList()
-                .Select(s => new BeerStyleResource
+                .Select(s => new BeerStyleRepresentation
                 {
                     Id = s.Id,
                     Name = s.Name,
@@ -38,7 +35,7 @@ namespace WebApi.Hal.Web.Api
                 })
                 .ToList();
 
-            return resourceLinker.CreateLinks(new BeerStyleListResource(beerStyles));
+            return new BeerStyleListRepresentation(beerStyles);
         }
 
         public HttpResponseMessage Get(int id)
@@ -47,7 +44,7 @@ namespace WebApi.Hal.Web.Api
             if (beerStyle == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
-            var beerStyleResource = new BeerStyleResource
+            var beerStyleResource = new BeerStyleRepresentation
             {
                 Id = beerStyle.Id,
                 Name = beerStyle.Name,
@@ -57,26 +54,26 @@ namespace WebApi.Hal.Web.Api
                 }
             };
 
-            return Request.CreateResponse(HttpStatusCode.OK, resourceLinker.CreateLinks(beerStyleResource));
+            return Request.CreateResponse(HttpStatusCode.OK, beerStyleResource);
         }
 
         [HttpGet]
-        public BeerListResource AssociatedBeers(int id)
+        public BeerListRepresentation AssociatedBeers(int id)
         {
             return AssociatedBeers(id, 1);
         }
 
         [HttpGet]
-        public BeerListResource AssociatedBeers(int id, int page)
+        public BeerListRepresentation AssociatedBeers(int id, int page)
         {
             var beers = repository.Find(new GetBeersQuery(b => b.Style.Id == id), page, BeersController.PageSize);
 
-            var resourceList = new BeerListResource(beers.ToList())
+            var resourceList = new BeerListRepresentation(beers.ToList())
             {
                 Total = beers.TotalResults
             };
 
-            return resourceLinker.CreateLinks(resourceList);
+            return resourceList;
         }
     }
 }

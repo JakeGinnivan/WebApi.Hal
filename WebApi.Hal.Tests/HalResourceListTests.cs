@@ -3,7 +3,6 @@ using System.IO;
 using System.Net.Http;
 using ApprovalTests;
 using ApprovalTests.Reporters;
-using WebApi.Hal.Tests.Linkers;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
 
@@ -11,21 +10,16 @@ namespace WebApi.Hal.Tests
 {
     public class HalResourceListTests
     {
-        readonly ResourceLinker resourceLinker;
-        readonly ResourceList<OrganisationRepresentation> resource;
+        readonly RepresentationList<OrganisationRepresentation> representation;
 
         public HalResourceListTests()
         {
-            resourceLinker = new ResourceLinker();
-            resourceLinker.AddLinker(new OrganisationListLinker());
-            resourceLinker.AddLinker(new OrganisationLinker());
-            resource = new ResourceList<OrganisationRepresentation>(
+            representation = new OrganisationListRepresentation(
                 new List<OrganisationRepresentation>
                        {
                            new OrganisationRepresentation(1, "Org1"),
                            new OrganisationRepresentation(2, "Org2")
                        });
-            resourceLinker.CreateLinks(resource);
         }
 
         [Fact]
@@ -35,12 +29,12 @@ namespace WebApi.Hal.Tests
             // arrange
             var mediaFormatter = new XmlHalMediaTypeFormatter();
             var contentHeaders = new StringContent(string.Empty).Headers;
-            var type = resource.GetType();
+            var type = representation.GetType();
 
             // act
             using (var stream = new MemoryStream())
             {
-                mediaFormatter.WriteToStream(type, resource, stream, contentHeaders);
+                mediaFormatter.WriteToStream(type, representation, stream, contentHeaders);
                 stream.Seek(0, SeekOrigin.Begin);
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
@@ -56,12 +50,12 @@ namespace WebApi.Hal.Tests
             // arrange
             var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
             var contentHeaders = new StringContent(string.Empty).Headers;
-            var type = resource.GetType();
+            var type = representation.GetType();
 
             // act
             using (var stream = new MemoryStream())
             {
-                mediaFormatter.WriteToStreamAsync(type, resource, stream, contentHeaders, null).Wait();
+                mediaFormatter.WriteToStreamAsync(type, representation, stream, contentHeaders, null).Wait();
                 stream.Seek(0, SeekOrigin.Begin);
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 

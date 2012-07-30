@@ -6,16 +6,11 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    public class ResourceList<T> : Resource, IResourceList, IEnumerable<T> where T : Resource
+    public abstract class RepresentationList<T> : Representation, IRepresentationList, IEnumerable<T> where T : Representation
     {
         private readonly IList<T> resources;
 
-        public ResourceList()
-        {
-            resources = new List<T>();
-        }
-
-        public ResourceList(IList<T> res)
+        protected RepresentationList(IList<T> res)
         {
             resources = res ?? new List<T>();
         }
