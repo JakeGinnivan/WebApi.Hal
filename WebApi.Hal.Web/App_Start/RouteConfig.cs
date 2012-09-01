@@ -10,11 +10,11 @@ namespace WebApi.Hal.Web.App_Start
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapHttpRoute(
+            /*routes.MapHttpRoute(
                 name: "BeersFilterApi",
                 routeTemplate: "api/{controller}/{id}/beers",
                 defaults: new { id = RouteParameter.Optional, action = "AssociatedBeers" }
-            );
+            );*/
 
             routes.MapHttpRoute(
                 name: "DefaultApi",

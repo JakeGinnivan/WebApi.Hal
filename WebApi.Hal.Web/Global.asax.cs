@@ -8,6 +8,7 @@ using System.Web.Routing;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
+using WebApi.Hal.Web.Api;
 using WebApi.Hal.Web.App_Start;
 using WebApi.Hal.Web.Data;
 
@@ -33,6 +34,7 @@ namespace WebApi.Hal.Web
 
             GlobalConfiguration.Configuration.Formatters.Add(new JsonHalMediaTypeFormatter());
             GlobalConfiguration.Configuration.Formatters.Add(new XmlHalMediaTypeFormatter());
+            GlobalConfiguration.Configuration.Filters.Add(new HalFilter());
 
             var containerBuilder = new ContainerBuilder();
 
