@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Filters;
+using WebApi.Hal.JsonConverters;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 using WebApi.Hal.Web.Data.Queries;
@@ -29,6 +30,8 @@ namespace WebApi.Hal.Web.Api
         }
     }
 
+    
+
     public class HalFilter : ActionFilterAttribute
     {
         public static class Resource
@@ -38,6 +41,9 @@ namespace WebApi.Hal.Web.Api
 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
+            if (!actionExecutedContext.Request.Headers.Accept.Any(h => h.MediaType.ToLower() == "application/hal+json"))
+                return;
+
             var controller = actionExecutedContext.ActionContext.ControllerContext.Controller as IHalController;
             if (controller == null)
                 return;
@@ -50,22 +56,29 @@ namespace WebApi.Hal.Web.Api
             if (attrs == null || attrs.Count == 0)
                 return;
 
+            HypermediaContent newContent;
             var objectList = objectContent.Value as IEnumerable;
-            var newContent = new ArrayList();
             if (objectList != null)
             {
+                var newList = new ArrayList();
+                newContent = new HypermediaContent(newList);
                 foreach (var o in objectList)
                 {
-                    newContent.Add(attrs.Select(attr => controller.GetLinkForResource(attr.Resource, o)).ToList());
+                    var newNewContent = new HypermediaContent(o);
+                    var o1 = o;
+                    attrs.Select(attr => controller.GetLinkForResource(attr.Resource, o1)).ToList()
+                        .ForEach(a => newNewContent.Links.Add(a));
+                    newList.Add(newNewContent);
                 }
             }
             else
             {
+                newContent = new HypermediaContent(objectContent.Value);
                 var o = objectContent.Value;
                 attrs.Select(attr => controller.GetLinkForResource(attr.Resource, o)).ToList()
-                    .ForEach(a => newContent.Add(a));
-                newContent.Add(new Link(Resource.Self, actionExecutedContext.Request.RequestUri.AbsolutePath));
+                    .ForEach(a => newContent.Links.Add(a));
             }
+            newContent.Links.Add(new Link(Resource.Self, actionExecutedContext.Request.RequestUri.AbsolutePath));
             actionExecutedContext.Response = actionExecutedContext.Request.CreateResponse(actionExecutedContext.Response.StatusCode, newContent);
         }
     }
