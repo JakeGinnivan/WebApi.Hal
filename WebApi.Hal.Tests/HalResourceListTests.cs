@@ -28,13 +28,13 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new XmlHalMediaTypeFormatter();
-            var contentHeaders = new StringContent(string.Empty).Headers;
+            var content = new StringContent(string.Empty);
             var type = representation.GetType();
 
             // act
             using (var stream = new MemoryStream())
             {
-                mediaFormatter.WriteToStream(type, representation, stream, contentHeaders);
+                mediaFormatter.WriteToStream(type, representation, stream, content);
                 stream.Seek(0, SeekOrigin.Begin);
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
@@ -49,13 +49,13 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
-            var contentHeaders = new StringContent(string.Empty).Headers;
+            var content = new StringContent(string.Empty);
             var type = representation.GetType();
 
             // act
             using (var stream = new MemoryStream())
             {
-                mediaFormatter.WriteToStreamAsync(type, representation, stream, contentHeaders, null).Wait();
+                mediaFormatter.WriteToStreamAsync(type, representation, stream, content, null).Wait();
                 stream.Seek(0, SeekOrigin.Begin);
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
