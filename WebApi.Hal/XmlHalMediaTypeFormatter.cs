@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace WebApi.Hal
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/hal+xml"));
         }
 
-        public override object ReadFromStream(Type type, Stream stream, HttpContentHeaders contentHeaders, IFormatterLogger formatterLogger)
+        public override object ReadFromStream(Type type, Stream stream, HttpContent content, IFormatterLogger formatterLogger)
         {
             if (!typeof(Representation).IsAssignableFrom(type))
             {
@@ -30,7 +31,7 @@ namespace WebApi.Hal
             return ReadHalResource(type, xml);
         }
 
-        public override void WriteToStream(Type type, object value, Stream stream, HttpContentHeaders contentHeaders)
+        public override void WriteToStream(Type type, object value, Stream stream, HttpContent content)
         {
             var resource = value as Representation;
             if (resource == null)
