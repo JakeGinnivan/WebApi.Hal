@@ -9,10 +9,11 @@ namespace WebApi.Hal
         public Link()
         { }
 
-        public Link(string rel, string href)
+        public Link(string rel, string href, bool isTemplated = false)
         {
             Rel = rel;
             Href = href;
+            IsTemplated = isTemplated;
             if (href != null)
                 IsTemplated = Regex.Match(href, @"{\w+}", RegexOptions.Compiled).Success;
         }

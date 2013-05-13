@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/JakeGinnivan/WebApi.Hal</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>Copyright Jake Ginnivan 2012</copyright>
+    <copyright>Copyright Jake Ginnivan 2013</copyright>
     <tags>Hypermedia Asp.net WebApi Json Xml HAL</tags>
   </metadata>
 </package>
