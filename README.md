@@ -17,7 +17,7 @@ Once those are registered, you can start defining your resources. WebApi.Hal has
 ### WebApi.Hal.Representation
 This is the base class for all representations your api returns. It has an abstract method you must override, `abstract void CreateHypermedia();` 
 
-In CreateHypermedia() you should register the **self** link, and any hypermedia that that resource should **always** have. For example (from the example project, the `BeerResource`):
+In CreateHypermedia() you should register the **self** link, and any hypermedia that that resource should **always** have. Other context sensitive hypermedia should be added in the API controller. Here is an example of the Beer CreateHypermedia override (from the example project, the `BeerResource`):
 
     protected override void CreateHypermedia()
     {
