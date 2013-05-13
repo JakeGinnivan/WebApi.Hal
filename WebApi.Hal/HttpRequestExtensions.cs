@@ -17,7 +17,7 @@ namespace WebApi.Hal
 
         public static Uri GetOriginalUrl(this HttpRequestBase request)
         {
-            var hostUrl = new System.UriBuilder();
+            var hostUrl = new UriBuilder();
             string hostHeader = request.Headers["Host"];
 
             if (hostHeader.Contains(":"))
@@ -32,7 +32,7 @@ namespace WebApi.Hal
             }
 
             Uri url = request.Url;
-            var uriBuilder = new System.UriBuilder(url);
+            var uriBuilder = new UriBuilder(url);
 
             // When the application is run behind a load-balancer (or forward proxy), request.IsSecureConnection returns 'true' or 'false'
             // based on the request from the load-balancer to the web server (e.g. IIS) and not the actual request to the load-balancer.

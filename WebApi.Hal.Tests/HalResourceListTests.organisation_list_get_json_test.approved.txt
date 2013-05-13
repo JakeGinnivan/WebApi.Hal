@@ -1,4 +1,4 @@
-{
+﻿{
   "_links": {
     "self": {
       "href": "/api/organisations"

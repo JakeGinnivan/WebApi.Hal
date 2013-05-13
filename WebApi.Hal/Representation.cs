@@ -24,7 +24,7 @@ namespace WebApi.Hal
             {
                 // Prevent CreateHypermedia from being reentrant to this method
                 if (creatingHyperMedia || selfLinkUpToDate)
-                    return href;
+                    return rel;
                 creatingHyperMedia = true;
                 try
                 {
