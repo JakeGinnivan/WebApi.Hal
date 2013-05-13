@@ -1,14 +1,23 @@
-﻿using System;
-
-namespace WebApi.Hal.Web
+﻿namespace WebApi.Hal.Web
 {
     public static class LinkTemplates
     {
         public static class Breweries
         {
+            /// <summary>
+            /// /breweries
+            /// </summary>
             public static Link GetBreweries { get { return new Link("breweries", "/breweries"); } }
 
+            /// <summary>
+            /// /breweries/{id}
+            /// </summary>
             public static Link Brewery { get{return new Link("brewery", "/breweries/{id}");} }
+
+            /// <summary>
+            /// /breweries/{id}/beers
+            /// </summary>
+            public static Link AssociatedBeers { get{return new Link("beers", "/breweries/{id}/beers");} }
         }
 
         public static class BeerStyles

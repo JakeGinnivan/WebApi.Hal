@@ -23,7 +23,7 @@ namespace WebApi.Hal.Web.Api
                     Name = s.Name,
                     Links =
                     {
-                        new Link{ Href = string.Format("breweries/{0}/beers", s.Id), Rel = "beers"}
+                        LinkTemplates.Breweries.AssociatedBeers.CreateLink(id => s.Id)
                     }
                 })
                 .ToList();
@@ -38,7 +38,11 @@ namespace WebApi.Hal.Web.Api
             return new BreweryRepresentation
             {
                 Id = brewery.Id,
-                Name = brewery.Name
+                Name = brewery.Name,
+                Links =
+                {
+                    LinkTemplates.Breweries.AssociatedBeers.CreateLink(_id => id)
+                }
             };
         }
 
@@ -54,8 +58,8 @@ namespace WebApi.Hal.Web.Api
                     BreweryName = b.Brewery.Name,
                     Links =
                     {
-                        new Link{Rel = "style", Href = string.Format("/styles/{0}", b.Style.Id )},
-                        new Link{Rel = "brewery", Href = string.Format("/breweries/{0}", b.Style.Id )}
+                        LinkTemplates.BeerStyles.Style.CreateLink(_id => b.Style.Id),
+                        LinkTemplates.Breweries.Brewery.CreateLink(_id => b.Brewery.Id)
                     }
                 }).ToList();
 

@@ -16,8 +16,8 @@ namespace WebApi.Hal.Web.Api.Resources
             Href = Href ?? selfLink.Href;
             Rel = Rel ?? selfLink.Rel;
 
-            Links.Add(new Link("page", LinkTemplates.Beers.GetBeers.Href));
-            Links.Add(new Link("search", LinkTemplates.Beers.SearchBeers.Href));
+            Links.Add(new Link("page", LinkTemplates.Beers.GetBeers.Href, true));
+            Links.Add(new Link("search", LinkTemplates.Beers.SearchBeers.Href, true));
         }
     }
 }
