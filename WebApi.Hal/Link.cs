@@ -28,34 +28,32 @@ namespace WebApi.Hal
         /// If this link is templated, you can use this method to make a non templated copy
         /// </summary>
         /// <param name="newRel">A different rel</param>
-        /// <param name="substitutions">Pass in substitutions like 'name=>"Value"', 
-        /// if you have a conflicting variable like page, you can do '_page => page + 1'</param>
+        /// <param name="parameters">The parameters, i.e 'new {id = "1"}'</param>
         /// <returns>A non templated link</returns>
-        public Link CreateLink(string newRel, params Func<string, object>[] substitutions)
+        public Link CreateLink(string newRel, object parameters)
         {
-            return new Link(newRel, CreateUri(substitutions).ToString());
+            return new Link(newRel, CreateUri(parameters).ToString());
         }
 
         /// <summary>
         /// If this link is templated, you can use this method to make a non templated copy
         /// </summary>
-        /// <param name="substitutions">Pass in substitutions like 'name=>"Value"', 
-        /// if you have a conflicting variable like page, you can do '_page => page + 1'</param>
+        /// <param name="parameters">The parameters, i.e 'new {id = "1"}'</param>
         /// <returns>A non templated link</returns>
-        public Link CreateLink(params Func<string, object>[] substitutions)
+        public Link CreateLink(object parameters)
         {
-            return CreateLink(Rel, substitutions);
+            return CreateLink(Rel, parameters);
         }
 
-        public Uri CreateUri(params Func<string, object>[] substitutions)
+        public Uri CreateUri(object parameters)
         {
             var href = Href;
-            foreach (var substitution in substitutions)
+            foreach (var substitution in parameters.GetType().GetProperties())
             {
-                var name = substitution.Method.GetParameters()[0].Name.Trim('_');
-                var value = substitution(null);
+                var name = substitution.Name;
+                var value = substitution.GetValue(parameters, null);
                 var substituionValue = value == null ? null : HttpUtility.UrlEncode(value.ToString());
-                href = href.Replace(string.Format("{{{0}}}", name), substituionValue);
+                href = href.Replace(string.Format("{{{0}}}", name), substituionValue, StringComparison.InvariantCultureIgnoreCase);
             }
 
             return new Uri(href, UriKind.Relative);

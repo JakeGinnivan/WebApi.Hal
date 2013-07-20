@@ -12,7 +12,7 @@ namespace WebApi.Hal.Web.Api.Resources
 
         protected override void CreateHypermedia()
         {
-            var selfLink = LinkTemplates.Beers.GetBeers.CreateLink(page => Page);
+            var selfLink = LinkTemplates.Beers.GetBeers.CreateLink(new {Page});
             Href = Href ?? selfLink.Href;
             Rel = Rel ?? selfLink.Rel;
 

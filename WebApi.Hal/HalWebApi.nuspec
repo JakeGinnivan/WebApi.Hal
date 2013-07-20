@@ -12,4 +12,8 @@
     <copyright>Copyright Jake Ginnivan 2013</copyright>
     <tags>Hypermedia Asp.net WebApi Json Xml HAL</tags>
   </metadata>
+  <files>
+    <file src="bin\$configuration$\WebApi.Hal.pdb" target="lib\net40\" />
+    <file src="Readme.txt" target="" />
+  </files>
 </package>

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -30,7 +29,7 @@ namespace WebApi.Hal.Web.Api
                     Name = s.Name,
                     Links =
                     {
-                        LinkTemplates.BeerStyles.AssociatedBeers.CreateLink(_id=>s.Id)
+                        LinkTemplates.BeerStyles.AssociatedBeers.CreateLink(new{s.Id})
                     }
                 })
                 .ToList();
@@ -50,7 +49,7 @@ namespace WebApi.Hal.Web.Api
                 Name = beerStyle.Name,
                 Links =
                 {
-                    LinkTemplates.BeerStyles.AssociatedBeers.CreateLink(_id=>beerStyle.Id)
+                    LinkTemplates.BeerStyles.AssociatedBeers.CreateLink(new{id=beerStyle.Id})
                 }
             };
 

@@ -23,7 +23,7 @@ namespace WebApi.Hal.Web.Api
                     Name = s.Name,
                     Links =
                     {
-                        LinkTemplates.Breweries.AssociatedBeers.CreateLink(id => s.Id)
+                        LinkTemplates.Breweries.AssociatedBeers.CreateLink(new { s.Id })
                     }
                 })
                 .ToList();
@@ -41,7 +41,7 @@ namespace WebApi.Hal.Web.Api
                 Name = brewery.Name,
                 Links =
                 {
-                    LinkTemplates.Breweries.AssociatedBeers.CreateLink(_id => id)
+                    LinkTemplates.Breweries.AssociatedBeers.CreateLink(new { id })
                 }
             };
         }
@@ -50,7 +50,7 @@ namespace WebApi.Hal.Web.Api
         {
             var beers = beerDbContext.Beers
                 .Where(b => b.Brewery.Id == id)
-                .Select(b=> new BeerRepresentation
+                .Select(b => new BeerRepresentation
                 {
                     Id = b.Id,
                     Name = b.Name,
@@ -58,8 +58,8 @@ namespace WebApi.Hal.Web.Api
                     BreweryName = b.Brewery.Name,
                     Links =
                     {
-                        LinkTemplates.BeerStyles.Style.CreateLink(_id => b.Style.Id),
-                        LinkTemplates.Breweries.Brewery.CreateLink(_id => b.Brewery.Id)
+                        LinkTemplates.BeerStyles.Style.CreateLink(new {id = b.Style.Id}),
+                        LinkTemplates.Breweries.Brewery.CreateLink(new {id = b.Brewery.Id})
                     }
                 }).ToList();
 

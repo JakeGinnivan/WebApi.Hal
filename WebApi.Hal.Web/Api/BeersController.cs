@@ -35,9 +35,9 @@ namespace WebApi.Hal.Web.Api
             var resourceList = new BeerListRepresentation(beers.ToList()) { Total = beers.TotalResults, Page = page };
 
             if (page > 1)
-                resourceList.Links.Add(LinkTemplates.Beers.GetBeers.CreateLink("prev", _page => page - 1));
+                resourceList.Links.Add(LinkTemplates.Beers.GetBeers.CreateLink("prev", new { page = page - 1 }));
             if (page < beers.TotalPages)
-                resourceList.Links.Add(LinkTemplates.Beers.GetBeers.CreateLink("next", _page => page + 1));
+                resourceList.Links.Add(LinkTemplates.Beers.GetBeers.CreateLink("next", new { page = page + 1 }));
 
             return resourceList;
         }
@@ -50,9 +50,9 @@ namespace WebApi.Hal.Web.Api
 
         public BeerListRepresentation Search(string searchTerm, int page)
         {
-            var beers = repository.Find(new GetBeersQuery(b=>b.Name.Contains(searchTerm)), page, PageSize);
+            var beers = repository.Find(new GetBeersQuery(b => b.Name.Contains(searchTerm)), page, PageSize);
 
-            var link = LinkTemplates.Beers.SearchBeers.CreateLink(_searchTerm => searchTerm, _page => page);
+            var link = LinkTemplates.Beers.SearchBeers.CreateLink(new{searchTerm, page});
             var beersResource = new BeerListRepresentation(beers.ToList())
             {
                 Page = 1,
@@ -62,9 +62,9 @@ namespace WebApi.Hal.Web.Api
             };
 
             if (page > 1)
-                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("prev", _searchTerm => searchTerm, _page => page - 1));
+                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("prev", new{searchTerm, page = page - 1}));
             if (page < beers.TotalPages)
-                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("next", _searchTerm => searchTerm, _page => page + 1));
+                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("next", new{searchTerm, page = page + 1}));
 
             return beersResource;
         }
@@ -96,7 +96,7 @@ namespace WebApi.Hal.Web.Api
             {
                 Headers =
                 {
-                    Location = LinkTemplates.Beers.Beer.CreateUri(id => newBeer.Id)
+                    Location = LinkTemplates.Beers.Beer.CreateUri(new {id = newBeer.Id})
                 }
             };
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 
 namespace WebApi.Hal.Tests
 {
@@ -12,7 +11,7 @@ namespace WebApi.Hal.Tests
             var templateLink = new Link("beers", "/beers");
 
             // act
-            var link = templateLink.CreateLink();
+            var link = templateLink.CreateLink(new{});
 
             // assert
             Assert.Equal("beers", link.Rel);
@@ -27,7 +26,7 @@ namespace WebApi.Hal.Tests
             var templateLink = new Link("beerSearch", "/beers?searchTerm={searchTerm}");
 
             // act
-            var link = templateLink.CreateLink();
+            var link = templateLink.CreateLink(new {});
 
             // assert
             Assert.True(link.IsTemplated);
@@ -40,7 +39,7 @@ namespace WebApi.Hal.Tests
             var templateLink = new Link("beerSearch", "/beers?searchTerm={searchTerm}");
 
             // act
-            var link = templateLink.CreateLink(searchTerm => "test");
+            var link = templateLink.CreateLink(new{searchTerm = "test"});
 
             // assert
             Assert.Equal("/beers?searchTerm=test", link.Href);
