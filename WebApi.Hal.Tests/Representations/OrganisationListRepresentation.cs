@@ -10,7 +10,7 @@ namespace WebApi.Hal.Tests.Representations
             
         }
 
-        protected override void CreateHypermedia()
+        protected override void CreateListHypermedia()
         {
             Rel = "organisations";
             Href = "/api/organisations";

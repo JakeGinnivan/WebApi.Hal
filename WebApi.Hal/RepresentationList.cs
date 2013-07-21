@@ -6,16 +6,16 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    public abstract class RepresentationList<T> : Representation, IRepresentationList, IEnumerable<T> where T : Representation
+    public abstract class RepresentationList<TRepresentation> : Representation, IRepresentationList, IEnumerable<TRepresentation> where TRepresentation : Representation
     {
-        private readonly IList<T> resources;
+        private readonly IList<TRepresentation> resources;
 
-        protected RepresentationList(IList<T> res)
+        protected RepresentationList(IList<TRepresentation> res)
         {
-            resources = res ?? new List<T>();
+            resources = res ?? new List<TRepresentation>();
         }
 
-        public T this[int index]
+        public TRepresentation this[int index]
         {
             get
             {
@@ -23,7 +23,7 @@ namespace WebApi.Hal
             }
         }
 
-        public T this[string name]
+        public TRepresentation this[string name]
         {
             get
             {
@@ -31,17 +31,24 @@ namespace WebApi.Hal
             }
         }
 
+        protected internal override void CreateHypermedia()
+        {
+            CreateListHypermedia();
+        }
+
+        protected abstract void CreateListHypermedia();
+
         /// <summary>
         /// This method was added solely for the purpose of supporting XMLSerializer. 
         /// Exception thrown - To be XML serializable, types which inherit from IEnumerable must have an implementation of Add(System.Object) 
         /// </summary>
         /// <param name="item">Object to be added</param>
-        public void Add(T item)
+        public void Add(TRepresentation item)
         {
             throw new InvalidOperationException("Cannot add to the list");
         }
 
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<TRepresentation> GetEnumerator()
         {
             return resources.GetEnumerator();
         }

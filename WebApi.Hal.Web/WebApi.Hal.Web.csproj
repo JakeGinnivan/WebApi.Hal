@@ -102,11 +102,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\BeersFromBreweryController.cs" />
+    <Compile Include="Api\BeersFromStyleController.cs" />
     <Compile Include="Api\BreweriesController.cs" />
     <Compile Include="Api\Resources\BeerStyleListRepresentation.cs" />
     <Compile Include="Api\Resources\BeerStyleRepresentation.cs" />
     <Compile Include="Api\Resources\BreweryListRepresentation.cs" />
     <Compile Include="Api\Resources\BreweryRepresentation.cs" />
+    <Compile Include="Api\Resources\PagedRepresentationList.cs" />
     <Compile Include="Api\StylesController.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Api\Resources\BeerListRepresentation.cs" />

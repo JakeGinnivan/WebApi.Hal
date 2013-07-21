@@ -9,7 +9,7 @@ namespace WebApi.Hal.Web.Api.Resources
         {
         }
 
-        protected override void CreateHypermedia()
+        protected override void CreateListHypermedia()
         {
             var selfLink = LinkTemplates.Breweries.GetBreweries;
             Href = selfLink.Href;

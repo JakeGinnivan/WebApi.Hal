@@ -2,7 +2,6 @@
 using System.Data.Entity;
 using System.Reflection;
 using System.Web.Http;
-using System.Web.Routing;
 using Autofac;
 using Autofac.Integration.WebApi;
 using WebApi.Hal.Web.App_Start;
@@ -19,7 +18,7 @@ namespace WebApi.Hal.Web
         {
             connectionString = ConfigurationManager.AppSettings["BeerDatabase"];
 
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            RouteConfig.RegisterRoutes(GlobalConfiguration.Configuration.Routes);
 
             GlobalConfiguration.Configuration.Formatters.Add(new JsonHalMediaTypeFormatter());
             GlobalConfiguration.Configuration.Formatters.Add(new XmlHalMediaTypeFormatter());

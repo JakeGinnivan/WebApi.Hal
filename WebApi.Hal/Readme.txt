@@ -21,14 +21,14 @@ In CreateHypermedia() you should register the **self** link, and any hypermedia 
 
     protected override void CreateHypermedia()
     {
-        var selfLink = LinkTemplates.Beers.Beer.CreateLink(id => Id);
+        var selfLink = LinkTemplates.Beers.Beer.CreateLink(new { Id });
         Href = selfLink.Href;
         Rel = selfLink.Rel;
 
         if (StyleId != null)
-            Links.Add(LinkTemplates.BeerStyles.Style.CreateLink(id => StyleId));
+            Links.Add(LinkTemplates.BeerStyles.Style.CreateLink(new { id = StyleId }));
         if (BreweryId != null)
-            Links.Add(LinkTemplates.Breweries.Brewery.CreateLink(id => BreweryId));
+            Links.Add(LinkTemplates.Breweries.Brewery.CreateLink(new { id = BreweryId }));
     }
 
 ### WebApi.Hal.RepresentationList<T>

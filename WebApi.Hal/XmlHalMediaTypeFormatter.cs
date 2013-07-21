@@ -168,7 +168,7 @@ namespace WebApi.Hal
 
         static void WriteResourceProperties(Representation representation, XmlWriter writer)
         {
-// Only simple type and nested ApiResource type will be handled : for any other type, exception will be thrown
+            // Only simple type and nested ApiResource type will be handled : for any other type, exception will be thrown
             // including List<ApiResource> as representation of List would require properties rel, href and linkname
             // To overcome the issue, use "RepresentationList<T>"
             foreach (var property in representation.GetType().GetPublicInstanceProperties())

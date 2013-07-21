@@ -4,19 +4,16 @@ using System.Net.Http;
 using System.Web.Http;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
-using WebApi.Hal.Web.Data.Queries;
 
 namespace WebApi.Hal.Web.Api
 {
     public class StylesController : ApiController
     {
         readonly IBeerDbContext beerDbContext;
-        readonly IRepository repository;
 
-        public StylesController(IBeerDbContext beerDbContext, IRepository repository)
+        public StylesController(IBeerDbContext beerDbContext)
         {
             this.beerDbContext = beerDbContext;
-            this.repository = repository;
         }
 
         public BeerStyleListRepresentation Get()
@@ -54,25 +51,6 @@ namespace WebApi.Hal.Web.Api
             };
 
             return Request.CreateResponse(HttpStatusCode.OK, beerStyleResource);
-        }
-
-        [HttpGet]
-        public BeerListRepresentation AssociatedBeers(int id)
-        {
-            return AssociatedBeers(id, 1);
-        }
-
-        [HttpGet]
-        public BeerListRepresentation AssociatedBeers(int id, int page)
-        {
-            var beers = repository.Find(new GetBeersQuery(b => b.Style.Id == id), page, BeersController.PageSize);
-
-            var resourceList = new BeerListRepresentation(beers.ToList())
-            {
-                Total = beers.TotalResults
-            };
-
-            return resourceList;
         }
     }
 }

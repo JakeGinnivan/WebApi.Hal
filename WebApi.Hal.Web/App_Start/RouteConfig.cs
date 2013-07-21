@@ -1,23 +1,20 @@
 ﻿using System.Web.Http;
-using System.Web.Routing;
+using WebApi.Hal.Web.Api;
 
 namespace WebApi.Hal.Web.App_Start
 {
     public class RouteConfig
     {
-        public static void RegisterRoutes(RouteCollection routes)
+        public static void RegisterRoutes(HttpRouteCollection routes)
         {
-            routes.MapHttpRoute(
-                name: "BeersFilterApi",
-                routeTemplate: "api/{controller}/{id}/beers",
-                defaults: new { id = RouteParameter.Optional, action = "AssociatedBeers" }
-            );
-
-            routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
+            LinkTemplates.Beers.Beer.RegisterLinkWithWebApi<BeerController>(routes);
+            LinkTemplates.Beers.GetBeers.RegisterLinkWithWebApi<BeersController>(routes);
+            LinkTemplates.Breweries.Brewery.RegisterLinkWithWebApi<BreweriesController>(routes);
+            LinkTemplates.Breweries.GetBreweries.RegisterLinkWithWebApi<BreweriesController>(routes);
+            LinkTemplates.Breweries.AssociatedBeers.RegisterLinkWithWebApi<BeersFromBreweryController>(routes);
+            LinkTemplates.BeerStyles.Style.RegisterLinkWithWebApi<StylesController>(routes);
+            LinkTemplates.BeerStyles.GetStyles.RegisterLinkWithWebApi<StylesController>(routes);
+            LinkTemplates.BeerStyles.AssociatedBeers.RegisterLinkWithWebApi<StylesController>(routes);
         }
     }
 }

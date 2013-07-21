@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
+using System.Web.Http;
+using System.Web.Http.Routing;
 
 namespace WebApi.Hal
 {
@@ -57,6 +60,29 @@ namespace WebApi.Hal
             }
 
             return new Uri(href, UriKind.Relative);
+        }
+
+        public void RegisterLinkWithWebApi<TController>(HttpRouteCollection routes, object defaults = null) where TController : ApiController
+        {
+            RegisterLinkWithWebApi(routes, typeof (TController).Name, defaults);
+        }
+
+        public void RegisterLinkWithWebApi(HttpRouteCollection routes, string controller, object defaults = null)
+        {
+            defaults = defaults ?? new {};
+            var dictionary = defaults.GetType().GetProperties().ToDictionary(i=>i.Name, i=>i.GetValue(defaults, null));
+            var strings = Href.TrimStart('/').Split('?', '#');
+            if (strings.Length > 1)
+            {
+                var queryStringParts = strings[1];
+                foreach (Match match in Regex.Matches(queryStringParts, @"{(?<variable>[^&]*?)=(?<default>.*?)}"))
+                {
+                    dictionary.Add(match.Groups["variable"].Value, match.Groups["default"].Value);
+                }
+            }
+            var route = strings[0];
+            dictionary.Add("controller", controller.Replace("Controller", string.Empty, StringComparison.InvariantCultureIgnoreCase));
+            routes.Add(Rel, new HttpRoute(route, new HttpRouteValueDictionary(dictionary)));
         }
     }
 }

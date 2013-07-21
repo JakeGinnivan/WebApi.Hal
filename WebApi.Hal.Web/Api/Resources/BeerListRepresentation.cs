@@ -2,22 +2,14 @@ using System.Collections.Generic;
 
 namespace WebApi.Hal.Web.Api.Resources
 {
-    public class BeerListRepresentation : RepresentationList<BeerRepresentation>
+    public class BeerListRepresentation : PagedRepresentationList<BeerRepresentation>
     {
-        public BeerListRepresentation(IList<BeerRepresentation> beers) : base(beers)
+        public BeerListRepresentation(IList<BeerRepresentation> beers, int totalResults, int totalPages, int page, Link uriTemplate) :
+            base(beers, totalResults, totalPages, page, uriTemplate)
         { }
 
-        public int Total { get; set; }
-        public int Page { get; set; }
-
-        protected override void CreateHypermedia()
+        protected override void CreateListHypermedia()
         {
-            var selfLink = LinkTemplates.Beers.GetBeers.CreateLink(new {Page});
-            Href = Href ?? selfLink.Href;
-            Rel = Rel ?? selfLink.Rel;
-
-            Links.Add(new Link("page", LinkTemplates.Beers.GetBeers.Href, true));
-            Links.Add(new Link("search", LinkTemplates.Beers.SearchBeers.Href, true));
         }
     }
 }

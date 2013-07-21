@@ -45,25 +45,5 @@ namespace WebApi.Hal.Web.Api
                 }
             };
         }
-
-        public BeerListRepresentation GetBeers(int id)
-        {
-            var beers = beerDbContext.Beers
-                .Where(b => b.Brewery.Id == id)
-                .Select(b => new BeerRepresentation
-                {
-                    Id = b.Id,
-                    Name = b.Name,
-                    StyleName = b.Style.Name,
-                    BreweryName = b.Brewery.Name,
-                    Links =
-                    {
-                        LinkTemplates.BeerStyles.Style.CreateLink(new {id = b.Style.Id}),
-                        LinkTemplates.Breweries.Brewery.CreateLink(new {id = b.Brewery.Id})
-                    }
-                }).ToList();
-
-            return new BeerListRepresentation(beers);
-        }
     }
 }

@@ -9,64 +9,13 @@ using WebApi.Hal.Web.Models;
 
 namespace WebApi.Hal.Web.Api
 {
-    public class BeersController : ApiController
+    public class BeerController : ApiController
     {
-        public const int PageSize = 5;
-
         readonly IBeerDbContext beerDbContext;
-        readonly IRepository repository;
 
-        public BeersController(IBeerDbContext beerDbContext, IRepository repository)
+        public BeerController(IBeerDbContext beerDbContext)
         {
             this.beerDbContext = beerDbContext;
-            this.repository = repository;
-        }
-
-        // GET api/beers
-        public BeerListRepresentation Get()
-        {
-            return GetPage(1);
-        }
-
-        public BeerListRepresentation GetPage(int page)
-        {
-            var beers = repository.Find(new GetBeersQuery(), page, PageSize);
-
-            var resourceList = new BeerListRepresentation(beers.ToList()) { Total = beers.TotalResults, Page = page };
-
-            if (page > 1)
-                resourceList.Links.Add(LinkTemplates.Beers.GetBeers.CreateLink("prev", new { page = page - 1 }));
-            if (page < beers.TotalPages)
-                resourceList.Links.Add(LinkTemplates.Beers.GetBeers.CreateLink("next", new { page = page + 1 }));
-
-            return resourceList;
-        }
-
-        [HttpGet]
-        public BeerListRepresentation Search(string searchTerm)
-        {
-            return Search(searchTerm, 1);
-        }
-
-        public BeerListRepresentation Search(string searchTerm, int page)
-        {
-            var beers = repository.Find(new GetBeersQuery(b => b.Name.Contains(searchTerm)), page, PageSize);
-
-            var link = LinkTemplates.Beers.SearchBeers.CreateLink(new{searchTerm, page});
-            var beersResource = new BeerListRepresentation(beers.ToList())
-            {
-                Page = 1,
-                Total = beers.TotalResults,
-                Rel = link.Rel,
-                Href = link.Href
-            };
-
-            if (page > 1)
-                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("prev", new{searchTerm, page = page - 1}));
-            if (page < beers.TotalPages)
-                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("next", new{searchTerm, page = page + 1}));
-
-            return beersResource;
         }
 
         // GET api/beers/5
@@ -96,7 +45,7 @@ namespace WebApi.Hal.Web.Api
             {
                 Headers =
                 {
-                    Location = LinkTemplates.Beers.Beer.CreateUri(new {id = newBeer.Id})
+                    Location = LinkTemplates.Beers.Beer.CreateUri(new { id = newBeer.Id })
                 }
             };
         }
@@ -110,5 +59,56 @@ namespace WebApi.Hal.Web.Api
         public void Delete(int id)
         {
         }
+    }
+
+    public class BeersController : ApiController
+    {
+        public const int PageSize = 5;
+
+        readonly IRepository repository;
+
+        public BeersController(IRepository repository)
+        {
+            this.repository = repository;
+        }
+
+        // GET api/beers
+        public BeerListRepresentation Get(int page)
+        {
+            var beers = repository.Find(new GetBeersQuery(), page, PageSize);
+
+            var resourceList = new BeerListRepresentation(beers.ToList(), beers.TotalResults, beers.TotalPages, page, LinkTemplates.Beers.GetBeers);
+
+            return resourceList;
+        }
+
+        [HttpGet]
+        public BeerListRepresentation Search(string searchTerm)
+        {
+            return Search(searchTerm, 1);
+        }
+
+        public BeerListRepresentation Search(string searchTerm, int page)
+        {
+            var beers = repository.Find(new GetBeersQuery(b => b.Name.Contains(searchTerm)), page, PageSize);
+
+            var link = LinkTemplates.Beers.SearchBeers.CreateLink(new{searchTerm, page});
+            var beersResource = new BeerListRepresentation(beers.ToList(), beers.TotalResults, beers.TotalPages, page, link)
+            {
+                Page = 1,
+                TotalResults = beers.TotalResults,
+                Rel = link.Rel,
+                Href = link.Href
+            };
+
+            if (page > 1)
+                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("prev", new{searchTerm, page = page - 1}));
+            if (page < beers.TotalPages)
+                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("next", new{searchTerm, page = page + 1}));
+
+            return beersResource;
+        }
+
+        
     }
 }
