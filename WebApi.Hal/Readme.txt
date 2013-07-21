@@ -93,12 +93,26 @@ And put it all together and an API action can look like this:
             Name = brewery.Name,
             Links =
             {
-                LinkTemplates.Breweries.AssociatedBeers.CreateLink(_id => id)
+                LinkTemplates.Breweries.AssociatedBeers.CreateLink(new { id })
             }
         };
     }
 
-**Note:** The link class supports prefixing a variable with `_` in case there is a conflicting variable name. 
+## Using Links to register WebAPI routes
+Once you have done the work defining all your link templates, you can use them to register your WebAPI routes!
+
+    LinkTemplates.Beers.Beer.RegisterLinkWithWebApi<BeerController>(routes);
+    LinkTemplates.Beers.GetBeers.RegisterLinkWithWebApi<BeersController>(routes);
+
+    LinkTemplates.Breweries.Brewery.RegisterLinkWithWebApi<BreweriesController>(routes);
+    LinkTemplates.Breweries.GetBreweries.RegisterLinkWithWebApi<BreweriesController>(routes);
+    LinkTemplates.Breweries.AssociatedBeers.RegisterLinkWithWebApi<BeersFromBreweryController>(routes);
+
+    LinkTemplates.BeerStyles.Style.RegisterLinkWithWebApi<StylesController>(routes);
+    LinkTemplates.BeerStyles.GetStyles.RegisterLinkWithWebApi<StylesController>(routes);
+    LinkTemplates.BeerStyles.AssociatedBeers.RegisterLinkWithWebApi<StylesController>(routes);
+
+WebAPI.Hal encourages you to separate actions into different controllers, all controllers in the sample only have the default Get, Post, Put, Delete actions
 
 ## Sample Project
 To run the sample project, update the connection string in web.config, then **create** the database. When you hit an API for the first time, the database will be setup using DbUp.

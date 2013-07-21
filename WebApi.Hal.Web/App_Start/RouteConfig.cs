@@ -9,9 +9,11 @@ namespace WebApi.Hal.Web.App_Start
         {
             LinkTemplates.Beers.Beer.RegisterLinkWithWebApi<BeerController>(routes);
             LinkTemplates.Beers.GetBeers.RegisterLinkWithWebApi<BeersController>(routes);
+
             LinkTemplates.Breweries.Brewery.RegisterLinkWithWebApi<BreweriesController>(routes);
             LinkTemplates.Breweries.GetBreweries.RegisterLinkWithWebApi<BreweriesController>(routes);
             LinkTemplates.Breweries.AssociatedBeers.RegisterLinkWithWebApi<BeersFromBreweryController>(routes);
+
             LinkTemplates.BeerStyles.Style.RegisterLinkWithWebApi<StylesController>(routes);
             LinkTemplates.BeerStyles.GetStyles.RegisterLinkWithWebApi<StylesController>(routes);
             LinkTemplates.BeerStyles.AssociatedBeers.RegisterLinkWithWebApi<StylesController>(routes);
