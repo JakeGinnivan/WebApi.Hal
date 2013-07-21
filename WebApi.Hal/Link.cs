@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Http;
 using System.Web.Http.Routing;
 
@@ -55,7 +54,7 @@ namespace WebApi.Hal
             {
                 var name = substitution.Name;
                 var value = substitution.GetValue(parameters, null);
-                var substituionValue = value == null ? null : HttpUtility.UrlEncode(value.ToString());
+                var substituionValue = value == null ? null : Uri.EscapeDataString(value.ToString());
                 href = href.Replace(string.Format("{{{0}}}", name), substituionValue, StringComparison.InvariantCultureIgnoreCase);
             }
 

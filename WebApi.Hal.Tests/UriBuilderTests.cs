@@ -64,5 +64,18 @@ namespace WebApi.Hal.Tests
             Assert.Equal("1", httpRouteCollection.Single().Defaults["page"]);
             Assert.Equal("Beers", httpRouteCollection.Single().Defaults["controller"]);
         }
+
+        [Fact]
+        public void create_link_handles_spaces()
+        {
+            // arrange
+            var templateLink = new Link("beerbyname", "/beers/{name}");
+
+            // act
+            var link = templateLink.CreateLink(new { name = "Tactical Nuclear Penguin" });
+
+            // assert
+            Assert.Equal("/beers/Tactical%20Nuclear%20Penguin", link.Href);
+        }
     }
 }
