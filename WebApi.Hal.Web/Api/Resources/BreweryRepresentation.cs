@@ -11,6 +11,8 @@ namespace WebApi.Hal.Web.Api.Resources
             var selfLink = LinkTemplates.Breweries.Brewery.CreateLink(new{Id});
             Href = selfLink.Href;
             Rel = selfLink.Rel;
+
+            LinkTemplates.Breweries.AssociatedBeers.CreateLink(new { Id });
         }
     }
 }
