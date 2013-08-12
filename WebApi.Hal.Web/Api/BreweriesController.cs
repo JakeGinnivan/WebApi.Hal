@@ -20,11 +20,7 @@ namespace WebApi.Hal.Web.Api
                 .Select(s => new BreweryRepresentation
                 {
                     Id = s.Id,
-                    Name = s.Name,
-                    Links =
-                    {
-                        LinkTemplates.Breweries.AssociatedBeers.CreateLink(new { s.Id })
-                    }
+                    Name = s.Name
                 })
                 .ToList();
 
@@ -38,11 +34,7 @@ namespace WebApi.Hal.Web.Api
             return new BreweryRepresentation
             {
                 Id = brewery.Id,
-                Name = brewery.Name,
-                Links =
-                {
-                    LinkTemplates.Breweries.AssociatedBeers.CreateLink(new { id })
-                }
+                Name = brewery.Name
             };
         }
     }
