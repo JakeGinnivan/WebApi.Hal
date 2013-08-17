@@ -115,6 +115,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\BeerController.cs" />
     <Compile Include="Api\BeersFromBreweryController.cs" />
     <Compile Include="Api\BeersFromStyleController.cs" />
     <Compile Include="Api\BreweriesController.cs" />
