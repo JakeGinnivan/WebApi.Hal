@@ -63,13 +63,13 @@ namespace WebApi.Hal
 
         public void RegisterLinkWithWebApi<TController>(HttpRouteCollection routes, object defaults = null) where TController : ApiController
         {
-            RegisterLinkWithWebApi(routes, typeof (TController).Name, defaults);
+            RegisterLinkWithWebApi(routes, typeof(TController).Name, defaults);
         }
 
         public void RegisterLinkWithWebApi(HttpRouteCollection routes, string controller, object defaults = null)
         {
-            defaults = defaults ?? new {};
-            var dictionary = defaults.GetType().GetProperties().ToDictionary(i=>i.Name, i=>i.GetValue(defaults, null));
+            defaults = defaults ?? new { };
+            var dictionary = defaults.GetType().GetProperties().ToDictionary(i => i.Name, i => i.GetValue(defaults, null));
             var strings = Href.TrimStart('/').Split('?', '#');
             if (strings.Length > 1)
             {
@@ -81,7 +81,7 @@ namespace WebApi.Hal
             }
             var route = strings[0];
             dictionary.Add("controller", controller.Replace("Controller", string.Empty, StringComparison.InvariantCultureIgnoreCase));
-            routes.Add(Rel, new HttpRoute(route, new HttpRouteValueDictionary(dictionary)));
+            routes.Add(controller + "+" + Rel, new HttpRoute(route, new HttpRouteValueDictionary(dictionary)));
         }
     }
 }
