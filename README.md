@@ -19,7 +19,7 @@ First thing first, WebApi.Hal is a media formatter. So to get started you have t
 Once those are registered, you can start defining your resources. In WebAPI.Hal, you always return `Representations` from your ApiControllers.
 
 Your representations should all inherit from `Representation` or if you are returning a collection either 
-a `RepresenationList<TRepresenation>` or a `PagedRepresenationList<TRepresentation>`
+a `RepresentationList<TRepresentation>` or a `PagedRepresentationList<TRepresentation>`
 
 WebApi.Hal.Link
 ---------------
