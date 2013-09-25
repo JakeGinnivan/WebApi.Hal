@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using WebApi.Hal.Interfaces;
 
@@ -95,8 +96,20 @@ namespace WebApi.Hal
             }
         }
 
-        [JsonProperty("_links")]
+        [JsonIgnore]
         public IList<Link> Links { get; set; }
+
+        public Dictionary<string, object> _links { get; set; }
+
+        [OnSerializing]
+        internal void OnSerialize(StreamingContext context)
+        {
+            _links = new Dictionary<string, object>();
+            foreach (var link in Links)
+            {
+                _links.Add(link.Rel, new { href = link.Href, title = link.Title, isTemplated = link.IsTemplated ? true : (bool?)null });
+            }
+        }
 
         protected internal abstract void CreateHypermedia();
     }

@@ -26,6 +26,8 @@ namespace WebApi.Hal.Web.Api.Resources
             Href = Href ?? uriTemplate.CreateLink(new {Page}).Href;
             Rel = Rel ?? uriTemplate.Rel;
 
+            Links.Add(new Link { Href = Href, Rel = "self" });
+
             if (Page > 1)
             {
                 var item = uriTemplate.CreateLink("prev", new { page = Page - 1 });
