@@ -16,6 +16,7 @@
             var selfLink = LinkTemplates.Beers.Beer.CreateLink(new { Id });
             Href = selfLink.Href;
             Rel = selfLink.Rel;
+            Links.Add(new Link{Href = Href, Rel = "self"});
 
             if (StyleId != null)
                 Links.Add(LinkTemplates.BeerStyles.Style.CreateLink(new { id = StyleId }));

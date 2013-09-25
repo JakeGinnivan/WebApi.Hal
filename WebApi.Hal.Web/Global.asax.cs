@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Web.Http;
 using Autofac;
 using Autofac.Integration.WebApi;
+using Newtonsoft.Json;
 using WebApi.Hal.Web.App_Start;
 using WebApi.Hal.Web.Data;
 
@@ -31,6 +32,7 @@ namespace WebApi.Hal.Web
 
             container = containerBuilder.Build();
             GlobalConfiguration.Configuration.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
         }
 
         private void ConfigureContainer(ContainerBuilder containerBuilder)
