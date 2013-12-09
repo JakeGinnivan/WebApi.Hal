@@ -39,6 +39,8 @@ namespace WebApi.Hal
                 return;
             }
 
+            resource.RepopulateHyperMedia();
+
             var settings = new XmlWriterSettings { Indent = true };
 
             var writer = XmlWriter.Create(stream, settings);
@@ -147,12 +149,13 @@ namespace WebApi.Hal
             {
                 foreach (var item in representationList.Cast<Representation>())
                 {
+                    item.RepopulateHyperMedia();
                     WriteHalResource(item, writer);
                 }
             }
 
             //Third write out the links of the resource
-            foreach (var link in representation.Links)
+            foreach (var link in representation.Links.Where(link => link.Rel != "self"))
             {
                 writer.WriteStartElement("link");
                 writer.WriteAttributeString("rel", link.Rel);
