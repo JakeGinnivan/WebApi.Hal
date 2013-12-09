@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Linq;
 using Newtonsoft.Json;
 using WebApi.Hal.Interfaces;
 
@@ -7,94 +7,27 @@ namespace WebApi.Hal
 {
     public abstract class Representation : IResource
     {
-        string href;
-        bool creatingHyperMedia;
-        string rel;
-        string linkName;
-        bool selfLinkUpToDate;
-
         protected Representation()
         {
             Links = new HypermediaList();
         }
 
-        [JsonIgnore]
-        public string Rel
+        public void RepopulateHyperMedia()
         {
-            get
-            {
-                // Prevent CreateHypermedia from being reentrant to this method
-                if (creatingHyperMedia || selfLinkUpToDate)
-                    return rel;
-                creatingHyperMedia = true;
-                try
-                {
-                    CreateHypermedia();
-                }
-                finally
-                {
-                    creatingHyperMedia = false;
-                }
-                return rel;
-            }
-            set
-            {
-                rel = value;
-                selfLinkUpToDate = false;
-            }
+            Links.Clear();
+            CreateHypermedia();
+            if (Links.Count(l=>l.Rel == "self") == 0)
+                Links.Insert(0, new Link { Rel = "self", Href = Href });
         }
 
         [JsonIgnore]
-        public string Href
-        {
-            get
-            {
-                // Prevent CreateHypermedia from being reentrant to this method
-                if (creatingHyperMedia || selfLinkUpToDate)
-                    return href;
-                creatingHyperMedia = true;
-                try
-                {
-                    CreateHypermedia();
-                }
-                finally
-                {
-                    creatingHyperMedia = false;
-                }
-                return href;
-            }
-            set
-            {
-                href = value;
-                selfLinkUpToDate = false;
-            }
-        }
+        public string Rel { get; set; }
 
         [JsonIgnore]
-        public string LinkName
-        {
-            get
-            {
-                // Prevent CreateHypermedia from being reentrant to this method
-                if (creatingHyperMedia || selfLinkUpToDate)
-                    return href;
-                creatingHyperMedia = true;
-                try
-                {
-                    CreateHypermedia();
-                }
-                finally
-                {
-                    creatingHyperMedia = false;
-                }
-                return linkName;
-            }
-            set
-            {
-                linkName = value;
-                selfLinkUpToDate = false;
-            }
-        }
+        public string Href { get; set; }
+
+        [JsonIgnore]
+        public string LinkName { get; set; }
 
         public IList<Link> Links { get; set; }
 
