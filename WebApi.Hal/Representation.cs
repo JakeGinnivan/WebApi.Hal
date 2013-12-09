@@ -15,7 +15,7 @@ namespace WebApi.Hal
 
         protected Representation()
         {
-            Links = new HypermediaList(CreateHypermedia);
+            Links = new HypermediaList();
         }
 
         [JsonIgnore]
@@ -96,20 +96,7 @@ namespace WebApi.Hal
             }
         }
 
-        [JsonIgnore]
         public IList<Link> Links { get; set; }
-
-        public Dictionary<string, object> _links { get; set; }
-
-        [OnSerializing]
-        internal void OnSerialize(StreamingContext context)
-        {
-            _links = new Dictionary<string, object>();
-            foreach (var link in Links)
-            {
-                _links.Add(link.Rel, new { href = link.Href, title = link.Title, isTemplated = link.IsTemplated ? true : (bool?)null });
-            }
-        }
 
         protected internal abstract void CreateHypermedia();
     }

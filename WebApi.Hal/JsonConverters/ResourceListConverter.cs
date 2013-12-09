@@ -11,7 +11,7 @@ namespace WebApi.Hal.JsonConverters
         {
             var list = (IRepresentationList)value;
 
-            list.Links.Add(new Link
+            list.Links.Insert(0, new Link
             {
                 Rel = "self",
                 Href = list.Href

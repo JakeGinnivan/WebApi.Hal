@@ -20,7 +20,7 @@ namespace WebApi.Hal.JsonConverters
 
                 if (link.IsTemplated)
                 {
-                    writer.WritePropertyName("isTemplated");
+                    writer.WritePropertyName("templated");
                     writer.WriteValue(true);
                 }
 

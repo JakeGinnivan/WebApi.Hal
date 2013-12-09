@@ -7,19 +7,15 @@ namespace WebApi.Hal
 {
     public class HypermediaList : IList<Link>
     {
-        readonly Action onEnumerate;
         readonly List<Link> innerList;
 
-        public HypermediaList(Action onEnumerate)
+        public HypermediaList()
         {
-            this.onEnumerate = onEnumerate;
             innerList = new List<Link>();
         }
 
         public IEnumerator<Link> GetEnumerator()
         {
-            onEnumerate();
-
             return innerList.GetEnumerator();
         }
 
@@ -30,11 +26,7 @@ namespace WebApi.Hal
 
         public void Add(Link link)
         {
-            var singleOrDefault = innerList.SingleOrDefault(l => l.Rel == link.Rel);
-            if (singleOrDefault != null)
-                innerList[innerList.IndexOf(singleOrDefault)] = link;
-            else
-                innerList.Add(link);
+            innerList.Add(link);
         }
 
         public void Clear()
