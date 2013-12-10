@@ -10,5 +10,6 @@ namespace WebApi.Hal.Web.Data
         public DbSet<Beer> Beers { get; set; }
         public DbSet<BeerStyle> Styles { get; set; }
         public DbSet<Brewery> Breweries { get; set; }
+        public DbSet<Review> Reviews { get; set; }
     }
 }

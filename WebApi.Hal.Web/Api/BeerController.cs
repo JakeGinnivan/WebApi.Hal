@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Linq;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 using WebApi.Hal.Web.Models;
@@ -20,6 +21,7 @@ namespace WebApi.Hal.Web.Api
         public BeerRepresentation Get(int id)
         {
             var beer = beerDbContext.Beers.Find(id);
+            var reviews = beerDbContext.Reviews.Where(r => r.Beer_Id == id).ToList();
 
             return new BeerRepresentation
             {
@@ -28,7 +30,8 @@ namespace WebApi.Hal.Web.Api
                 BreweryId = beer.Brewery == null ? (int?)null : beer.Brewery.Id,
                 BreweryName = beer.Brewery == null ? null : beer.Brewery.Name,
                 StyleId = beer.Style == null ? (int?)null : beer.Style.Id,
-                StyleName = beer.Style == null ? null : beer.Style.Name
+                StyleName = beer.Style == null ? null : beer.Style.Name,
+                ReviewIds = beerDbContext.Reviews.Where(r => r.Beer_Id == id).Select(r => r.Id).ToList()
             };
         }
 

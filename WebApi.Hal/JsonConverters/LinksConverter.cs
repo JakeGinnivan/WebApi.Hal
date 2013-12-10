@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace WebApi.Hal.JsonConverters
@@ -11,20 +12,29 @@ namespace WebApi.Hal.JsonConverters
             var links = (IList<Link>)value;
             writer.WriteStartObject();
 
-            foreach (var link in links)
+            var lookup = links.ToLookup(l => l.Rel);
+
+            foreach (var rel in lookup)
             {
-                writer.WritePropertyName(link.Rel);
-                writer.WriteStartObject();
-                writer.WritePropertyName("href");
-                writer.WriteValue(link.Href);
-
-                if (link.IsTemplated)
+                writer.WritePropertyName(rel.Key);
+                if (rel.Count() > 1)
+                    writer.WriteStartArray();
+                foreach (var link in rel)
                 {
-                    writer.WritePropertyName("templated");
-                    writer.WriteValue(true);
-                }
+                    writer.WriteStartObject();
+                    writer.WritePropertyName("href");
+                    writer.WriteValue(link.Href);
 
-                writer.WriteEndObject();
+                    if (link.IsTemplated)
+                    {
+                        writer.WritePropertyName("templated");
+                        writer.WriteValue(true);
+                    }
+
+                    writer.WriteEndObject();
+                }
+                if (rel.Count() > 1)
+                    writer.WriteEndArray();
             }
             writer.WriteEndObject();
         }
