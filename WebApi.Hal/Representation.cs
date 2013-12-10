@@ -9,7 +9,7 @@ namespace WebApi.Hal
     {
         protected Representation()
         {
-            Links = new HypermediaList();
+            Links = new List<Link>();
         }
 
         public void RepopulateHyperMedia()
