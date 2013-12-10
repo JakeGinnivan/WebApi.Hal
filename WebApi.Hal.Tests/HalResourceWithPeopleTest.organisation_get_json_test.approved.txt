@@ -7,6 +7,14 @@
     },
     "people": {
       "href": "/api/organisations/1/people"
-    }
+    },
+    "brownnoser": [
+      {
+        "href": "/api/organisations/1/brown/1"
+      },
+      {
+        "href": "/api/organisations/1/brown/2"
+      }
+    ]
   }
 }

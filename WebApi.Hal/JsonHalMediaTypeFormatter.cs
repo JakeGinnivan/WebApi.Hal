@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
+using Newtonsoft.Json;
 using WebApi.Hal.JsonConverters;
 
 namespace WebApi.Hal
@@ -17,6 +18,7 @@ namespace WebApi.Hal
             SerializerSettings.Converters.Add(linksConverter);
             SerializerSettings.Converters.Add(resourceListConverter);
             SerializerSettings.Converters.Add(resourceConverter);
+            SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
         }
 
         public override bool CanReadType(Type type)

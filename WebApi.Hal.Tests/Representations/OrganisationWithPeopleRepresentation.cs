@@ -25,6 +25,16 @@ namespace WebApi.Hal.Tests.Representations
                 Rel = "people",
                 Href = string.Format("/api/organisations/{0}/people", Id)
             });
+            Links.Add(new Link
+            {
+                Rel = "brownnoser",
+                Href = string.Format("/api/organisations/{0}/brown/1", Id)
+            });
+            Links.Add(new Link
+            {
+                Rel = "brownnoser",
+                Href = string.Format("/api/organisations/{0}/brown/2", Id)
+            });
         }
     }
 }

@@ -1,8 +1,8 @@
 namespace WebApi.Hal.Web.Models
 {
-    public class BeerStyle
+    public class Brewery
     {
-        protected BeerStyle()
+        protected Brewery()
         {
         }
 

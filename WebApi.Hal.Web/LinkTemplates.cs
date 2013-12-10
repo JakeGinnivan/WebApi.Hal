@@ -55,5 +55,13 @@
             /// </summary>
             public static Link Beer { get { return new Link("beer", "/beers/{id}"); } }
         }
+
+        public static class Reviews
+        {
+            /// <summary>
+            /// /beers/{id}/reviews/{rid}
+            /// </summary>
+            public static Link GetBeerReview { get { return new Link("review", "/beers/{id}/reviews/{rid}"); } }
+        }
     }
 }

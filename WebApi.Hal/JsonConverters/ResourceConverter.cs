@@ -8,13 +8,8 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var resource = (Representation)value;
-
-            resource.Links.Insert(0, new Link
-                                   {
-                                       Rel = "self",
-                                       Href = resource.Href
-                                   });
+            var resource = (IResource)value;
+            resource.RepopulateHyperMedia();
 
             serializer.Converters.Remove(this);
             serializer.Serialize(writer, resource);

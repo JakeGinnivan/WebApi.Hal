@@ -8,6 +8,7 @@ namespace WebApi.Hal.Web.Data
         DbSet<Beer> Beers { get; }
         DbSet<BeerStyle> Styles { get; }
         DbSet<Brewery> Breweries { get; set; }
+        DbSet<Review> Reviews { get; set; }
         int SaveChanges();
         DbSet<T> Set<T>() where T : class;
     }
