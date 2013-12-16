@@ -5,6 +5,7 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal.JsonConverters
 {
+    [Obsolete("use SimpleListRepresentation instead of RepresentationList")]
     public class ResourceListConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

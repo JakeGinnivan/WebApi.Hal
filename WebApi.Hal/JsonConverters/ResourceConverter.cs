@@ -10,7 +10,6 @@ namespace WebApi.Hal.JsonConverters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var resource = (IResource)value;
-            //resource.RepopulateHyperMedia();
 
             serializer.Converters.Remove(this);
             serializer.Serialize(writer, resource);
