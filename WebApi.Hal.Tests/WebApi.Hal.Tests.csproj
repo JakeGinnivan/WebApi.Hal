@@ -82,12 +82,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HalResourceMixedContentTest.cs" />
     <Compile Include="HalResourceWithPeopleTest.cs" />
     <Compile Include="HalResourceTest.cs" />
     <Compile Include="Representations\OrganisationListRepresentation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HalResourceListTests.cs" />
     <Compile Include="Representations\OrganisationRepresentation.cs" />
+    <Compile Include="Representations\OrganisationWithPeopleDetailRepresentation.cs" />
     <Compile Include="Representations\OrganisationWithPeopleRepresentation.cs" />
     <Compile Include="UriBuilderTests.cs" />
   </ItemGroup>

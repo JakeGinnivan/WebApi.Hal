@@ -6,6 +6,7 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
+    [Obsolete("Use SimpleListRepresentation", false)]
     public abstract class RepresentationList<TRepresentation> : Representation, IRepresentationList, IEnumerable<TRepresentation> where TRepresentation : Representation
     {
         private readonly IList<TRepresentation> resources;

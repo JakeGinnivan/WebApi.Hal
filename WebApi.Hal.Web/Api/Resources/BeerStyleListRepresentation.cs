@@ -2,18 +2,15 @@ using System.Collections.Generic;
 
 namespace WebApi.Hal.Web.Api.Resources
 {
-    public class BeerStyleListRepresentation : RepresentationList<BeerStyleRepresentation>
+    public class BeerStyleListRepresentation : SimpleListRepresentation<BeerStyleRepresentation>
     {
         public BeerStyleListRepresentation(IList<BeerStyleRepresentation> beerStyles) : base(beerStyles)
         {
-            
         }
 
-        protected override void CreateListHypermedia()
+        protected override void CreateHypermedia()
         {
-            var beerStyles = LinkTemplates.BeerStyles.GetStyles;
-            Href = beerStyles.Href;
-            Rel = beerStyles.Rel;
+            Href = LinkTemplates.BeerStyles.GetStyles.Href;
 
             Links.Add(new Link { Href = Href, Rel = "self" });
         }

@@ -4,9 +4,10 @@
     {
         public OrganisationRepresentation()
         {
+            Rel = "organisation";
         }
 
-        public OrganisationRepresentation(int id, string name)
+        public OrganisationRepresentation(int id, string name) : this()
         {
             Id = id;
             Name = name;
@@ -17,7 +18,6 @@
 
         protected override void CreateHypermedia()
         {
-            Rel = "organisation";
             Href = string.Format("/api/organisations/{0}", Id);
         }
     }

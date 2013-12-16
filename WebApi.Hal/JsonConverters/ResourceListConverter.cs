@@ -9,9 +9,11 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var list = (IRepresentationList)value;
+            var representation = value as Representation;
+            if (representation != null)
+                representation.RepopulateHyperMedia();
 
-            list.RepopulateHyperMedia();
+            var list = (IRepresentationList)value;
 
             writer.WriteStartObject();
             writer.WritePropertyName("_links");

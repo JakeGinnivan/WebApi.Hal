@@ -7,9 +7,5 @@ namespace WebApi.Hal.Web.Api.Resources
         public BeerListRepresentation(IList<BeerRepresentation> beers, int totalResults, int totalPages, int page, Link uriTemplate) :
             base(beers, totalResults, totalPages, page, uriTemplate)
         { }
-
-        protected override void CreateListHypermedia()
-        {
-        }
     }
 }
