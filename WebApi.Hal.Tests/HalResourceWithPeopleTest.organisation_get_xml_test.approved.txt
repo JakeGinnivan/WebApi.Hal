@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resource rel="organisation" href="/api/organisations/1">
   <link rel="people" href="/api/organisations/1/people" />
+  <link rel="brownnoser" href="/api/organisations/1/brown/1" />
+  <link rel="brownnoser" href="/api/organisations/1/brown/2" />
   <Id>1</Id>
   <Name>Org Name</Name>
 </resource>

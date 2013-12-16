@@ -16,5 +16,7 @@ namespace WebApi.Hal.Interfaces
 
         [JsonProperty("_links")]
         IList<Link> Links { get; set; }
+
+        void RepopulateHyperMedia();
     }
 }

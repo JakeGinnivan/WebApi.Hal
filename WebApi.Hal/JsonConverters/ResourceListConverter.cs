@@ -11,11 +11,7 @@ namespace WebApi.Hal.JsonConverters
         {
             var list = (IRepresentationList)value;
 
-            list.Links.Add(new Link
-            {
-                Rel = "self",
-                Href = list.Href
-            });
+            list.RepopulateHyperMedia();
 
             writer.WriteStartObject();
             writer.WritePropertyName("_links");

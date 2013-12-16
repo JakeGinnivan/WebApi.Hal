@@ -1,4 +1,4 @@
-namespace WebApi.Hal.Web.Data
+namespace WebApi.Hal.Web.Models
 {
     public class Brewery
     {
