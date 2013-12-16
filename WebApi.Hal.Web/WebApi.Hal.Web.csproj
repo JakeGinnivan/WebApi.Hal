@@ -135,6 +135,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Data\Scripts\Script001.sql" />
     <EmbeddedResource Include="Data\Scripts\Script002_InitialData.sql" />
+    <Content Include="Data\Scripts\Script003.sql" />
     <Content Include="Global.asax" />
     <Content Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

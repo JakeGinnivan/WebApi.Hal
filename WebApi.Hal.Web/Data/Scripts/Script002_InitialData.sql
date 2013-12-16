@@ -38,12 +38,3 @@ VALUES
 	('Dead Guy Ale', 9, 6, 6.5),
 	('5 A.M. Saint', 2, 2, 5.0)
 GO
-
-INSERT INTO Reviews (Beer_Id, [Title], [Content])
-VALUES
-	(1, 'Nasty', 'Tastes like horse piss'),
-	(1, 'Awful', 'Tastes like sheep piss'),
-	(2, 'Gross', 'Tastes like cat stew'),
-	(3, 'Yuck', 'Tastes like buzzard puke'),
-	(4, 'Phhhttt', 'Two words: dis gusting')
-GO

@@ -29,12 +29,3 @@ create table Beers
 	Abv decimal(3,2) NULL
 )
 go
-
-create table Reviews
-(
-	Id int identity PRIMARY KEY,
-	Beer_Id int FOREIGN KEY REFERENCES Beers(Id) NULL,
-	[Title] ntext NULL,
-	[Content] ntext NULL
-)
-go
