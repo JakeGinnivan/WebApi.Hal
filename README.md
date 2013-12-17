@@ -18,8 +18,10 @@ First thing first, WebApi.Hal is a media formatter. So to get started you have t
 
 Once those are registered, you can start defining your resources. In WebAPI.Hal, you always return `Representations` from your ApiControllers.
 
-Your representations should all inherit from `Representation` or if you are returning a collection either 
-a `RepresentationList<TRepresentation>` or a `PagedRepresentationList<TRepresentation>`
+Your representations should all inherit from `Representation` or if you are returning a collection 
+a `SimpleListRepresentation<TRepresentation>` or if you are returning a resource with multiple embedded
+resources, inherit from `Representation` and add properties for the embedded resources which might
+include lists of resources of the form `List<MyRepresentation>`. See the sample.
 
 WebApi.Hal.Link
 ---------------
@@ -45,7 +47,8 @@ Notice the {id}, this allows you to return a templated link as hypermedia. But y
 
 Using Links to register WebAPI routes
 -------------------------------------
-Once you have done the work defining all your link templates, you can use them to register your WebAPI routes!
+Once you have done the work of defining all your link templates, you can use them to register your WebAPI routes,
+so long as the URI Templates are fairly simple and adhere to RFC6570 according to the HAL spec!
 
 	var link = new Link("beers, "/breweries/{id}/beers", isTemplated: true);
 	link.RegisterLinkWithWebApi<BeersForBreweryController>(routes);
@@ -65,7 +68,7 @@ A nice place to keep your Links is in a static class called LinkTemplates, with 
 			/// <summary>
             /// /beers?page={page}
             /// </summary>
-            public static Link GetBeers { get { return new Link("beers", "/beers?page={page=1}"); } }
+            public static Link GetBeers { get { return new Link("beers", "/beers{?page}"); } }
 		}
 	}
 
@@ -75,16 +78,20 @@ WebApi.Hal.Representation
 -------------------------
 This is the base class for all representations your api returns. It has an abstract method you must override, `abstract void CreateHypermedia();` 
 
-In CreateHypermedia() you should register the **self** link, and any hypermedia that that resource should **always** have.
-Other context sensitive hypermedia should be added in the API controller. 
+In the constructor, you can set the Rel property, as this generally doesn't change based on context.
+
+In CreateHypermedia() you could register a **self** link, but it's done automatically for you if you don't.
+Register other hypermedia that your resource should **always** have.
+Other context sensitive hypermedia should be added in the API controller.
 
 Here is an example of the Beer CreateHypermedia override (from the example project, the `BeerResource`):
-
+	public Beer()
+	{
+		Rel = LinkTemplates.Beers.Beer.Rel;
+	}
 	protected override void CreateHypermedia()
 	{
-		var selfLink = LinkTemplates.Beers.Beer.CreateLink(new { Id });
-		Href = selfLink.Href;
-		Rel = selfLink.Rel;
+		Href = LinkTemplates.Beers.Beer.CreateLink(new { id = Id }).Href;
 
 		if (StyleId != null)
 			Links.Add(LinkTemplates.BeerStyles.Style.CreateLink(new { id = StyleId }));
