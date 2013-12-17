@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Linq;
 using System.Web.Http;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
-using WebApi.Hal.Web.Models;
 
 namespace WebApi.Hal.Web.Api
 {

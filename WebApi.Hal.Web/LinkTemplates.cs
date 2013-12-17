@@ -17,7 +17,8 @@
             /// <summary>
             /// /breweries/{id}/beers
             /// </summary>
-            public static Link AssociatedBeers { get{return new Link("beers", "/breweries/{id}/beers?page={page=1}");} }
+            //public static Link AssociatedBeers { get{return new Link("beers", "/breweries/{id}/beers?page={page=1}");} } // not RFC6570 compliant
+            public static Link AssociatedBeers { get { return new Link("beers", "/breweries/{id}/beers{?page}"); } }
         }
 
         public static class BeerStyles
@@ -30,7 +31,8 @@
             /// <summary>
             /// /styles/{id}/beers
             /// </summary>
-            public static Link AssociatedBeers { get { return new Link("beers", "/styles/{id}/beers?page={page=1}"); } }
+            //public static Link AssociatedBeers { get { return new Link("beers", "/styles/{id}/beers?page={page=1}"); } } // not RFC6570 compliant
+            public static Link AssociatedBeers { get { return new Link("beers", "/styles/{id}/beers{?page}"); } }
 
             /// <summary>
             /// /styles/{id}
@@ -43,12 +45,14 @@
             /// <summary>
             /// /beers?page={page}
             /// </summary>
-            public static Link GetBeers { get { return new Link("beers", "/beers?page={page=1}"); } }
+            //public static Link GetBeers { get { return new Link("beers", "/beers?page={page=1}"); } } // not RFC6570 compliant
+            public static Link GetBeers { get { return new Link("beers", "/beers{?page}"); } }
 
             /// <summary>
             /// /beers?searchTerm={searchTerm}&amp;page={page}
             /// </summary>
-            public static Link SearchBeers { get { return new Link("beerSearch", "/beers?searchTerm={searchTerm}&page={page}"); } }
+            //public static Link SearchBeers { get { return new Link("beerSearch", "/beers?searchTerm={searchTerm}&page={page}"); } } // not RFC6570 compliant
+            public static Link SearchBeers { get { return new Link("page", "/beers{?searchTerm,page}"); } }
 
             /// <summary>
             /// /beers/{id}

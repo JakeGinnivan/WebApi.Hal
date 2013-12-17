@@ -76,6 +76,7 @@
     <Compile Include="RepresentationList.cs" />
     <Compile Include="SimpleListRepresentation.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="UriTemplate.cs" />
     <Compile Include="XmlHalMediaTypeFormatter.cs" />
   </ItemGroup>
   <ItemGroup>

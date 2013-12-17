@@ -17,11 +17,10 @@ namespace WebApi.Hal.Web.Api
             this.beerDbContext = beerDbContext;
         }
 
-        // GET api/beers/5
+        // GET beers/5
         public BeerRepresentation Get(int id)
         {
-            var beer = beerDbContext.Beers.Find(id);
-            var reviews = beerDbContext.Reviews.Where(r => r.Beer_Id == id).ToList();
+            var beer = beerDbContext.Beers.Include("Brewery").Include("Style").Single(br => br.Id == id); // lazy loading isn't on for this query; force loading
 
             return new BeerRepresentation
             {
@@ -35,7 +34,7 @@ namespace WebApi.Hal.Web.Api
             };
         }
 
-        // POST api/beers
+        // POST beers
         public HttpResponseMessage Post(BeerRepresentation value)
         {
             var newBeer = new Beer(value.Name);
@@ -51,12 +50,12 @@ namespace WebApi.Hal.Web.Api
             };
         }
 
-        // PUT api/beers/5
+        // PUT beers/5
         public void Put(int id, string value)
         {
         }
 
-        // DELETE api/beers/5
+        // DELETE beers/5
         public void Delete(int id)
         {
         }

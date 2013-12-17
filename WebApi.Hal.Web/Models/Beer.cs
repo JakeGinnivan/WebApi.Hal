@@ -1,6 +1,4 @@
-﻿using WebApi.Hal.Web.Data;
-
-namespace WebApi.Hal.Web.Models
+﻿namespace WebApi.Hal.Web.Models
 {
     public class Beer
     {
