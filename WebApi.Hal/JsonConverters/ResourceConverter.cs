@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Newtonsoft.Json;
 using WebApi.Hal.Interfaces;
 
@@ -9,7 +10,6 @@ namespace WebApi.Hal.JsonConverters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var resource = (IResource)value;
-            resource.RepopulateHyperMedia();
 
             serializer.Converters.Remove(this);
             serializer.Serialize(writer, resource);

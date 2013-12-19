@@ -56,6 +56,11 @@
             public static Link Beer { get { return new Link("beer", "/beers/{id}"); } }
         }
 
+        public static class BeerDetails
+        {
+            public static Link GetBeerDetail { get { return new Link("beerdetail", "/beerdetail/{id}"); } }
+        }
+
         public static class Reviews
         {
             /// <summary>

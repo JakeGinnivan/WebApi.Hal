@@ -4,9 +4,10 @@ namespace WebApi.Hal.Tests.Representations
     {
         public OrganisationWithPeopleRepresentation()
         {
+            Rel = "organisation";
         }
 
-        public OrganisationWithPeopleRepresentation(int id, string name)
+        public OrganisationWithPeopleRepresentation(int id, string name) : this()
         {
             Id = id;
             Name = name;
@@ -17,7 +18,6 @@ namespace WebApi.Hal.Tests.Representations
 
         protected override void CreateHypermedia()
         {
-            Rel = "organisation";
             Href = string.Format("/api/organisations/{0}", Id);
 
             Links.Add(new Link

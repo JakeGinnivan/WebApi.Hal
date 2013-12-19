@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Interfaces\IRepresentationList.cs" />
     <Compile Include="Interfaces\IResource.cs" />
+    <Compile Include="JsonConverters\EmbeddedResourceConverter.cs" />
     <Compile Include="Representation.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="JsonConverters\LinksConverter.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionExtensions.cs" />
     <Compile Include="RepresentationList.cs" />
+    <Compile Include="SimpleListRepresentation.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="XmlHalMediaTypeFormatter.cs" />
   </ItemGroup>

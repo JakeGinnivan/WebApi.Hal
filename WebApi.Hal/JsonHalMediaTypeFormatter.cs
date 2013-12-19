@@ -11,6 +11,7 @@ namespace WebApi.Hal
         readonly ResourceListConverter resourceListConverter = new ResourceListConverter();
         readonly ResourceConverter resourceConverter = new ResourceConverter();
         readonly LinksConverter linksConverter = new LinksConverter();
+        readonly EmbeddedResourceConverter embeddedResourceConverter = new EmbeddedResourceConverter();
 
         public JsonHalMediaTypeFormatter()
         {
@@ -18,6 +19,7 @@ namespace WebApi.Hal
             SerializerSettings.Converters.Add(linksConverter);
             SerializerSettings.Converters.Add(resourceListConverter);
             SerializerSettings.Converters.Add(resourceConverter);
+            SerializerSettings.Converters.Add(embeddedResourceConverter);
             SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
         }
 

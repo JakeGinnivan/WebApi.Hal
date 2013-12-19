@@ -5,13 +5,16 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal.JsonConverters
 {
+    [Obsolete("use SimpleListRepresentation instead of RepresentationList")]
     public class ResourceListConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var list = (IRepresentationList)value;
+            var representation = value as Representation;
+            if (representation != null)
+                representation.RepopulateHyperMedia();
 
-            list.RepopulateHyperMedia();
+            var list = (IRepresentationList)value;
 
             writer.WriteStartObject();
             writer.WritePropertyName("_links");

@@ -39,8 +39,6 @@ namespace WebApi.Hal
                 return;
             }
 
-            resource.RepopulateHyperMedia();
-
             var settings = new XmlWriterSettings { Indent = true };
 
             var writer = XmlWriter.Create(stream, settings);
@@ -134,6 +132,8 @@ namespace WebApi.Hal
                 return;
             }
 
+            representation.RepopulateHyperMedia();
+
             // First write the well-known HAL properties
             writer.WriteStartElement("resource");
             writer.WriteAttributeString("rel", representation.Rel);
@@ -149,7 +149,6 @@ namespace WebApi.Hal
             {
                 foreach (var item in representationList.Cast<Representation>())
                 {
-                    item.RepopulateHyperMedia();
                     WriteHalResource(item, writer);
                 }
             }
@@ -189,6 +188,13 @@ namespace WebApi.Hal
                 {
                     var halResource = property.GetValue(representation, null);
                     WriteHalResource((Representation) halResource, writer, property.Name);
+                }
+                else if (typeof (IEnumerable<Representation>).IsAssignableFrom(property.PropertyType))
+                {
+                    var halResourceList = property.GetValue(representation, null) as IEnumerable<Representation>;
+                    if (halResourceList != null)
+                        foreach (var item in halResourceList)
+                            WriteHalResource(item, writer);
                 }
             }
         }

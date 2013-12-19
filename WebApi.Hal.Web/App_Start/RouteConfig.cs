@@ -17,6 +17,8 @@ namespace WebApi.Hal.Web.App_Start
             LinkTemplates.BeerStyles.Style.RegisterLinkWithWebApi<StylesController>(routes);
             LinkTemplates.BeerStyles.GetStyles.RegisterLinkWithWebApi<StylesController>(routes);
             LinkTemplates.BeerStyles.AssociatedBeers.RegisterLinkWithWebApi<StylesController>(routes);
+
+            LinkTemplates.BeerDetails.GetBeerDetail.RegisterLinkWithWebApi<BeerDetailController>(routes);
         }
     }
 }

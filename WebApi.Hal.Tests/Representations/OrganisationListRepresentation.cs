@@ -2,17 +2,16 @@ using System.Collections.Generic;
 
 namespace WebApi.Hal.Tests.Representations
 {
-    public class OrganisationListRepresentation : RepresentationList<OrganisationRepresentation>
+    public class OrganisationListRepresentation : SimpleListRepresentation<OrganisationRepresentation>
     {
         public OrganisationListRepresentation(IList<OrganisationRepresentation> organisationRepresentations) :
             base(organisationRepresentations)
         {
-            
+            Rel = "organisations";
         }
 
-        protected override void CreateListHypermedia()
+        protected override void CreateHypermedia()
         {
-            Rel = "organisations";
             Href = "/api/organisations";
         }
     }

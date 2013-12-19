@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace WebApi.Hal.Web.Api.Resources
 {
-    public abstract class PagedRepresentationList<TRepresentation> : RepresentationList<TRepresentation> where TRepresentation : Representation
+    public abstract class PagedRepresentationList<TRepresentation> : SimpleListRepresentation<TRepresentation> where TRepresentation : Representation
     {
         readonly Link uriTemplate;
 
@@ -21,10 +21,7 @@ namespace WebApi.Hal.Web.Api.Resources
 
         protected override void CreateHypermedia()
         {
-            base.CreateHypermedia();
-
             Href = Href ?? uriTemplate.CreateLink(new {Page}).Href;
-            Rel = Rel ?? uriTemplate.Rel;
 
             Links.Add(new Link { Href = Href, Rel = "self" });
 
