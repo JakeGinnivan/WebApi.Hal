@@ -4,7 +4,7 @@ namespace WebApi.Hal.Web.Api.Resources
     {
         public BreweryRepresentation()
         {
-            Rel = LinkTemplates.Breweries.Brewery.CreateLink(new { Id }).Rel;
+            Rel = LinkTemplates.Breweries.Brewery.Rel;
         }
 
         public int Id { get; set; }
@@ -13,7 +13,7 @@ namespace WebApi.Hal.Web.Api.Resources
 
         protected override void CreateHypermedia()
         {
-            Href = LinkTemplates.Breweries.Brewery.CreateLink(new { Id }).Href;
+            Href = LinkTemplates.Breweries.Brewery.CreateLink(new {id = Id}).Href;
 
             Links.Add(new Link { Href = Href, Rel = "self" });
         }

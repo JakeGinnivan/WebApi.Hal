@@ -23,23 +23,35 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void detects_templated_link()
+        public void detects_nontemplated_link()
         {
             // arrange
-            var templateLink = new Link("beerSearch", "/beers?searchTerm={searchTerm}");
+            var templateLink = new Link("beerSearch", "/beers{?searchTerm}");
 
             // act
             var link = templateLink.CreateLink(new {});
 
             // assert
-            Assert.True(link.IsTemplated);
+            Assert.False(link.IsTemplated);
+        }
+
+        [Fact]
+        public void detects_templated_link()
+        {
+            // arrange
+
+            // act
+            var templateLink = new Link("beerSearch", "/beers{?searchTerm}");
+
+            // assert
+            Assert.True(templateLink.IsTemplated);
         }
 
         [Fact]
         public void substitutes_templated_link()
         {
             // arrange
-            var templateLink = new Link("beerSearch", "/beers?searchTerm={searchTerm}");
+            var templateLink = new Link("beerSearch", "/beers{?searchTerm}");
 
             // act
             var link = templateLink.CreateLink(new{searchTerm = "test"});
@@ -48,7 +60,7 @@ namespace WebApi.Hal.Tests
             Assert.Equal("/beers?searchTerm=test", link.Href);
         }
 
-        [Fact]
+        [Fact(Skip = "registering routes with uritemplates is obsolete; use ordinary MVC/WebApi machinery")]
         public void registers_link_correctly_with_web_api()
         {
             // arrange
@@ -76,6 +88,32 @@ namespace WebApi.Hal.Tests
 
             // assert
             Assert.Equal("/beers/Tactical%20Nuclear%20Penguin", link.Href);
+        }
+
+        [Fact]
+        public void create_link_substitution_is_case_sensitive1()
+        {
+            // arrange
+            var templateLink = new Link("beerbyname", "/beers/{naMe}");
+
+            // act
+            var link = templateLink.CreateLink(new { nAme = "Sorry Charlie" });
+
+            // assert
+            Assert.Equal("/beers/", link.Href);
+        }
+
+        [Fact]
+        public void create_link_substitution_is_case_sensitive2()
+        {
+            // arrange
+            var templateLink = new Link("beerbyname", "/beers/{nAme}");
+
+            // act
+            var link = templateLink.CreateLink(new { nAme = "This Works" });
+
+            // assert
+            Assert.Equal("/beers/This%20Works", link.Href);
         }
     }
 }

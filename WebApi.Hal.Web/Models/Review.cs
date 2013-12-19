@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace WebApi.Hal.Web.Models
+﻿namespace WebApi.Hal.Web.Models
 {
     public class Review
     {

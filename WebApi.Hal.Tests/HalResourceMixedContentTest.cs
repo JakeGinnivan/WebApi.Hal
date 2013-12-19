@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net.Http;
-using System.Text;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using WebApi.Hal.Tests.Representations;

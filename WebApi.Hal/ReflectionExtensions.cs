@@ -3,7 +3,6 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
-using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {

@@ -17,8 +17,8 @@ namespace WebApi.Hal.Web.Api
             this.repository = repository;
         }
 
-        // GET api/beers
-        public BeerListRepresentation Get(int page)
+        // GET beers
+        public BeerListRepresentation Get(int page = 1)
         {
             var beers = repository.Find(new GetBeersQuery(), page, PageSize);
 
@@ -28,28 +28,21 @@ namespace WebApi.Hal.Web.Api
         }
 
         [HttpGet]
-        public BeerListRepresentation Search(string searchTerm)
-        {
-            return Search(searchTerm, 1);
-        }
-
-        public BeerListRepresentation Search(string searchTerm, int page)
+        public BeerListRepresentation Search(string searchTerm, int page = 1)
         {
             var beers = repository.Find(new GetBeersQuery(b => b.Name.Contains(searchTerm)), page, PageSize);
 
-            var link = LinkTemplates.Beers.SearchBeers.CreateLink(new{searchTerm, page});
-            var beersResource = new BeerListRepresentation(beers.ToList(), beers.TotalResults, beers.TotalPages, page, link)
-            {
-                Page = 1,
-                TotalResults = beers.TotalResults,
-                Rel = link.Rel,
-                Href = link.Href
-            };
+            // snap page back to actual page found
+            if (page > beers.TotalPages) page = beers.TotalPages;
 
-            if (page > 1)
-                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("prev", new{searchTerm, page = page - 1}));
-            if (page < beers.TotalPages)
-                beersResource.Links.Add(LinkTemplates.Beers.SearchBeers.CreateLink("next", new{searchTerm, page = page + 1}));
+            //var link = LinkTemplates.Beers.SearchBeers.CreateLink(new { searchTerm, page });
+            var beersResource = new BeerListRepresentation(beers.ToList(), beers.TotalResults, beers.TotalPages, page,
+                                                           LinkTemplates.Beers.SearchBeers,
+                                                           new { searchTerm })
+            {
+                Page = page,
+                TotalResults = beers.TotalResults
+            };
 
             return beersResource;
         }

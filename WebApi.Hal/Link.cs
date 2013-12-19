@@ -11,20 +11,20 @@ namespace WebApi.Hal
         public Link()
         { }
 
-        public Link(string rel, string href, bool isTemplated = false, string title = null)
+        public Link(string rel, string href, string title = null)
         {
             Rel = rel;
             Href = href;
             Title = title;
-            IsTemplated = isTemplated;
-            if (href != null)
-                IsTemplated = Regex.Match(href, @"{\w+}", RegexOptions.Compiled).Success;
         }
 
         public string Rel { get; set; }
         public string Href { get; set; }
         public string Title { get; set; }
-        public bool IsTemplated { get; set; }
+        public bool IsTemplated
+        {
+            get { return !string.IsNullOrEmpty(Href) && Regex.Match(Href, @"{.+}", RegexOptions.Compiled).Success; }
+        }
 
         /// <summary>
         /// If this link is templated, you can use this method to make a non templated copy
@@ -32,7 +32,7 @@ namespace WebApi.Hal
         /// <param name="newRel">A different rel</param>
         /// <param name="parameters">The parameters, i.e 'new {id = "1"}'</param>
         /// <returns>A non templated link</returns>
-        public Link CreateLink(string newRel, object parameters)
+        public Link CreateLink(string newRel, params object[] parameters)
         {
             return new Link(newRel, CreateUri(parameters).ToString());
         }
@@ -42,30 +42,43 @@ namespace WebApi.Hal
         /// </summary>
         /// <param name="parameters">The parameters, i.e 'new {id = "1"}'</param>
         /// <returns>A non templated link</returns>
-        public Link CreateLink(object parameters)
+        public Link CreateLink(params object[] parameters)
         {
             return CreateLink(Rel, parameters);
         }
 
-        public Uri CreateUri(object parameters)
+        public Uri CreateUri(params object[] parameters)
         {
             var href = Href;
-            foreach (var substitution in parameters.GetType().GetProperties())
-            {
-                var name = substitution.Name;
-                var value = substitution.GetValue(parameters, null);
-                var substituionValue = value == null ? null : Uri.EscapeDataString(value.ToString());
-                href = href.Replace(string.Format("{{{0}}}", name), substituionValue, StringComparison.InvariantCultureIgnoreCase);
-            }
+            href = SubstituteParams(href, parameters);
 
             return new Uri(href, UriKind.Relative);
         }
 
+        public static string SubstituteParams(string href, params object[] parameters)
+        {
+            var uriTemplate = new UriTemplate(href);
+            foreach (var parameter in parameters)
+            {
+                foreach (var substitution in parameter.GetType().GetProperties())
+                {
+                    var name = substitution.Name;
+                    var value = substitution.GetValue(parameter, null);
+                    var substituionValue = value == null ? null : value.ToString();
+                    uriTemplate.SetParameter(name, substituionValue);
+                }
+            }
+
+            return uriTemplate.Resolve();
+        }
+
+        [Obsolete("use ordinary MVC/WebApi machinery; HAL UriTemplates must comply with RFC6570, which is in conflict with route generation")]
         public void RegisterLinkWithWebApi<TController>(HttpRouteCollection routes, object defaults = null) where TController : ApiController
         {
             RegisterLinkWithWebApi(routes, typeof(TController).Name, defaults);
         }
 
+        [Obsolete("use ordinary MVC/WebApi machinery; HAL UriTemplates must comply with RFC6570, which is in conflict with route generation")]
         public void RegisterLinkWithWebApi(HttpRouteCollection routes, string controller, object defaults = null)
         {
             defaults = defaults ?? new { };
