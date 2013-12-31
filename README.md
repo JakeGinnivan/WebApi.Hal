@@ -38,22 +38,19 @@ The link class represents hypermedia on a representation. It looks like this:
 
 The thing which makes this class special is it's support for templates. For example:
 
-	var link = new Link("beers, "/breweries/{id}/beers", isTemplated: true);
+	var link = new Link("beers, "/breweries/{id}/beers");
 
 Notice the {id}, this allows you to return a templated link as hypermedia. But you can also turn it into an absolute link really easily:
 
 	Brewery brewery;
 	link.CreateLink(new { id = brewery.Id });
 
-Using Links to register WebAPI routes
--------------------------------------
-Once you have done the work of defining all your link templates, you can use them to register your WebAPI routes,
-so long as the URI Templates are fairly simple and adhere to RFC6570 according to the HAL spec!
+URI Templates adhere to [RFC6570](http://tools.ietf.org/html/rfc6570), as per the HAL specification.
 
-	var link = new Link("beers, "/breweries/{id}/beers", isTemplated: true);
-	link.RegisterLinkWithWebApi<BeersForBreweryController>(routes);
-
-WebAPI.Hal encourages you to separate actions into different controllers, all controllers in the sample only have the default Get, Post, Put, Delete actions
+Register WebAPI routes
+----------------------
+Once you have done the work of defining all your link templates, register your routes in the ordinary MVC WebApi manner.
+See the sample project for an example.
 
 LinkTemplates class
 -------------------
@@ -78,7 +75,7 @@ WebApi.Hal.Representation
 -------------------------
 This is the base class for all representations your api returns. It has an abstract method you must override, `abstract void CreateHypermedia();` 
 
-In the constructor, you can set the Rel property, as this generally doesn't change based on context.
+In the constructor, set the Rel property, as this generally doesn't change based on context.
 
 In CreateHypermedia() you could register a **self** link, but it's done automatically for you if you don't.
 Register other hypermedia that your resource should **always** have.
