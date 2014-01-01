@@ -60,23 +60,6 @@ namespace WebApi.Hal.Tests
             Assert.Equal("/beers?searchTerm=test", link.Href);
         }
 
-        [Fact(Skip = "registering routes with uritemplates is obsolete; use ordinary MVC/WebApi machinery")]
-        public void registers_link_correctly_with_web_api()
-        {
-            // arrange
-            var templateLink = new Link("beerSearch", "/beers/{name}?searchTerm={searchTerm}&page={page=1}");
-            var httpRouteCollection = new HttpRouteCollection();
-
-            // act
-            templateLink.RegisterLinkWithWebApi<BeersController>(httpRouteCollection);
-
-            // assert
-            Assert.NotEmpty(httpRouteCollection);
-            Assert.Equal("beers/{name}", httpRouteCollection.Single().RouteTemplate);
-            Assert.Equal("1", httpRouteCollection.Single().Defaults["page"]);
-            Assert.Equal("Beers", httpRouteCollection.Single().Defaults["controller"]);
-        }
-
         [Fact]
         public void create_link_handles_spaces()
         {

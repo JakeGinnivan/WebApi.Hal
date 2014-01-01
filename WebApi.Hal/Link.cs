@@ -23,8 +23,10 @@ namespace WebApi.Hal
         public string Title { get; set; }
         public bool IsTemplated
         {
-            get { return !string.IsNullOrEmpty(Href) && Regex.Match(Href, @"{.+}", RegexOptions.Compiled).Success; }
+            get { return !string.IsNullOrEmpty(Href) && IsTemplatedRegex.IsMatch(Href); }
         }
+
+        private static readonly Regex IsTemplatedRegex = new Regex(@"{.+}", RegexOptions.Compiled);
 
         /// <summary>
         /// If this link is templated, you can use this method to make a non templated copy
@@ -70,31 +72,6 @@ namespace WebApi.Hal
             }
 
             return uriTemplate.Resolve();
-        }
-
-        [Obsolete("use ordinary MVC/WebApi machinery; HAL UriTemplates must comply with RFC6570, which is in conflict with route generation")]
-        public void RegisterLinkWithWebApi<TController>(HttpRouteCollection routes, object defaults = null) where TController : ApiController
-        {
-            RegisterLinkWithWebApi(routes, typeof(TController).Name, defaults);
-        }
-
-        [Obsolete("use ordinary MVC/WebApi machinery; HAL UriTemplates must comply with RFC6570, which is in conflict with route generation")]
-        public void RegisterLinkWithWebApi(HttpRouteCollection routes, string controller, object defaults = null)
-        {
-            defaults = defaults ?? new { };
-            var dictionary = defaults.GetType().GetProperties().ToDictionary(i => i.Name, i => i.GetValue(defaults, null));
-            var strings = Href.TrimStart('/').Split('?', '#');
-            if (strings.Length > 1)
-            {
-                var queryStringParts = strings[1];
-                foreach (Match match in Regex.Matches(queryStringParts, @"{(?<variable>[^&]*?)=(?<default>.*?)}"))
-                {
-                    dictionary.Add(match.Groups["variable"].Value, match.Groups["default"].Value);
-                }
-            }
-            var route = strings[0];
-            dictionary.Add("controller", controller.Replace("Controller", string.Empty, StringComparison.InvariantCultureIgnoreCase));
-            routes.Add(controller + "+" + Rel, new HttpRoute(route, new HttpRouteValueDictionary(dictionary)));
         }
     }
 }
