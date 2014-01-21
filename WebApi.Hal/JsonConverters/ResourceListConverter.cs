@@ -43,6 +43,11 @@ namespace WebApi.Hal.JsonConverters
             writer.WriteEndObject();
         }
 
+        public override bool CanRead
+        {
+            get { return false; }
+        }
+
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             return reader.Value;

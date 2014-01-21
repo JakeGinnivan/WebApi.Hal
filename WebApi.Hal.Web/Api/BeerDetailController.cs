@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Web.Http;
+using Newtonsoft.Json;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 
@@ -40,6 +41,14 @@ namespace WebApi.Hal.Web.Api
             foreach (var review in reviews)
                 detail.Reviews.Add(review);
             return detail;
+        }
+
+        // PUT beerdetail/5
+        public void Put(int id, BeerDetailRepresentation beer)
+        {
+            // this is here just to see how the deserializer is working
+            // we should get the links and all the embedded objects deserialized
+            // we'd be better off creating a client to test the full deserializing, but this way is cheap for now
         }
     }
 }

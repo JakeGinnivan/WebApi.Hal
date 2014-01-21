@@ -1,8 +1,11 @@
 ﻿using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 using WebApi.Hal.Web.Data.Queries;
+using WebApi.Hal.Web.Models;
 
 namespace WebApi.Hal.Web.Api
 {
@@ -45,6 +48,21 @@ namespace WebApi.Hal.Web.Api
             };
 
             return beersResource;
+        }
+
+        // POST beers
+        public HttpResponseMessage Post(BeerRepresentation value)
+        {
+            var newBeer = new Beer(value.Name);
+            repository.Add(newBeer);
+
+            return new HttpResponseMessage(HttpStatusCode.Created)
+            {
+                Headers =
+                {
+                    Location = LinkTemplates.Beers.Beer.CreateUri(new { id = newBeer.Id })
+                }
+            };
         }
 
         

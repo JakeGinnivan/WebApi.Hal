@@ -34,22 +34,6 @@ namespace WebApi.Hal.Web.Api
             };
         }
 
-        // POST beers
-        public HttpResponseMessage Post(BeerRepresentation value)
-        {
-            var newBeer = new Beer(value.Name);
-            beerDbContext.Beers.Add(newBeer);
-            beerDbContext.SaveChanges();
-
-            return new HttpResponseMessage(HttpStatusCode.Created)
-            {
-                Headers =
-                {
-                    Location = LinkTemplates.Beers.Beer.CreateUri(new { id = newBeer.Id })
-                }
-            };
-        }
-
         // PUT beers/5
         public void Put(int id, string value)
         {

@@ -57,7 +57,7 @@ namespace WebApi.Hal
                 prop.SetValue(this, embeddedResourceProperties[prop], null);
         }
 
-        private static bool IsEmbeddedResourceType(Type type)
+        internal static bool IsEmbeddedResourceType(Type type)
         {
             return typeof (IResource).IsAssignableFrom(type) ||
                    typeof (IEnumerable<IResource>).IsAssignableFrom(type);
