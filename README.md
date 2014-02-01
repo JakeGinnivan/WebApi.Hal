@@ -82,6 +82,7 @@ Register other hypermedia that your resource should **always** have.
 Other context sensitive hypermedia should be added in the API controller.
 
 Here is an example of the Beer CreateHypermedia override (from the example project, the `BeerResource`):
+
 	public Beer()
 	{
 		Rel = LinkTemplates.Beers.Beer.Rel;
