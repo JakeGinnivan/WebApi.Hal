@@ -13,7 +13,7 @@
     <tags>Hypermedia Asp.net WebApi Json Xml HAL</tags>
   </metadata>
   <files>
-    <file src="bin\$configuration$\WebApi.Hal.pdb" target="lib\net40\" />
+    <file src="bin\$configuration$\WebApi.Hal.pdb" target="lib\net45\" />
     <file src="Readme.txt" target="" />
   </files>
 </package>
