@@ -24,8 +24,7 @@ namespace WebApi.Hal
         [OnSerializing]
         private void OnSerialize(StreamingContext context)
         {
-            if (string.IsNullOrEmpty(Href) || string.IsNullOrEmpty(Rel) || Links.Count == 0)
-                RepopulateHyperMedia();
+            RepopulateHyperMedia();
 
             // put all embedded resources and lists of resources into Embedded for the _embedded serializer
             var resourceList = new List<IResource>();
@@ -65,17 +64,16 @@ namespace WebApi.Hal
 
         public void RepopulateHyperMedia()
         {
-            Links.Clear();
             CreateHypermedia();
             if (Links.Count(l=>l.Rel == "self") == 0)
                 Links.Insert(0, new Link { Rel = "self", Href = Href });
         }
 
         [JsonIgnore]
-        public string Rel { get; set; }
+        public virtual string Rel { get; set; }
 
         [JsonIgnore]
-        public string Href { get; set; }
+        public virtual string Href { get; set; }
 
         [JsonIgnore]
         public string LinkName { get; set; }

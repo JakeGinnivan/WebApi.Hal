@@ -2,19 +2,24 @@ namespace WebApi.Hal.Web.Api.Resources
 {
     public class BeerStyleRepresentation : Representation
     {
-        public BeerStyleRepresentation()
-        {
-            Rel = LinkTemplates.BeerStyles.Style.Rel;
-        }
-
         public int Id { get; set; }
         public string Name { get; set; }
 
+        public override string Rel
+        {
+            get { return LinkTemplates.BeerStyles.Style.Rel; }
+            set { }
+        }
+
+        public override string Href
+        {
+            get { return LinkTemplates.BeerStyles.Style.CreateLink(new { id = Id }).Href; }
+            set { }
+        }
+
         protected override void CreateHypermedia()
         {
-            Href = LinkTemplates.BeerStyles.Style.CreateLink(new {id = Id}).Href;
-
-            Links.Add(new Link { Href = Href, Rel = "self" });
+            Links.Add(LinkTemplates.BeerStyles.AssociatedBeers.CreateLink(new {id = Id}));
         }
     }
 }

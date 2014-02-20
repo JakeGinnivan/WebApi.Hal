@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Web;
+using System.Web.Http.Controllers;
+using System.Web.Http.Routing;
 using Newtonsoft.Json;
 
 namespace WebApi.Hal.JsonConverters
@@ -9,7 +13,7 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var links = (IList<Link>)value;
+            var links = new HashSet<Link>((IList<Link>)value, new LinkEqualityComparer());
             writer.WriteStartObject();
 
             var lookup = links.ToLookup(l => l.Rel);

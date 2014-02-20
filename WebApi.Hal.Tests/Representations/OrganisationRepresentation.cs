@@ -2,15 +2,24 @@
 {
     public class OrganisationRepresentation : Representation
     {
-        public OrganisationRepresentation()
-        {
-            Rel = "organisation";
-        }
+        static readonly Link NoAppPath = new Link("organisation", "/api/organisations/{0}");
 
-        public OrganisationRepresentation(int id, string name) : this()
+        public OrganisationRepresentation(int id, string name)
         {
             Id = id;
             Name = name;
+        }
+
+        public override string Rel
+        {
+            get { return NoAppPath.Rel; }
+            set { }
+        }
+
+        public override string Href
+        {
+            get { return string.Format(NoAppPath.Href, Id); }
+            set { }
         }
 
         public int Id { get; set; }
@@ -18,7 +27,6 @@
 
         protected override void CreateHypermedia()
         {
-            Href = string.Format("/api/organisations/{0}", Id);
         }
     }
 }

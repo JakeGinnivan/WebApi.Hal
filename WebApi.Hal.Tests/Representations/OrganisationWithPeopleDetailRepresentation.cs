@@ -6,7 +6,6 @@ namespace WebApi.Hal.Tests.Representations
     {
         public Person(int id, string name, int orgId)
         {
-            Rel = "person";
             Id = id;
             Name = name;
             OrganisationId = orgId;
@@ -16,9 +15,20 @@ namespace WebApi.Hal.Tests.Representations
         public string Name { get; set; }
         public int OrganisationId { get; set; }
 
+        public override string Rel
+        {
+            get { return "person"; }
+            set { }
+        }
+
+        public override string Href
+        {
+            get { return string.Format("/api/organisations/{0}/people/{1}", OrganisationId, Id); }
+            set { }
+        }
+
         protected override void CreateHypermedia()
         {
-            Href = string.Format("/api/organisations/{0}/people/{1}", OrganisationId, Id);
         }
     }
 
@@ -26,15 +36,25 @@ namespace WebApi.Hal.Tests.Representations
     {
         public Boss(int id, string name, int orgId, bool hasPointHair) : base(id, name, orgId)
         {
-            Rel = "boss";
             HasPointyHair = hasPointHair;
         }
 
         public bool HasPointyHair { get; set; }
 
+        public override string Rel
+        {
+            get { return "boss"; }
+            set { }
+        }
+
+        public override string Href
+        {
+            get { return string.Format("/api/organisations/{0}/boss", OrganisationId); }
+            set { }
+        }
+
         protected override void CreateHypermedia()
         {
-            Href = string.Format("/api/organisations/{0}/boss", OrganisationId);
         }
     }
 
@@ -44,7 +64,6 @@ namespace WebApi.Hal.Tests.Representations
         {
             Id = id;
             Name = name;
-            Rel = "organisation";
             People = new List<Person>();
         }
 
@@ -54,15 +73,28 @@ namespace WebApi.Hal.Tests.Representations
         public List<Person> People { get; set; }
         public Boss Boss { get; set; }
 
+        public override string Rel
+        {
+            get { return "organisation"; }
+            set { }
+        }
+
+        public override string Href
+        {
+            get { return string.Format("/api/organisations/{0}", Id); }
+            set { }
+        }
+
         protected override void CreateHypermedia()
         {
-            Href = string.Format("/api/organisations/{0}", Id);
-
-            Links.Add(new Link
+            var l = new Link
             {
                 Rel = "people",
                 Href = string.Format("/api/organisations/{0}/people", Id)
-            });
+            };
+            Links.Add(l);
+            // intentionally add a duplicate to make sure it gets screened out
+            Links.Add(l);
         }
     }
 }
