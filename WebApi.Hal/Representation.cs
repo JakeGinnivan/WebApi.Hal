@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using WebApi.Hal.Interfaces;
+using WebApi.Hal.JsonConverters;
 
 namespace WebApi.Hal
 {
@@ -26,34 +27,42 @@ namespace WebApi.Hal
         {
             RepopulateHyperMedia();
 
-            // put all embedded resources and lists of resources into Embedded for the _embedded serializer
-            var resourceList = new List<IResource>();
-            foreach (var prop in GetType().GetProperties().Where(p => IsEmbeddedResourceType(p.PropertyType)))
+            if (ResourceConverter.IsResourceConverterContext(context))
             {
-                var val = prop.GetValue(this, null);
-                if (val != null)
+                // put all embedded resources and lists of resources into Embedded for the _embedded serializer
+                var resourceList = new List<IResource>();
+                foreach (var prop in GetType().GetProperties().Where(p => IsEmbeddedResourceType(p.PropertyType)))
                 {
-                    // remember embedded resource property for restoring after serialization
-                    embeddedResourceProperties.Add(prop, val);
-                    // add embedded resource to collection for the serializtion
-                    var res = val as IResource;
-                    if (res != null)
-                        resourceList.Add(res);
-                    else
-                        resourceList.AddRange((IEnumerable<IResource>) val);
-                    // null out the embedded property so it doesn't serialize separately as a property
-                    prop.SetValue(this, null, null);
+                    var val = prop.GetValue(this, null);
+                    if (val != null)
+                    {
+                        // remember embedded resource property for restoring after serialization
+                        embeddedResourceProperties.Add(prop, val);
+                        // add embedded resource to collection for the serializtion
+                        var res = val as IResource;
+                        if (res != null)
+                            resourceList.Add(res);
+                        else
+                            resourceList.AddRange((IEnumerable<IResource>) val);
+                        // null out the embedded property so it doesn't serialize separately as a property
+                        prop.SetValue(this, null, null);
+                    }
                 }
+                foreach (var res in resourceList.Where(r => string.IsNullOrEmpty(r.Rel)))
+                    res.Rel = "unknownRel-" + res.GetType().Name;
+                Embedded = resourceList.Count > 0 ? resourceList.ToLookup(r => r.Rel) : null;
             }
-            Embedded = resourceList.Count > 0 ? resourceList.ToLookup(r => r.Rel) : null;
         }
 
         [OnSerialized]
         private void OnSerialized(StreamingContext context)
         {
-            // restore embedded resource properties
-            foreach (var prop in embeddedResourceProperties.Keys)
-                prop.SetValue(this, embeddedResourceProperties[prop], null);
+            if (ResourceConverter.IsResourceConverterContext(context))
+            {
+                // restore embedded resource properties
+                foreach (var prop in embeddedResourceProperties.Keys)
+                    prop.SetValue(this, embeddedResourceProperties[prop], null);
+            }
         }
 
         internal static bool IsEmbeddedResourceType(Type type)
