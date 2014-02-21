@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Web.Http;
-using Newtonsoft.Json;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 

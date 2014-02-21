@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web.Http;
-using System.Web.Http.Routing;
 
 namespace WebApi.Hal
 {
@@ -55,7 +52,7 @@ namespace WebApi.Hal
             var href = Href;
             href = SubstituteParams(href, parameters);
 
-            return new Uri(href, UriKind.Relative);
+            return new Uri(href, UriKind.RelativeOrAbsolute);
         }
 
         public static string SubstituteParams(string href, params object[] parameters)
