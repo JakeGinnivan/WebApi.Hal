@@ -7,7 +7,6 @@ namespace WebApi.Hal.Web.Api.Resources
         public BeerDetailRepresentation()
         {
             Reviews = new List<ReviewRepresentation>();
-            Rel = LinkTemplates.BeerDetails.GetBeerDetail.CreateLink(new { id = Id }).Rel;
         }
 
         public int Id { get; set; }
@@ -17,12 +16,20 @@ namespace WebApi.Hal.Web.Api.Resources
         public BreweryRepresentation Brewery { get; set; }
         public List<ReviewRepresentation> Reviews { get; set; }
 
+        public override string Rel
+        {
+            get { return LinkTemplates.BeerDetails.GetBeerDetail.Rel; }
+            set { }
+        }
+
+        public override string Href
+        {
+            get { return LinkTemplates.BeerDetails.GetBeerDetail.CreateLink(new { id = Id }).Href; }
+            set { }
+        }
+
         protected override void CreateHypermedia()
         {
-            Href = LinkTemplates.BeerDetails.GetBeerDetail.CreateLink(new { id = Id }).Href;
-
-            Links.Add(new Link { Href = Href, Rel = "self" });
-
             if (Style != null)
                 Links.Add(LinkTemplates.BeerStyles.Style.CreateLink(new { id = Style.Id }));
             if (Brewery != null)

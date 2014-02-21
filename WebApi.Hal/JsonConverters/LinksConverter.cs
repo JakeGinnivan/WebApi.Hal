@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using Newtonsoft.Json;
 
 namespace WebApi.Hal.JsonConverters
@@ -9,7 +10,8 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var links = (IList<Link>)value;
+            var links = new HashSet<Link>((IList<Link>)value, new LinkEqualityComparer());
+
             writer.WriteStartObject();
 
             var lookup = links.ToLookup(l => l.Rel);
@@ -23,7 +25,7 @@ namespace WebApi.Hal.JsonConverters
                 {
                     writer.WriteStartObject();
                     writer.WritePropertyName("href");
-                    writer.WriteValue(link.Href);
+                    writer.WriteValue(ResolveUri(link.Href));
 
                     if (link.IsTemplated)
                     {
@@ -52,6 +54,13 @@ namespace WebApi.Hal.JsonConverters
         public override bool CanConvert(Type objectType)
         {
             return typeof(IList<Link>).IsAssignableFrom(objectType);
+        }
+
+        public string ResolveUri(string href)
+        {
+            if (VirtualPathUtility.IsAppRelative(href))
+                return HttpContext.Current != null ? VirtualPathUtility.ToAbsolute(href) : href.Replace("~/", "/");
+            return href;
         }
     }
 }

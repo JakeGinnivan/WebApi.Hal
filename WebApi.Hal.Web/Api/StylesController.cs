@@ -23,11 +23,7 @@ namespace WebApi.Hal.Web.Api
                 .Select(s => new BeerStyleRepresentation
                 {
                     Id = s.Id,
-                    Name = s.Name,
-                    Links =
-                    {
-                        LinkTemplates.BeerStyles.AssociatedBeers.CreateLink(new{s.Id})
-                    }
+                    Name = s.Name
                 })
                 .ToList();
 
@@ -43,11 +39,7 @@ namespace WebApi.Hal.Web.Api
             var beerStyleResource = new BeerStyleRepresentation
             {
                 Id = beerStyle.Id,
-                Name = beerStyle.Name,
-                Links =
-                {
-                    LinkTemplates.BeerStyles.AssociatedBeers.CreateLink(new{id=beerStyle.Id})
-                }
+                Name = beerStyle.Name
             };
 
             return Request.CreateResponse(HttpStatusCode.OK, beerStyleResource);

@@ -98,5 +98,18 @@ namespace WebApi.Hal.Tests
             // assert
             Assert.Equal("/beers/This%20Works", link.Href);
         }
+
+        [Fact]
+        public void create_uri_absolute()
+        {
+            // arrange
+            var templateLink = new Link("beerbyname", "http://myserver.com/api/beers/{name}");
+
+            // act
+            var link = templateLink.CreateUri(new {name = "BeerName"});
+
+            // assert
+            Assert.Equal("http://myserver.com/api/beers/BeerName", link.ToString());
+        }
     }
 }

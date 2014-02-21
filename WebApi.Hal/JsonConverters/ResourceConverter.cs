@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WebApi.Hal.Interfaces;
@@ -11,13 +12,31 @@ namespace WebApi.Hal.JsonConverters
 {
     public class ResourceConverter : JsonConverter
     {
+        const string StreamingContextResourceConverterToken = "hal+json";
+        const StreamingContextStates StreamingContextResourceConverterState = StreamingContextStates.Other;
+
+        public static bool IsResourceConverterContext(StreamingContext context)
+        {
+            return context.Context is string &&
+                   (string) context.Context == StreamingContextResourceConverterToken &&
+                   context.State == StreamingContextResourceConverterState;
+        }
+
+        private static StreamingContext GetResourceConverterContext()
+        {
+            return new StreamingContext(StreamingContextResourceConverterState, StreamingContextResourceConverterToken);
+        }
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var resource = (IResource)value;
 
+            var saveContext = serializer.Context;
+            serializer.Context = GetResourceConverterContext();
             serializer.Converters.Remove(this);
             serializer.Serialize(writer, resource);
             serializer.Converters.Add(this);
+            serializer.Context = saveContext;
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
@@ -61,10 +80,10 @@ namespace WebApi.Hal.JsonConverters
                 foreach (var prop in resourceType.GetProperties().Where(p => Representation.IsEmbeddedResourceType(p.PropertyType)))
                 {
                     // expects embedded collection of resources is implemented as an IList on the Representation-derived class
-                    if (typeof (IList).IsAssignableFrom(prop.PropertyType))
+                    var lst = prop.GetValue(resource) as IList;
+                    if (lst != null)
                     {
-                        var lst = prop.GetValue(resource) as IList;
-                        if (lst != null && prop.PropertyType.GenericTypeArguments != null &&
+                        if (prop.PropertyType.GenericTypeArguments != null &&
                             prop.PropertyType.GenericTypeArguments.Length > 0)
                             CreateEmbedded(embeddeds, prop.PropertyType.GenericTypeArguments[0],
                                 newRes => lst.Add(newRes));
@@ -102,7 +121,7 @@ namespace WebApi.Hal.JsonConverters
             var rel = GetResourceTypeRel(resourceType);
             if (!string.IsNullOrEmpty(rel))
             {
-                var tok = embeddeds.SelectToken(rel, false);
+                var tok = embeddeds[rel];
                 if (tok != null)
                 {
                     switch (tok.Type)

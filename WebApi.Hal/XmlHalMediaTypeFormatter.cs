@@ -154,7 +154,8 @@ namespace WebApi.Hal
             }
 
             //Third write out the links of the resource
-            foreach (var link in representation.Links.Where(link => link.Rel != "self"))
+            var links = new HashSet<Link>(representation.Links.Where(link => link.Rel != "self"), new LinkEqualityComparer());
+            foreach (var link in links)
             {
                 writer.WriteStartElement("link");
                 writer.WriteAttributeString("rel", link.Rel);

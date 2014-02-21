@@ -41,7 +41,7 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
             }
         }
 
@@ -62,7 +62,7 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
             }
         }
 
@@ -211,6 +211,56 @@ namespace WebApi.Hal.Tests
                 Assert.NotNull(org.Boss);
                 Assert.Equal(2, org.People.Count);
                 Assert.Equal(1, org.Boss.Links.Count);
+            }
+        }
+
+        class MySimpleList : SimpleListRepresentation<OrganisationRepresentation>
+        {
+            protected override void CreateHypermedia()
+            {
+            }
+
+            public string SimpleData { get; set; }
+        }
+
+        [Fact]
+        public void simplelist_post_json_test()
+        {
+            // arrange
+            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var type = typeof(MySimpleList);
+            const string json = @"
+{
+""_embedded"": {
+ ""organisation"": [
+   {""Id"": ""7"",""Name"": ""Org Seven"",
+    ""_links"": {""self"": {""href"": ""/api/organisations/7""}}},
+   {""Id"": ""8"",""Name"": ""Org Eight"",
+    ""_links"": {""self"": {""href"": ""/api/organisations/8""}}}
+   ]},
+""SimpleData"": ""simple string""
+}
+";
+
+            // act
+            using (
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
+                )
+            {
+                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+
+                // assert
+                Assert.NotNull(obj);
+                var orgList = obj as MySimpleList;
+                Assert.NotNull(orgList);
+                Assert.Equal(2, orgList.ResourceList.Count);
+                Assert.Equal(7, orgList.ResourceList[0].Id);
+                Assert.Equal("Org Seven", orgList.ResourceList[0].Name);
+                Assert.Equal("/api/organisations/7", orgList.ResourceList[0].Href);
+                Assert.Equal(8, orgList.ResourceList[1].Id);
+                Assert.Equal("Org Eight", orgList.ResourceList[1].Name);
+                Assert.Equal("/api/organisations/8", orgList.ResourceList[1].Href);
+                Assert.Equal("simple string", orgList.SimpleData);
             }
         }
     }
