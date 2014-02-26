@@ -124,3 +124,6 @@ You can use fiddler to explore the API. Make sure you put in an accept header of
 I have more credits to add, but this is the most obvious (as I based my Xml formatter off this project)
 
 https://bitbucket.org/smichelotti/hal-media-type
+
+## Release Notes
+See Readme.txt at http://github.com/JakeGinnivan/WebApi.Hal

@@ -1,5 +1,11 @@
 Release Notes
 
+Version 2.2.0
+- Deserialize HAL resources into C# objects
+- Representation.Href and .Rel virtual
+- Support absolute URIs
+- A few minor fixes for better serialization
+
 Version 2.1.0
 - Enhancements to provide adherence to the HAL spec:
   - Support array of link objects for any given rel, instead of only allowing a single link object.
