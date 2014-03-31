@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -8,6 +9,9 @@ namespace WebApi.Hal
 {
     public class Link
     {
+        const string CuriesRel = "curies";
+        const string CuriesRelExpression = "rel";
+
         public Link()
         { }
 
@@ -93,7 +97,7 @@ namespace WebApi.Hal
 
         private static bool IsValidCuriesRel(string rel)
         {
-            return !string.IsNullOrEmpty(rel) && rel.Equals("curies", StringComparison.OrdinalIgnoreCase);
+            return !string.IsNullOrEmpty(rel) && rel.Equals(CuriesRel, StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsValidCuriesHref(string template)
@@ -116,7 +120,7 @@ namespace WebApi.Hal
                         expression.Clear();
                         break;
                     case '}':
-                        if (!expression.ToString().Equals("rel", StringComparison.OrdinalIgnoreCase))
+                        if (!IsValidCuriesHrefRelExpression(expression.ToString()))
                             return false; // only a single "rel" expression is allowed in this template ...
                         building = false;
                         foundRel = true;
@@ -131,6 +135,20 @@ namespace WebApi.Hal
             return foundRel;
         }
 
+        private static bool IsValidCuriesHrefRelExpression(string expression)
+        {
+            if (expression.Equals(CuriesRelExpression, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            var operators = new[] {'+', ';', '/', '#', '&', '?', '.'};
+            var first = expression[0];
+
+            if (operators.Any(o => o == first))
+                return expression.Substring(1).Equals(CuriesRelExpression, StringComparison.OrdinalIgnoreCase);
+
+            return false; // only a single "rel" expression is allowed in this template ...
+        }
+
         /// <summary>
         /// Factory method that simplifies creating a curies link
         /// </summary>
@@ -142,7 +160,7 @@ namespace WebApi.Hal
             if (!IsValidCuriesHref(href)) 
                 throw new ArgumentException("Not a valid uri template for curies, exactly one {rel} expression is required");
 
-            return new Link("curies", href)
+            return new Link(CuriesRel, href)
             {
                 Name = name
             };
