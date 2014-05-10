@@ -3,6 +3,7 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using WebApi.Hal.JsonConverters;
+using WebApi.Hal.Proposed;
 
 namespace WebApi.Hal
 {
@@ -12,8 +13,24 @@ namespace WebApi.Hal
         readonly ResourceConverter resourceConverter = new ResourceConverter();
         readonly LinksConverter linksConverter = new LinksConverter();
         readonly EmbeddedResourceConverter embeddedResourceConverter = new EmbeddedResourceConverter();
+        readonly IHypermediaConfiguration hypermediaConfiguration;
+
+        public JsonHalMediaTypeFormatter(IHypermediaConfiguration hypermediaConfiguration)
+        {
+            if (hypermediaConfiguration == null) 
+                throw new ArgumentNullException("hypermediaConfiguration");
+
+            resourceConverter = new ResourceConverter(hypermediaConfiguration);
+            Initialize();
+        }
 
         public JsonHalMediaTypeFormatter()
+        {
+            resourceConverter = new ResourceConverter();
+            Initialize();
+        }
+
+        void Initialize()
         {
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/hal+json"));
             SerializerSettings.Converters.Add(linksConverter);

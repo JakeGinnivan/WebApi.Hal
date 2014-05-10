@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 
 namespace WebApi.Hal
 {
     public class Link
     {
-        const string CuriesRel = "curies";
-        const string CuriesRelExpression = "rel";
+        public const string RelForSelf = "self";
+        public const string RelForCuries = "curies";
+
+        string linkRelation;
 
         public Link()
         { }
@@ -22,7 +21,16 @@ namespace WebApi.Hal
             Title = title;
         }
 
-        public string Rel { get; set; }
+        public string Rel
+        {
+            get { return linkRelation; }
+            set
+            {
+                // should be case insensitive when comparing, so default to lower-case (http://tools.ietf.org/html/rfc5988#section-4.1)
+                linkRelation = string.IsNullOrEmpty(value) ? value : value.ToLowerInvariant();
+            }
+        }
+
         public string Href { get; set; }
         public string Title { get; set; }
         public string Type { get; set; }
@@ -36,7 +44,7 @@ namespace WebApi.Hal
         }
 
         private static readonly Regex IsTemplatedRegex = new Regex(@"{.+}", RegexOptions.Compiled);
-
+        
         /// <summary>
         /// If this link is templated, you can use this method to make a non templated copy
         /// </summary>
@@ -45,7 +53,12 @@ namespace WebApi.Hal
         /// <returns>A non templated link</returns>
         public Link CreateLink(string newRel, params object[] parameters)
         {
-            return new Link(newRel, CreateUri(parameters).ToString());
+            var clone = Clone();
+
+            clone.Rel = newRel;
+            clone.Href = CreateUri(parameters).ToString();
+
+            return clone;
         }
 
         /// <summary>
@@ -84,90 +97,16 @@ namespace WebApi.Hal
         }
 
         /// <summary>
-        /// Gets whether the link represents a Curies link
+        /// Performs a shallow clone of the instance
         /// </summary>
-        [JsonIgnore]
-        public bool IsCuries
+        /// <returns>Cloned instance</returns>
+        public Link Clone()
         {
-            get
-            {
-                return !string.IsNullOrEmpty(Name) && IsValidCuriesRel(Rel) && IsValidCuriesHref(Href);
-            }
-        }
-
-        private static bool IsValidCuriesRel(string rel)
-        {
-            return !string.IsNullOrEmpty(rel) && rel.Equals(CuriesRel, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsValidCuriesHref(string template)
-        {
-            if (string.IsNullOrEmpty(template))
-                return false;
-
-            var expression = new StringBuilder();
-            var building = false;
-            var foundRel = false;
-
-            foreach (var c in template)
-            {
-                switch (c)
-                {
-                    case '{':
-                        if (foundRel)
-                            return false; // only a single "rel" expression is allowed in this template ...
-                        building = true;
-                        expression.Clear();
-                        break;
-                    case '}':
-                        if (!IsValidCuriesHrefRelExpression(expression.ToString()))
-                            return false; // only a single "rel" expression is allowed in this template ...
-                        building = false;
-                        foundRel = true;
-                        break;
-                    default:
-                        if (building)
-                            expression.Append(c);
-                        break;
-                }
-            }
-
-            return foundRel;
-        }
-
-        private static bool IsValidCuriesHrefRelExpression(string expression)
-        {
-            if (expression.Equals(CuriesRelExpression, StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            var operators = new[] {'+', ';', '/', '#', '&', '?', '.'};
-            var first = expression[0];
-
-            if (operators.Any(o => o == first))
-                return expression.Substring(1).Equals(CuriesRelExpression, StringComparison.OrdinalIgnoreCase);
-
-            return false; // only a single "rel" expression is allowed in this template ...
-        }
-
-        /// <summary>
-        /// Factory method that simplifies creating a curies link
-        /// </summary>
-        public static Link CreateCuries(string name, string href)
-        {
-            if (string.IsNullOrEmpty(name)) 
-                throw new ArgumentNullException("name", "A curies link requires a name");
-
-            if (!IsValidCuriesHref(href)) 
-                throw new ArgumentException("Not a valid uri template for curies, exactly one {rel} expression is required");
-
-            return new Link(CuriesRel, href)
-            {
-                Name = name
-            };
+            return (Link) MemberwiseClone();
         }
     }
 
-    internal class LinkEqualityComparer : IEqualityComparer<Link>
+    public class LinkEqualityComparer : IEqualityComparer<Link>
     {
         public bool Equals(Link l1, Link l2)
         {

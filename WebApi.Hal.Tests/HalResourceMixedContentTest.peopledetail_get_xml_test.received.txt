@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resource rel="organisation" href="/api/organisations/1">
+  <link rel="people" href="/api/organisations/1/people" />
+  <Id>1</Id>
+  <Name>Org Name</Name>
+  <resource rel="person" href="/api/organisations/1/people/3">
+    <Id>3</Id>
+    <Name>Dilbert</Name>
+    <OrganisationId>1</OrganisationId>
+  </resource>
+  <resource rel="person" href="/api/organisations/1/people/4">
+    <Id>4</Id>
+    <Name>Wally</Name>
+    <OrganisationId>1</OrganisationId>
+  </resource>
+  <resource rel="person" href="/api/organisations/1/people/5">
+    <Id>5</Id>
+    <Name>Alice</Name>
+    <OrganisationId>1</OrganisationId>
+  </resource>
+  <resource rel="boss" href="/api/organisations/1/boss" name="Boss">
+    <HasPointyHair>True</HasPointyHair>
+    <Id>2</Id>
+    <Name>Eunice PHB</Name>
+    <OrganisationId>1</OrganisationId>
+  </resource>
+</resource>
