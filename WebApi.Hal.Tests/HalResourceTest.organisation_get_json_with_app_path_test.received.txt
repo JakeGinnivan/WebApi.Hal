@@ -1,9 +1,0 @@
-﻿{
-  "Id": 1,
-  "Name": "Org Name",
-  "_links": {
-    "self": {
-      "href": "/api/organisations/1"
-    }
-  }
-}
