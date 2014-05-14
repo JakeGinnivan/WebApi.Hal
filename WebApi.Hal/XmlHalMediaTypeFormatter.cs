@@ -10,14 +10,27 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using WebApi.Hal.Interfaces;
+using WebApi.Hal.Proposed;
 
 namespace WebApi.Hal
 {
     public class XmlHalMediaTypeFormatter : BufferedMediaTypeFormatter
     {
+        readonly IHypermediaConfiguration configuration;
+
         public XmlHalMediaTypeFormatter()
         {
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/hal+xml"));
+        }
+
+        public XmlHalMediaTypeFormatter(IHypermediaConfiguration configuration) : this()
+        {
+            if (configuration == null)
+                throw new ArgumentNullException("configuration");
+
+            this.configuration = configuration;
+
+            // TODO: I need help here! The HAL+XML variation is not my thing ...
         }
 
         public override object ReadFromStream(Type type, Stream stream, HttpContent content, IFormatterLogger formatterLogger)

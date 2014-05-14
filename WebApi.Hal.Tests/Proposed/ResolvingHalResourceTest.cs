@@ -12,28 +12,28 @@ namespace WebApi.Hal.Tests.Proposed
 {
     public class ResolvingHalResourceTest
     {
-        readonly OrganisationRepresentation resource;
+        readonly ProductRepresentation representation;
+        readonly IHypermediaConfiguration config;
 
         public ResolvingHalResourceTest()
         {
-            resource = new OrganisationRepresentation(1, "Org Name");
-        }
+            //
+            // Create representation
 
-        [Fact]
-        [UseReporter(typeof(DiffReporter))]
-        public void ProperlySerializesRepresentationToJson()
-        {
-            // arrange
-            var representation = new ProductRepresentation
+            representation = new ProductRepresentation
             {
                 Id = 9,
                 Title = "Morpheus in a chair statuette",
+                Price = 20.14,
                 Category = new CategoryRepresentation
                 {
                     Id = 99,
                     Title = "Action Figures"
                 }
             };
+
+            //
+            // Build hypermedia configuration
 
             var curiesLink = new CuriesLink("example-namespace", "http://api.example.com/docs/{rel}");
             var productLink = new Link("example-namespace:product", "http://api.example.com/products/{id}");
@@ -43,17 +43,24 @@ namespace WebApi.Hal.Tests.Proposed
 
             var builder = new HypermediaConfigurationBuilder();
 
-            builder.RegisterAppender(new ProductRepresentationHypermediaAppender()); 
-            builder.RegisterAppender(new CategoryRepresentationHypermediaAppender()); 
-            builder.RegisterCuries(curiesLink); 
+            builder.RegisterAppender(new ProductRepresentationHypermediaAppender());
+            builder.RegisterAppender(new CategoryRepresentationHypermediaAppender());
+            builder.RegisterCuries(curiesLink);
             builder.RegisterSelf<ProductRepresentation>(productLink);
             builder.RegisterSelf<CategoryRepresentation>(categoryLink);
             builder.RegisterLinks<ProductRepresentation>(relatedProductLink, saleProductLink);
 
-            var config = builder.Build();
+            config = builder.Build();
+        }
+        
+        [Fact]
+        [UseReporter(typeof(DiffReporter))]
+        public void ProperlySerializesRepresentationToJson()
+        {
+            // arrange
             var mediaFormatter = new JsonHalMediaTypeFormatter(config) { Indent = true };
             var content = new StringContent(string.Empty);
-            var type = resource.GetType();
+            var type = representation.GetType();
 
             // act
             using (var stream = new MemoryStream())
@@ -69,18 +76,17 @@ namespace WebApi.Hal.Tests.Proposed
 
         [Fact]
         [UseReporter(typeof(DiffReporter))]
-        public void organisation_get_json_with_app_path_test()
+        public void ProperlySerializesRepresentationToXml()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var mediaFormatter = new XmlHalMediaTypeFormatter(config);
             var content = new StringContent(string.Empty);
-            var resourceWithAppPath = new OrganisationWithAppPathRepresentation(1, "Org Name");
-            var type = resourceWithAppPath.GetType();
+            var type = representation.GetType();
 
             // act
             using (var stream = new MemoryStream())
             {
-                mediaFormatter.WriteToStreamAsync(type, resourceWithAppPath, stream, content, null);
+                mediaFormatter.WriteToStreamAsync(type, representation, stream, content, null);
                 stream.Seek(0, SeekOrigin.Begin);
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
@@ -88,26 +94,5 @@ namespace WebApi.Hal.Tests.Proposed
                 Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
             }
         }
-
-        [Fact]
-        [UseReporter(typeof(DiffReporter))]
-        public void organisation_get_xml_test()
-        {
-            // arrange
-            var mediaFormatter = new XmlHalMediaTypeFormatter();
-            var content = new StringContent(string.Empty);
-            var type = resource.GetType();
-
-            // act
-            using (var stream = new MemoryStream())
-            {
-                mediaFormatter.WriteToStreamAsync(type, resource, stream, content, null);
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
-
-                // assert
-                Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
-            }
-        } 
     }
 }
