@@ -62,6 +62,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CuriesLink.cs" />
+    <Compile Include="Exceptions\DuplicateCurisLinkRegistrationException.cs" />
+    <Compile Include="Exceptions\DuplicateHypermediaResolverRegistrationException.cs" />
+    <Compile Include="Exceptions\DuplicateSelfLinkRegistrationException.cs" />
+    <Compile Include="Exceptions\MissingCuriesLinkException.cs" />
+    <Compile Include="Exceptions\MissingHypermediaBuilderException.cs" />
+    <Compile Include="Exceptions\MissingSelfLinkException.cs" />
+    <Compile Include="HypermediaAppender.cs" />
+    <Compile Include="HypermediaConfiguration.cs" />
+    <Compile Include="HypermediaConfigurationBuilder.cs" />
+    <Compile Include="HypermediaConfigurationMode.cs" />
+    <Compile Include="IHypermediaAppender.cs" />
+    <Compile Include="IHypermediaConfiguration.cs" />
     <Compile Include="Interfaces\IRepresentationList.cs" />
     <Compile Include="Interfaces\IResource.cs" />
     <Compile Include="JsonConverters\EmbeddedResourceConverter.cs" />
@@ -79,19 +92,6 @@
     <Compile Include="SimpleListRepresentation.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UriTemplate.cs" />
-    <Compile Include="Proposed\CuriesLink.cs" />
-    <Compile Include="Proposed\Exceptions\DuplicateCurisLinkRegistrationException.cs" />
-    <Compile Include="Proposed\Exceptions\DuplicateHypermediaResolverRegistrationException.cs" />
-    <Compile Include="Proposed\Exceptions\DuplicateSelfLinkRegistrationException.cs" />
-    <Compile Include="Proposed\Exceptions\MissingCuriesLinkException.cs" />
-    <Compile Include="Proposed\Exceptions\MissingHypermediaBuilderException.cs" />
-    <Compile Include="Proposed\Exceptions\MissingSelfLinkException.cs" />
-    <Compile Include="Proposed\HypermediaAppender.cs" />
-    <Compile Include="Proposed\HypermediaConfigurationBuilder.cs" />
-    <Compile Include="Proposed\IHypermediaAppender.cs" />
-    <Compile Include="Proposed\IHypermediaConfiguration.cs" />
-    <Compile Include="Proposed\HypermediaConfiguration.cs" />
-    <Compile Include="Proposed\HypermediaConfigurationMode.cs" />
     <Compile Include="XmlHalMediaTypeFormatter.cs" />
   </ItemGroup>
   <ItemGroup>

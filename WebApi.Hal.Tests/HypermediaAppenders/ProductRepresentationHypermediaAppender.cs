@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using WebApi.Hal.Proposed;
-using WebApi.Hal.Tests.Proposed.Representations;
+using WebApi.Hal.Tests.Representations;
 
-namespace WebApi.Hal.Tests.Proposed.HypermediaAppenders
+namespace WebApi.Hal.Tests.HypermediaAppenders
 {
     public class ProductRepresentationHypermediaAppender : HypermediaAppender<ProductRepresentation>
     {

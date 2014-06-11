@@ -3,7 +3,6 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using WebApi.Hal.JsonConverters;
-using WebApi.Hal.Proposed;
 
 namespace WebApi.Hal
 {

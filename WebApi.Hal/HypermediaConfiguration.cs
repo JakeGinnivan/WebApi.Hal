@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using WebApi.Hal.Exceptions;
 using WebApi.Hal.Interfaces;
-using WebApi.Hal.Proposed.Exceptions;
 
-namespace WebApi.Hal.Proposed
+namespace WebApi.Hal
 {
     class HypermediaConfiguration : IHypermediaConfiguration
     {

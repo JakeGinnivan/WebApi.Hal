@@ -1,6 +1,4 @@
-using Newtonsoft.Json;
-
-namespace WebApi.Hal.Tests.Proposed.Representations
+namespace WebApi.Hal.Tests.Representations
 {
     public class ProductRepresentation : Representation
     {

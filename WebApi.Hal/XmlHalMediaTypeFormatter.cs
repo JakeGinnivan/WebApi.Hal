@@ -10,7 +10,6 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using WebApi.Hal.Interfaces;
-using WebApi.Hal.Proposed;
 
 namespace WebApi.Hal
 {

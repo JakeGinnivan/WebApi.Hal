@@ -7,7 +7,6 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WebApi.Hal.Interfaces;
-using WebApi.Hal.Proposed;
 
 namespace WebApi.Hal.JsonConverters
 {

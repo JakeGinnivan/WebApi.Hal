@@ -2,13 +2,11 @@
 using System.Net.Http;
 using ApprovalTests;
 using ApprovalTests.Reporters;
-using WebApi.Hal.Proposed;
-using WebApi.Hal.Tests.Proposed.HypermediaAppenders;
-using WebApi.Hal.Tests.Proposed.Representations;
+using WebApi.Hal.Tests.HypermediaAppenders;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
 
-namespace WebApi.Hal.Tests.Proposed
+namespace WebApi.Hal.Tests
 {
     public class ResolvingHalResourceTest
     {

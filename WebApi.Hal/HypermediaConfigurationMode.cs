@@ -1,4 +1,4 @@
-namespace WebApi.Hal.Proposed
+namespace WebApi.Hal
 {
     public enum HypermediaConfigurationMode
     {

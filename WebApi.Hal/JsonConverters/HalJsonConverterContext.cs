@@ -1,5 +1,4 @@
 using System;
-using WebApi.Hal.Proposed;
 
 namespace WebApi.Hal.JsonConverters
 {

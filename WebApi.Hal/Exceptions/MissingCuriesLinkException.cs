@@ -1,6 +1,6 @@
 using System;
 
-namespace WebApi.Hal.Proposed.Exceptions
+namespace WebApi.Hal.Exceptions
 {
     public class MissingCuriesLinkException : Exception
     {

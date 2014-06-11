@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 
-namespace WebApi.Hal.Proposed
+namespace WebApi.Hal
 {
     public class CuriesLink
     {

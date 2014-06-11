@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using WebApi.Hal.Interfaces;
 
-namespace WebApi.Hal.Proposed
+namespace WebApi.Hal
 {
     public interface IHypermediaAppender
     {
