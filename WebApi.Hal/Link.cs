@@ -6,6 +6,11 @@ namespace WebApi.Hal
 {
     public class Link
     {
+        public const string RelForSelf = "self";
+        public const string RelForCuries = "curies";
+
+        string linkRelation;
+
         public Link()
         { }
 
@@ -16,16 +21,30 @@ namespace WebApi.Hal
             Title = title;
         }
 
-        public string Rel { get; set; }
+        public string Rel
+        {
+            get { return linkRelation; }
+            set
+            {
+                // should be case insensitive when comparing, so default to lower-case (http://tools.ietf.org/html/rfc5988#section-4.1)
+                linkRelation = string.IsNullOrEmpty(value) ? value : value.ToLowerInvariant();
+            }
+        }
+
         public string Href { get; set; }
         public string Title { get; set; }
+        public string Type { get; set; }
+        public string Deprecation { get; set; }
+        public string Name { get; set; }
+        public string Profile { get; set; }
+        public string HrefLang { get; set; }
         public bool IsTemplated
         {
             get { return !string.IsNullOrEmpty(Href) && IsTemplatedRegex.IsMatch(Href); }
         }
 
         private static readonly Regex IsTemplatedRegex = new Regex(@"{.+}", RegexOptions.Compiled);
-
+        
         /// <summary>
         /// If this link is templated, you can use this method to make a non templated copy
         /// </summary>
@@ -34,7 +53,12 @@ namespace WebApi.Hal
         /// <returns>A non templated link</returns>
         public Link CreateLink(string newRel, params object[] parameters)
         {
-            return new Link(newRel, CreateUri(parameters).ToString());
+            var clone = Clone();
+
+            clone.Rel = newRel;
+            clone.Href = CreateUri(parameters).ToString();
+
+            return clone;
         }
 
         /// <summary>
@@ -71,9 +95,18 @@ namespace WebApi.Hal
 
             return uriTemplate.Resolve();
         }
+
+        /// <summary>
+        /// Performs a shallow clone of the instance
+        /// </summary>
+        /// <returns>Cloned instance</returns>
+        public Link Clone()
+        {
+            return (Link) MemberwiseClone();
+        }
     }
 
-    internal class LinkEqualityComparer : IEqualityComparer<Link>
+    public class LinkEqualityComparer : IEqualityComparer<Link>
     {
         public bool Equals(Link l1, Link l2)
         {

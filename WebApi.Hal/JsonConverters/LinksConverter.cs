@@ -33,8 +33,27 @@ namespace WebApi.Hal.JsonConverters
                         writer.WriteValue(true);
                     }
 
+                    var remaining = link.GetType()
+                        .GetProperties()
+                        .Where(x => !x.Name.Equals("Href") && !x.Name.Equals("IsTemplated") && !x.Name.Equals("Rel"));
+
+                    foreach (var info in remaining)
+                    {
+                        if ((info.PropertyType != typeof (string))) 
+                            continue; // no sensible way to serialize ...
+
+                        var text = info.GetValue(link) as string;
+
+                        if (string.IsNullOrEmpty(text)) 
+                            continue; // no value set, so don't serialize this ...
+
+                        writer.WritePropertyName(info.Name.ToLowerInvariant());
+                        writer.WriteValue(text);
+                    }
+
                     writer.WriteEndObject();
                 }
+
                 if (rel.Count() > 1)
                     writer.WriteEndArray();
             }

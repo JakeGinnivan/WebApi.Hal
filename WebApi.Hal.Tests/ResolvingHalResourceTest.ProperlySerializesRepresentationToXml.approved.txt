@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resource rel="" href="">
+  <Id>9</Id>
+  <Title>Morpheus in a chair statuette</Title>
+  <Price>20,14</Price>
+  <resource rel="" href="" name="Category">
+    <Id>99</Id>
+    <Title>Action Figures</Title>
+  </resource>
+</resource>
