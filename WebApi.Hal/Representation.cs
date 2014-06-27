@@ -25,6 +25,9 @@ namespace WebApi.Hal
         [OnSerializing]
         private void OnSerialize(StreamingContext context)
         {
+            // Clear the embeddedResourceProperties in order to make this object re-serializable.
+            embeddedResourceProperties.Clear();
+
             RepopulateHyperMedia();
 
             if (ResourceConverter.IsResourceConverterContext(context))
