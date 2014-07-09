@@ -18,10 +18,13 @@ namespace WebApi.Hal.Tests
         [UseReporter(typeof(DiffReporter))]
         public void CanUseRegisterExtensionMethod()
         {
+            var curie = new CuriesLink("aap", "http://www.helpt.com/{?rel}");
+
             var builder = new HypermediaConfigurationBuilder();
             var link = new Link<ProductRepresentation>("product", "http://www.product.com?id=1");
             var link2 = new Link("related", "http://www.related.com");
-            var link3 = new Link<CategoryRepresentation>("category", "http://www.category.com");
+            var link3 = curie.CreateLink<CategoryRepresentation>("category", "http://www.category.com");
+            
 
             builder.Register(link, link2, link3);
             

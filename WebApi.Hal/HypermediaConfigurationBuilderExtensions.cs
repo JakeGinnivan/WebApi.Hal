@@ -43,7 +43,7 @@ namespace WebApi.Hal
             builder.RegisterAppender(new ActionBasedHypermediaAppender<T>(
                 (resource, configured) =>
                 {
-                    resource.Links = configured.ToArray();
+                    resource.Links = configured.ToList();
                 }));
         }
     }
