@@ -113,7 +113,7 @@ namespace WebApi.Hal
         [JsonIgnore]
         public string LinkName { get; set; }
 
-        public IList<Link> Links { get; set; }
+        public List<Link> Links { get; set; }
 
         protected internal virtual void CreateHypermedia()
         {
