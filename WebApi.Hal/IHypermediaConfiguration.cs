@@ -8,8 +8,8 @@ namespace WebApi.Hal
         void Configure(IResource resource);
         string ResolveRel(IResource resource);
         Link ResolveSelf(IResource resource);
-        IEnumerable<Link> ResolveCuries(params Link[] links);
+        IEnumerable<Link> ExtractUniqueCuriesLinks(params Link[] links);
         IEnumerable<Link> ResolveLinks(IResource resource);
-        IHypermediaAppender ResolveAppender(IResource resource);
+        IHypermediaAppender<T> ResolveAppender<T>(T resource) where T : class, IResource;
     }
 }

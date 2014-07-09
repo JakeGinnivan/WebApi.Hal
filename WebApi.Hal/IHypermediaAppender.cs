@@ -3,9 +3,8 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    public interface IHypermediaAppender
+    public interface IHypermediaAppender<T> where T:class, IResource
     {
-        void Append(IEnumerable<Link> configured);
-        void SetResource(IResource resource);
+        void Append(T resource, IEnumerable<Link> configured);
     }
 }

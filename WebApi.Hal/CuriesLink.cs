@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
+using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
@@ -17,7 +20,7 @@ namespace WebApi.Hal
                 throw new ArgumentNullException("href");
 
             if (!IsValidCuriesHref(href))
-                throw new ArgumentException("The provided href is not a valid uri template: " + href);
+                throw new ArgumentException("The provided href is not a valid uri template: " + href, href);
 
             Name = name;
             Href = href;
@@ -25,6 +28,27 @@ namespace WebApi.Hal
 
         public string Name { get; private set; }
         public string Href { get; private set; }
+
+        string CreateLinkRelation(string name)
+        {
+            if (string.IsNullOrEmpty(name)) 
+                throw new ArgumentNullException("name");
+
+            if (name.Contains(":"))
+                throw new ArgumentException("Specified link relation already contains ':' " + name, "name");
+
+            return string.Concat(Name, ":", name);
+        }
+
+        public Link CreateLink(string name, string href)
+        {
+            return new Link(CreateLinkRelation(name), href, this);
+        }
+
+        public Link<T> CreateLink<T>(string name, string href) where T : class, IResource
+        {
+            return new Link<T>(CreateLinkRelation(name), href, this);
+        }
 
         private static bool IsValidCuriesHref(string template)
         {
@@ -73,6 +97,42 @@ namespace WebApi.Hal
                 return expression.Substring(1).Equals(CuriesRelExpression, StringComparison.OrdinalIgnoreCase);
 
             return false; // only a single "rel" expression is allowed in this template ...
+        }
+
+        sealed class NameEqualityComparer : IEqualityComparer<CuriesLink>
+        {
+            public bool Equals(CuriesLink x, CuriesLink y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(x, null)) return false;
+                if (ReferenceEquals(y, null)) return false;
+                if (x.GetType() != y.GetType()) return false;
+                return string.Equals(x.Name, y.Name);
+            }
+
+            public int GetHashCode(CuriesLink obj)
+            {
+                return (obj.Name != null
+                    ? obj.Name.GetHashCode()
+                    : 0);
+            }
+        }
+
+        static readonly IEqualityComparer<CuriesLink> NameComparerInstance = new NameEqualityComparer();
+
+        public static IEqualityComparer<CuriesLink> NameComparer
+        {
+            get { return NameComparerInstance; }
+        }
+
+        public Link ToLink()
+        {
+            return new Link
+            {
+                Rel = Link.RelForCuries,
+                Name = Name,
+                Href = Href
+            };
         }
     }
 }

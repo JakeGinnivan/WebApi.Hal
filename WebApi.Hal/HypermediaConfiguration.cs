@@ -10,11 +10,10 @@ namespace WebApi.Hal
     {
         readonly IDictionary<Type, Link> selfLinks;
         readonly IDictionary<Type, IList<Link>> hypermedia;
-        readonly IDictionary<string, string> curiesLinks;
-        readonly IDictionary<Type, IHypermediaAppender> builders;
+        readonly IDictionary<Type, object> appenders;
         readonly HypermediaConfigurationMode mode;
 
-        public HypermediaConfiguration(IDictionary<Type, Link> selfLinks, IDictionary<Type, IList<Link>> hypermedia, IDictionary<string, string> curiesLinks, IDictionary<Type, IHypermediaAppender> builders, HypermediaConfigurationMode mode)
+        public HypermediaConfiguration(IDictionary<Type, Link> selfLinks, IDictionary<Type, IList<Link>> hypermedia, IDictionary<Type, object> appenders, HypermediaConfigurationMode mode)
         {
             if (selfLinks == null) 
                 throw new ArgumentNullException("selfLinks");
@@ -22,16 +21,12 @@ namespace WebApi.Hal
             if (hypermedia == null) 
                 throw new ArgumentNullException("hypermedia");
 
-            if (curiesLinks == null) 
-                throw new ArgumentNullException("curiesLinks");
-
-            if (builders == null) 
-                throw new ArgumentNullException("builders");
+            if (appenders == null) 
+                throw new ArgumentNullException("appenders");
 
             this.selfLinks = selfLinks;
             this.hypermedia = hypermedia;
-            this.curiesLinks = curiesLinks;
-            this.builders = builders;
+            this.appenders = appenders;
             this.mode = mode;
         }
 
@@ -48,7 +43,7 @@ namespace WebApi.Hal
                 representation.RepopulateAndConfigureDeep(ResolveAndAppend, ResolveRel);
 
                 var all = representation.GetHypermediaDeep().ToArray();
-                var curies = ResolveCuries(all);
+                var curies = ExtractUniqueCuriesLinks(all);
 
                 foreach (var link in curies)
                     representation.Links.Add(link);
@@ -69,16 +64,22 @@ namespace WebApi.Hal
         {
             try
             {
-                var appender = ResolveAppender(resource);
-                var configured = new List<Link>(ResolveLinks(resource)) { ResolveSelf(resource) };
-
                 resource.Links.Clear();
 
-                if (appender == null)
-                    return; // no specific appender registered, so we're done ...
+                var configured = new List<Link>(ResolveLinks(resource)) { ResolveSelf(resource) };
+                var resourceType = resource.GetType();
 
-                appender.SetResource(resource);
-                appender.Append(configured);
+                // As the IHypermediaAppender interface is generic and the parameter of the Append 
+                // method which represents the resource is typed based on that, we need some reflection
+                // in order to resolve the appender and to subsequently invoke the Append method on it.
+
+                var info = GetType().GetMethod("ResolveAppender");
+                var typedInfo = info.MakeGenericMethod(resourceType);
+                var appender = typedInfo.Invoke(this, new object[] {resource});
+                var appenderType = appender.GetType();
+                var appendMethodInfo = appenderType.GetMethod("Append");
+                
+                appendMethodInfo.Invoke(appender, new object[]{resource, configured});
             }
             catch (Exception e)
             {
@@ -86,16 +87,14 @@ namespace WebApi.Hal
             }
         }
 
-        public IHypermediaAppender ResolveAppender(IResource resource)
+        public IHypermediaAppender<T> ResolveAppender<T>(T resource) where T: class, IResource
         {
             var type = resource.GetType();
 
-            if (!builders.ContainsKey(type) && (mode == HypermediaConfigurationMode.Strict))
+            if (!appenders.ContainsKey(type)) 
                 throw new MissingHypermediaBuilderException(type);
-
-            return builders.ContainsKey(type)
-                ? builders[type]
-                : null;
+            
+            return (IHypermediaAppender<T>) appenders[type];
         }
 
         public IEnumerable<Link> ResolveLinks(IResource resource)
@@ -117,7 +116,7 @@ namespace WebApi.Hal
             if (mode == HypermediaConfigurationMode.Strict)
                 throw new MissingSelfLinkException(type);
 
-            return null;
+            return type.Name;
         }
 
         public Link ResolveSelf(IResource resource)
@@ -137,46 +136,15 @@ namespace WebApi.Hal
             return null;
         }
 
-        public IEnumerable<Link> ResolveCuries(params Link[] links)
+        public IEnumerable<Link> ExtractUniqueCuriesLinks(params Link[] links)
         {
             if (links == null) 
                 throw new ArgumentNullException("links");
 
-            var names = links.Select(x => x.Rel).Distinct().Select(ExtractCuriesName).Where(x => x != null);
-
-            foreach (var name in names)
-            {
-                if (curiesLinks.ContainsKey(name))
-                    yield return new Link
-                    {
-                        Rel = Link.RelForCuries,
-                        Name = name,
-                        Href = curiesLinks[name]
-                    };
-                else if (mode == HypermediaConfigurationMode.Strict)
-                    throw new MissingCuriesLinkException(name);
-            }
-        }
-
-        static string ExtractCuriesName(string rel)
-        {
-            if (string.IsNullOrEmpty(rel))
-                return null;
-
-            var parts = rel.Split(':');
-
-            if (parts.Length != 2)
-                return null;
-            
-           /*
-            * There is some abiguity here as a rel may be a URI or a CURIE as described in 
-            * section 2.2 here: http://www.w3.org/TR/2009/CR-curie-20090116/ Simply put
-            * "http://" or "mailto:me@you.it" would result in the respective curie names "http" 
-            * and "mailto". We can only trust the developer knows what he is doing and choses 
-            * the curie names wisely.
-            */
-            
-            return parts[0];
+            return links.Where(x => x.Curie != null)
+                .Select(x => x.Curie)
+                .Distinct(CuriesLink.NameComparer)
+                .Select(x => x.ToLink());
         }
     }
 }

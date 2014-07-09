@@ -71,8 +71,13 @@ namespace WebApi.Hal
             
             foreach (var res in resourceList.Where(r => string.IsNullOrEmpty(r.Rel)))
                 res.Rel = "unknownRel-" + res.GetType().Name;
-            
-            Embedded = resourceList.Count > 0 ? resourceList.ToLookup(r => getRel != null ? getRel(r) : r.Rel) : null;
+
+            Embedded = resourceList.Any()
+                ? resourceList.ToLookup(
+                    r => getRel != null
+                        ? getRel(r)
+                        : r.Rel)
+                : null;
         }
 
         [OnSerialized]

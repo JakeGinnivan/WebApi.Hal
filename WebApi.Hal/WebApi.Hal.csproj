@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionBasedHypermediaAppender.cs" />
     <Compile Include="CuriesLink.cs" />
     <Compile Include="Exceptions\DuplicateCurisLinkRegistrationException.cs" />
     <Compile Include="Exceptions\DuplicateHypermediaResolverRegistrationException.cs" />
@@ -69,7 +70,7 @@
     <Compile Include="Exceptions\MissingCuriesLinkException.cs" />
     <Compile Include="Exceptions\MissingHypermediaBuilderException.cs" />
     <Compile Include="Exceptions\MissingSelfLinkException.cs" />
-    <Compile Include="HypermediaAppender.cs" />
+    <Compile Include="HypermediaConfigurationBuilderExtensions.cs" />
     <Compile Include="HypermediaConfiguration.cs" />
     <Compile Include="HypermediaConfigurationBuilder.cs" />
     <Compile Include="HypermediaConfigurationMode.cs" />

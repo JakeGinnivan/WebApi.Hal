@@ -8,10 +8,9 @@ namespace WebApi.Hal
 {
     public class HypermediaConfigurationBuilder
     {
-        readonly IDictionary<Type, IHypermediaAppender> builders = new Dictionary<Type, IHypermediaAppender>();
+        readonly IDictionary<Type, object> appenders = new Dictionary<Type, object>();
         readonly IDictionary<Type, Link> selfLinks = new Dictionary<Type, Link>();
         readonly IDictionary<Type, IList<Link>> hypermedia = new Dictionary<Type, IList<Link>>();
-        readonly IDictionary<string, string> curiesLinks = new Dictionary<string, string>();
         readonly HypermediaConfigurationMode mode;
 
         public HypermediaConfigurationBuilder(HypermediaConfigurationMode mode = HypermediaConfigurationMode.Loose)
@@ -19,25 +18,25 @@ namespace WebApi.Hal
             this.mode = mode;
         }
 
-        public void RegisterAppender<T>(HypermediaAppender<T> appender) where T : class, IResource
+        public void RegisterAppender<T>(IHypermediaAppender<T> appender) where T : class, IResource
         {
             if (appender == null) 
                 throw new ArgumentNullException("appender");
 
             var type = typeof(T);
 
-            if (selfLinks.ContainsKey(type))
+            if (appenders.ContainsKey(type))
                 throw new DuplicateHypermediaResolverRegistrationException(type);
 
-            builders.Add(type, appender);
+            appenders.Add(type, appender);
         }
 
-        public void RegisterSelf<T>(Link link) where T: IResource
+        public void RegisterSelf<T>(Link link) where T : IResource
         {
-            if (link == null) 
+            if (link == null)
                 throw new ArgumentNullException("link");
 
-            var type = typeof (T);
+            var type = typeof(T);
 
             if (selfLinks.ContainsKey(type))
                 throw new DuplicateSelfLinkRegistrationException(type);
@@ -45,26 +44,20 @@ namespace WebApi.Hal
             selfLinks.Add(type, link);
         }
 
-        public void RegisterCuries(params CuriesLink[] links)
+        public void RegisterSelf<T>(Link<T> link) where T : class, IResource
         {
-            if (links == null) 
-                throw new ArgumentNullException("links");
+            if (link == null)
+                throw new ArgumentNullException("link");
 
-            if (!links.Any())
-                return; // nothing to add ...
+            var type = typeof(T);
 
-            foreach (var curiesLink in links)
-            {
-                if (curiesLinks.ContainsKey(curiesLink.Name))
-                    throw new DuplicateCurisLinkRegistrationException(curiesLink.Name);
-                
-                // no need to (re)validate the href, it has already been done by the ctor of CuriesLink
+            if (selfLinks.ContainsKey(type))
+                throw new DuplicateSelfLinkRegistrationException(type);
 
-                curiesLinks.Add(curiesLink.Name, curiesLink.Href);
-            }
+            selfLinks.Add(type, link);
         }
 
-        public void RegisterLinks<T>(params Link[] links)
+        public void RegisterLinks<T>(params Link[] links) where T : class, IResource
         {
             if (links == null) 
                 throw new ArgumentNullException("links");
@@ -79,7 +72,7 @@ namespace WebApi.Hal
 
         public IHypermediaConfiguration Build()
         {
-            return new HypermediaConfiguration(selfLinks, hypermedia, curiesLinks, builders, mode);
+            return new HypermediaConfiguration(selfLinks, hypermedia, appenders, mode);
         }
     }
 }

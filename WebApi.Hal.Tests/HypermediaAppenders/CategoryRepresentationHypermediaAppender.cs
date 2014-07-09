@@ -1,21 +1,22 @@
 using System.Collections.Generic;
+using WebApi.Hal.Interfaces;
 using WebApi.Hal.Tests.Representations;
 
 namespace WebApi.Hal.Tests.HypermediaAppenders
 {
-    public class CategoryRepresentationHypermediaAppender : HypermediaAppender<CategoryRepresentation>
+    public class CategoryRepresentationHypermediaAppender : IHypermediaAppender<CategoryRepresentation>
     {
-        public override void Append(IEnumerable<Link> configured)
+        public void Append(CategoryRepresentation resource, IEnumerable<Link> configured)
         {
             foreach (var link in configured)
             {
                 switch (link.Rel)
                 {
                     case Link.RelForSelf:
-                        Resource.Links.Add(link.CreateLink(new { id = Resource.Id }));
+                        resource.Links.Add(link.CreateLink(new { id = resource.Id }));
                         break;
                     default:
-                        Resource.Links.Add(link); // append untouched ...
+                        resource.Links.Add(link); // append untouched ...
                         break;
                 }
             }

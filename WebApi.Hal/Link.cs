@@ -1,24 +1,64 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
+    public class Link<T> : Link where T : class, IResource
+    {
+        // simply for typing purposes (avoid magic strings) ...
+
+        public Link()
+        {
+        }
+
+        public Link(string rel, string href, CuriesLink curie) : base(rel, href, curie)
+        {
+        }
+
+        public Link(string rel, string href, string title = null) : base(rel, href, title)
+        {
+        }
+    }
+
     public class Link
     {
         public const string RelForSelf = "self";
         public const string RelForCuries = "curies";
 
         string linkRelation;
+        readonly CuriesLink curie;
 
         public Link()
         { }
+
+        public Link(string rel, string href, CuriesLink curie)
+        {
+            if (string.IsNullOrEmpty(rel)) 
+                throw new ArgumentNullException("rel");
+
+            if (string.IsNullOrEmpty(href)) 
+                throw new ArgumentNullException("href");
+            
+            if (curie == null) 
+                throw new ArgumentNullException("curie");
+
+            Rel = rel;
+            Href = href;
+            this.curie = curie;
+        }
 
         public Link(string rel, string href, string title = null)
         {
             Rel = rel;
             Href = href;
             Title = title;
+        }
+
+        public CuriesLink Curie
+        {
+            get { return curie; }
         }
 
         public string Rel

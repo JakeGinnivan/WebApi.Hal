@@ -1,4 +1,9 @@
-﻿using System.Linq;
+﻿using System.Configuration;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using ApprovalTests;
+using ApprovalTests.Reporters;
 using WebApi.Hal.Tests.HypermediaAppenders;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
@@ -8,6 +13,36 @@ namespace WebApi.Hal.Tests
     public class HypermediaConfigurationTests
     {
         readonly ProductRepresentation representation = new ProductRepresentation();
+
+        [Fact]
+        [UseReporter(typeof(DiffReporter))]
+        public void CanUseRegisterExtensionMethod()
+        {
+            var builder = new HypermediaConfigurationBuilder();
+            var link = new Link<ProductRepresentation>("product", "http://www.product.com?id=1");
+            var link2 = new Link("related", "http://www.related.com");
+            var link3 = new Link<CategoryRepresentation>("category", "http://www.category.com");
+
+            builder.Register(link, link2, link3);
+            
+            var config = builder.Build();
+
+            // arrange
+            var mediaFormatter = new JsonHalMediaTypeFormatter(config) { Indent = true };
+            var content = new StringContent(string.Empty);
+            var type = representation.GetType();
+
+            // act
+            using (var stream = new MemoryStream())
+            {
+                mediaFormatter.WriteToStreamAsync(type, representation, stream, content, null);
+                stream.Seek(0, SeekOrigin.Begin);
+                var serialisedResult = new StreamReader(stream).ReadToEnd();
+
+                // assert
+                Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
+            }
+        }
 
         [Fact]
         public void CanRegisterAndResolveAHypermediaAppender()
@@ -74,53 +109,59 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void CanRegisterSingleCuriesLinkAndResolveItBasedOnALink()
-        {
-            const string href = "http://api.example.com/docs/{rel}"; 
-            
-            var link = new Link("foo:bar", "http://api.example.com/baz");
-            var builder = new HypermediaConfigurationBuilder();
-
-            builder.RegisterCuries(new CuriesLink("foo", href));
-
-            var config = builder.Build();
-            var curies = config.ResolveCuries(link);
-
-            Assert.Equal(1, curies.Count());
-            Assert.Equal(href, curies.First().Href);
-        }
-
-        [Fact]
-        public void CanRegisterMultipleCuriesLinksAndResolveOneBasedOnALink()
+        public void CanRegisterASelfLinkAndExtractACuriesLink()
         {
             const string href = "http://api.example.com/docs/{rel}";
 
-            var link = new Link("foo:bar", "http://api.example.com/baz");
+            var foo = new CuriesLink("foo", href);
+            var link = foo.CreateLink("bar", "http://api.example.com/baz");
             var builder = new HypermediaConfigurationBuilder();
 
-            builder.RegisterCuries(new CuriesLink("foo", href), new CuriesLink("qux", "http://api.company.com/docs/{rel}"));
+            builder.RegisterSelf<ProductRepresentation>(link);
 
             var config = builder.Build();
-            var curies = config.ResolveCuries(link);
+            var curies = config.ExtractUniqueCuriesLinks(link);
 
             Assert.Equal(1, curies.Count());
             Assert.Equal(href, curies.First().Href);
         }
 
         [Fact]
-        public void CanRegisterMultipleCuriesLinksAndResolveAllBasedOnLinks()
+        public void CanRegisterALinkAndExtractACuriesLink()
+        {
+            const string href = "http://api.example.com/docs/{rel}";
+
+            var foo = new CuriesLink("foo", href);
+            var link = foo.CreateLink("bar", "http://api.example.com/baz");
+            var builder = new HypermediaConfigurationBuilder();
+
+            builder.RegisterLinks<ProductRepresentation>(link);
+
+            var config = builder.Build();
+            var curies = config.ExtractUniqueCuriesLinks(link);
+
+            Assert.Equal(1, curies.Count());
+            Assert.Equal(href, curies.First().Href);
+        }
+
+        [Fact]
+        public void CanRegistermultipleLinksAndExtractAllCuriesLink()
         {
             const string hrefFoo = "http://api.example.com/docs/{rel}";
             const string hrefQux = "http://api.company.com/docs/{rel}";
 
-            var link1 = new Link("foo:bar", "http://api.example.com/baz");
-            var link2 = new Link("qux:bar", "http://api.company.com/baz");
+            var curie1 = new CuriesLink("foo", hrefFoo);
+            var curie2 = new CuriesLink("bar", hrefQux);
+
+            var link1 = curie1.CreateLink("baz", "http://api.example.com/baz");
+            var link2 = curie2.CreateLink("qux", "http://api.company.com/baz");
+            
             var builder = new HypermediaConfigurationBuilder();
             
-            builder.RegisterCuries(new CuriesLink("foo", hrefFoo), new CuriesLink("qux", hrefQux));
+            builder.RegisterLinks<ProductRepresentation>(link1, link2);
 
             var config = builder.Build();
-            var curies = config.ResolveCuries(link1, link2);
+            var curies = config.ExtractUniqueCuriesLinks(link1, link2);
 
             Assert.Equal(2, curies.Count());
             Assert.True(curies.Any(x => x.Href == hrefFoo));
