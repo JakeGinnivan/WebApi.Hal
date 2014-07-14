@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using WebApi.Hal.Interfaces;
 
@@ -9,20 +9,28 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var resourceList = (ILookup<string, IResource>)value;
+            var resourceList = (IList<EmbeddedResource>)value;
             if (resourceList.Count == 0) return;
 
             writer.WriteStartObject();
 
             foreach (var rel in resourceList)
             {
-                writer.WritePropertyName(rel.Key);
-                writer.WriteStartArray();
-                foreach (var res in rel)
+                writer.WritePropertyName(NormalizeRel(rel.Resources[0]));
+                if (rel.IsSourceAnArray)
+                    writer.WriteStartArray();
+                foreach (var res in rel.Resources)
                     serializer.Serialize(writer, res);
-                writer.WriteEndArray();
+                if (rel.IsSourceAnArray)
+                    writer.WriteEndArray();
             }
             writer.WriteEndObject();
+        }
+
+        private static string NormalizeRel(IResource res)
+        {
+            if (!string.IsNullOrEmpty(res.Rel)) return res.Rel;
+            return "unknownRel-" + res.GetType().Name;
         }
 
         public override bool CanRead
@@ -38,7 +46,7 @@ namespace WebApi.Hal.JsonConverters
 
         public override bool CanConvert(Type objectType)
         {
-            return typeof(ILookup<string, IResource>).IsAssignableFrom(objectType);
+            return typeof(IList<EmbeddedResource>).IsAssignableFrom(objectType);
         }
     }
 }

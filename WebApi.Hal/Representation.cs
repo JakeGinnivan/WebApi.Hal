@@ -17,7 +17,7 @@ namespace WebApi.Hal
         }
 
         [JsonProperty("_embedded")]
-        private ILookup<string, IResource> Embedded { get; set; }
+        private IList<EmbeddedResource> Embedded { get; set; }
 
         [JsonIgnore]
         readonly IDictionary<PropertyInfo, object> embeddedResourceProperties = new Dictionary<PropertyInfo, object>();
@@ -33,27 +33,42 @@ namespace WebApi.Hal
             if (ResourceConverter.IsResourceConverterContext(context))
             {
                 // put all embedded resources and lists of resources into Embedded for the _embedded serializer
-                var resourceList = new List<IResource>();
+                Embedded = new List<EmbeddedResource>();
                 foreach (var prop in GetType().GetProperties().Where(p => IsEmbeddedResourceType(p.PropertyType)))
                 {
                     var val = prop.GetValue(this, null);
-                    if (val != null)
+                    if (val == null) continue;
+                    // remember embedded resource property for restoring after serialization
+                    embeddedResourceProperties.Add(prop, val);
+                    // add embedded resource to collection for the serializtion
+                    var res = val as IResource;
+                    var embeddedResource = new EmbeddedResource();
+                    if (res != null)
                     {
-                        // remember embedded resource property for restoring after serialization
-                        embeddedResourceProperties.Add(prop, val);
-                        // add embedded resource to collection for the serializtion
-                        var res = val as IResource;
-                        if (res != null)
-                            resourceList.Add(res);
-                        else
-                            resourceList.AddRange((IEnumerable<IResource>) val);
-                        // null out the embedded property so it doesn't serialize separately as a property
-                        prop.SetValue(this, null, null);
+                        embeddedResource.IsSourceAnArray = false;
+                        embeddedResource.Resources.Add(res);
+                        Embedded.Add(embeddedResource);
                     }
+                    else
+                    {
+                        var resEnum = val as IEnumerable<IResource>;
+                        if (resEnum != null)
+                        {
+                            var resList = resEnum.ToList();
+                            if (resList.Count > 0)
+                            {
+                                embeddedResource.IsSourceAnArray = true;
+                                foreach (var resElem in resList)
+                                    embeddedResource.Resources.Add(resElem);
+                                Embedded.Add(embeddedResource);
+                            }
+                        }
+                    }
+                    // null out the embedded property so it doesn't serialize separately as a property
+                    prop.SetValue(this, null, null);
                 }
-                foreach (var res in resourceList.Where(r => string.IsNullOrEmpty(r.Rel)))
-                    res.Rel = "unknownRel-" + res.GetType().Name;
-                Embedded = resourceList.Count > 0 ? resourceList.ToLookup(r => r.Rel) : null;
+                if (Embedded.Count == 0)
+                    Embedded = null;
             }
         }
 
@@ -77,7 +92,7 @@ namespace WebApi.Hal
         public void RepopulateHyperMedia()
         {
             CreateHypermedia();
-            if (Links.Count(l=>l.Rel == "self") == 0)
+            if (!string.IsNullOrEmpty(Href) && Links.Count(l=>l.Rel == "self") == 0)
                 Links.Insert(0, new Link { Rel = "self", Href = Href });
         }
 
@@ -93,5 +108,16 @@ namespace WebApi.Hal
         public IList<Link> Links { get; set; }
 
         protected internal abstract void CreateHypermedia();
+    }
+
+    internal class EmbeddedResource
+    {
+        public EmbeddedResource()
+        {
+            Resources = new List<IResource>();
+        }
+
+        public bool IsSourceAnArray { get; set; }
+        public IList<IResource> Resources { get; private set; }
     }
 }
