@@ -65,7 +65,7 @@ namespace WebApi.Hal.JsonConverters
 
         static bool IsResource(Type objectType)
         {
-            return typeof(Representation).IsAssignableFrom(objectType);
+            return typeof(IResource).IsAssignableFrom(objectType);
         }
     }
 }
