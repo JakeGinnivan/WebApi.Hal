@@ -218,7 +218,7 @@ namespace WebApi.Hal
 
         public override bool CanWriteType(Type type)
         {
-            return typeof(Representation).IsAssignableFrom(type);
+            return typeof(IResource).IsAssignableFrom(type);
         }
     }
 }
