@@ -16,11 +16,23 @@ namespace WebApi.Hal.JsonConverters
 
             foreach (var rel in resourceList)
             {
+                var count = rel.Count();
+                if (count == 0) continue;
+
                 writer.WritePropertyName(rel.Key);
-                writer.WriteStartArray();
-                foreach (var res in rel)
-                    serializer.Serialize(writer, res);
-                writer.WriteEndArray();
+                if (count > 1)
+                {
+                    writer.WriteStartArray();
+                    foreach (var res in rel)
+                    {
+                        serializer.Serialize(writer, res);
+                    }
+                    writer.WriteEndArray();
+                }
+                else 
+                {
+                    serializer.Serialize(writer, rel.Single());
+                }
             }
             writer.WriteEndObject();
         }
