@@ -46,7 +46,7 @@ namespace WebApi.Hal
                 var curies = ExtractUniqueCuriesLinks(all);
 
                 foreach (var link in curies)
-                    representation.Links.Add(link);
+                    representation.Links.Insert(0, link);
 
                 /*
                  * TODO: IMHO we should also add links to any embedded resource to its direct parent
