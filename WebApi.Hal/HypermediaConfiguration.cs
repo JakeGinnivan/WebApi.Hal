@@ -13,7 +13,7 @@ namespace WebApi.Hal
         readonly IDictionary<Type, object> appenders;
         readonly HypermediaConfigurationMode mode;
 
-        public HypermediaConfiguration(IDictionary<Type, Link> selfLinks, IDictionary<Type, IList<Link>> hypermedia, IDictionary<Type, object> appenders, HypermediaConfigurationMode mode)
+        internal HypermediaConfiguration(IDictionary<Type, Link> selfLinks, IDictionary<Type, IList<Link>> hypermedia, IDictionary<Type, object> appenders, HypermediaConfigurationMode mode)
         {
             if (selfLinks == null) 
                 throw new ArgumentNullException("selfLinks");
@@ -110,6 +110,16 @@ namespace WebApi.Hal
         {
             var type = resource.GetType();
 
+            return GetRel(type);
+        }
+
+        public string ResolveRel<T>() where T : class, IResource
+        {
+            return GetRel(typeof(T));
+        }
+
+        string GetRel(Type type)
+        {
             if (selfLinks.ContainsKey(type))
                 return selfLinks[type].Rel;
 
@@ -121,8 +131,16 @@ namespace WebApi.Hal
 
         public Link ResolveSelf(IResource resource)
         {
-            var type = resource.GetType();
+            return ResolveSelf(resource.GetType());
+        }
 
+        public Link ResolveSelf<T>() where T : class, IResource
+        {
+            return ResolveSelf(typeof(T));
+        }
+
+        Link ResolveSelf(Type type)
+        {
             if (selfLinks.ContainsKey(type))
             {
                 var clone = selfLinks[type].Clone();
