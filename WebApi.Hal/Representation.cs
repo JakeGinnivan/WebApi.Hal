@@ -28,6 +28,11 @@ namespace WebApi.Hal
             if (!ResourceConverter.IsResourceConverterContext(context))
                 return;
 
+            // Clear the embeddedResourceProperties in order to make this object re-serializable.
+            embeddedResourceProperties.Clear();
+
+            RepopulateHyperMedia();
+
             var ctx = (HalJsonConverterContext) context.Context;
 
             if (ctx.HypermediaConfiguration != null)

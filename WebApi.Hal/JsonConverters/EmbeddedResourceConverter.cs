@@ -17,12 +17,10 @@ namespace WebApi.Hal.JsonConverters
             foreach (var rel in resourceList)
             {
                 writer.WritePropertyName(rel.Key);
-                if (rel.Count() > 1)
-                    writer.WriteStartArray();
+                writer.WriteStartArray();
                 foreach (var res in rel)
                     serializer.Serialize(writer, res);
-                if (rel.Count() > 1)
-                    writer.WriteEndArray();
+                writer.WriteEndArray();
             }
             writer.WriteEndObject();
         }

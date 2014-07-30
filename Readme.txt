@@ -1,5 +1,10 @@
 Release Notes
 
+Version 2.3.0
+ - Serialization of one-item SimpleListRepresentation (now is always an array)
+ - Support .net 4.5 (Currently is 4.5.1 for no reason)
+ - Update WebApi references to 5.1.2
+
 Version 2.2.0
 - Deserialize HAL resources into C# objects
 - Representation.Href and .Rel virtual
