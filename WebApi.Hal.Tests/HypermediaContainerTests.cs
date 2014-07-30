@@ -60,6 +60,19 @@ namespace WebApi.Hal.Tests
             Assert.True(ReferenceEquals(appender, registered));
 
         }
+
+        [Fact]
+        public void ResolvesNullHypermediaAppenderIfNotRegistered()
+        {
+            var resource = new ProductRepresentation();
+            var builder = new HypermediaContainerBuilder();
+
+            var config = builder.Build();
+            var registered = config.ResolveAppender(resource);
+
+            Assert.Null(registered);
+        }
+
         [Fact]
         public void CanRegisterAndResolveASelfLinkForARepresentation()
         {
