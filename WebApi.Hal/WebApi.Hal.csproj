@@ -70,10 +70,11 @@
     <Compile Include="Exceptions\MissingCuriesLinkException.cs" />
     <Compile Include="Exceptions\MissingHypermediaBuilderException.cs" />
     <Compile Include="Exceptions\MissingSelfLinkException.cs" />
-    <Compile Include="HypermediaConfigurationBuilderExtensions.cs" />
-    <Compile Include="HypermediaConfiguration.cs" />
-    <Compile Include="HypermediaConfigurationBuilder.cs" />
+    <Compile Include="HypermediaContainerBuilderExtensions.cs" />
+    <Compile Include="HypermediaContainer.cs" />
+    <Compile Include="HypermediaContainerBuilder.cs" />
     <Compile Include="HypermediaConfigurationMode.cs" />
+    <Compile Include="IHypermediaContainer.cs" />
     <Compile Include="IHypermediaAppender.cs" />
     <Compile Include="IHypermediaConfiguration.cs" />
     <Compile Include="Interfaces\IRepresentationList.cs" />

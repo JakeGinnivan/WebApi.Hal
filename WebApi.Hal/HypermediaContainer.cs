@@ -6,14 +6,14 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    class HypermediaConfiguration : IHypermediaConfiguration
+    class HypermediaContainer : IHypermediaContainer
     {
         readonly IDictionary<Type, Link> selfLinks;
         readonly IDictionary<Type, IList<Link>> hypermedia;
         readonly IDictionary<Type, object> appenders;
         readonly HypermediaConfigurationMode mode;
 
-        internal HypermediaConfiguration(IDictionary<Type, Link> selfLinks, IDictionary<Type, IList<Link>> hypermedia, IDictionary<Type, object> appenders, HypermediaConfigurationMode mode)
+        internal HypermediaContainer(IDictionary<Type, Link> selfLinks, IDictionary<Type, IList<Link>> hypermedia, IDictionary<Type, object> appenders, HypermediaConfigurationMode mode)
         {
             if (selfLinks == null) 
                 throw new ArgumentNullException("selfLinks");
@@ -70,7 +70,7 @@ namespace WebApi.Hal
                 var resourceType = resource.GetType();
 
                 // As the IHypermediaAppender interface is generic and the parameter of the Append 
-                // method which represents the resource is typed based on that, we need some reflection
+                // method (which represents the resource) is typed based on that, we need some reflection
                 // in order to resolve the appender and to subsequently invoke the Append method on it.
 
                 var info = GetType().GetMethod("ResolveAppender");

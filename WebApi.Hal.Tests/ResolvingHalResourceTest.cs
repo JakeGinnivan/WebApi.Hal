@@ -39,7 +39,7 @@ namespace WebApi.Hal.Tests
             var saleProductLink = example.CreateLink("product-on-sale", "http://api.example.com/products/sale/{id}");
             var categoryLink = example.CreateLink("category", "http://api.example.com/categories/{id}");
 
-            var builder = new HypermediaConfigurationBuilder();
+            var builder = new HypermediaContainerBuilder();
 
             builder.RegisterAppender(new ProductRepresentationHypermediaAppender());
             builder.RegisterAppender(new CategoryRepresentationHypermediaAppender());

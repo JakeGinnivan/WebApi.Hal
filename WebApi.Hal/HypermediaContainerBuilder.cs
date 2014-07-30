@@ -6,14 +6,14 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    public class HypermediaConfigurationBuilder
+    public class HypermediaContainerBuilder
     {
         readonly IDictionary<Type, object> appenders = new Dictionary<Type, object>();
         readonly IDictionary<Type, Link> selfLinks = new Dictionary<Type, Link>();
         readonly IDictionary<Type, IList<Link>> hypermedia = new Dictionary<Type, IList<Link>>();
         readonly HypermediaConfigurationMode mode;
 
-        public HypermediaConfigurationBuilder(HypermediaConfigurationMode mode = HypermediaConfigurationMode.Loose)
+        public HypermediaContainerBuilder(HypermediaConfigurationMode mode = HypermediaConfigurationMode.Loose)
         {
             this.mode = mode;
         }
@@ -70,9 +70,9 @@ namespace WebApi.Hal
                 hypermedia.Add(type, links.Distinct(new LinkEqualityComparer()).ToList());
         }
 
-        public IHypermediaConfiguration Build()
+        public IHypermediaContainer Build()
         {
-            return new HypermediaConfiguration(selfLinks, hypermedia, appenders, mode);
+            return new HypermediaContainer(selfLinks, hypermedia, appenders, mode);
         }
     }
 }

@@ -5,9 +5,9 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    public static class HypermediaConfigurationBuilderExtensions
+    public static class HypermediaContainerBuilderExtensions
     {
-        public static void Register<T>(this HypermediaConfigurationBuilder builder, Link<T> selfLink, IHypermediaAppender<T> appender, params Link[] links) where T : class, IResource
+        public static void Register<T>(this HypermediaContainerBuilder builder, Link<T> selfLink, IHypermediaAppender<T> appender, params Link[] links) where T : class, IResource
         {
             if (selfLink == null)
                 throw new ArgumentNullException("selfLink");
@@ -20,7 +20,7 @@ namespace WebApi.Hal
             builder.RegisterLinks<T>(links);
         }
 
-        public static void Register<T>(this HypermediaConfigurationBuilder builder, Link<T> selfLink, Action<T, IEnumerable<Link>> appender, params Link[] links) where T : class, IResource
+        public static void Register<T>(this HypermediaContainerBuilder builder, Link<T> selfLink, Action<T, IEnumerable<Link>> appender, params Link[] links) where T : class, IResource
         {
             if (selfLink == null)
                 throw new ArgumentNullException("selfLink");
@@ -33,7 +33,7 @@ namespace WebApi.Hal
             builder.RegisterLinks<T>(links);
         }
 
-        public static void Register<T>(this HypermediaConfigurationBuilder builder, Link<T> selfLink, params Link[] links) where T : class, IResource
+        public static void Register<T>(this HypermediaContainerBuilder builder, Link<T> selfLink, params Link[] links) where T : class, IResource
         {
             if (selfLink == null)
                 throw new ArgumentNullException("selfLink");

@@ -74,7 +74,7 @@
     <Compile Include="HalResourceTest.cs" />
     <Compile Include="HypermediaAppenders\CategoryRepresentationHypermediaAppender.cs" />
     <Compile Include="HypermediaAppenders\ProductRepresentationHypermediaAppender.cs" />
-    <Compile Include="HypermediaConfigurationTests.cs" />
+    <Compile Include="HypermediaContainerTests.cs" />
     <Compile Include="Representations\CategoryRepresentation.cs" />
     <Compile Include="Representations\OrganisationListRepresentation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

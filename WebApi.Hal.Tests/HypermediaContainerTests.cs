@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Net.Http;
 using ApprovalTests;
@@ -10,7 +9,7 @@ using Xunit;
 
 namespace WebApi.Hal.Tests
 {
-    public class HypermediaConfigurationTests
+    public class HypermediaContainerTests
     {
         readonly ProductRepresentation representation = new ProductRepresentation();
 
@@ -20,13 +19,12 @@ namespace WebApi.Hal.Tests
         {
             var curie = new CuriesLink("aap", "http://www.helpt.com/{?rel}");
 
-            var builder = new HypermediaConfigurationBuilder();
-            var link = new Link<ProductRepresentation>("product", "http://www.product.com?id=1");
+            var builder = new HypermediaContainerBuilder();
+            var selfLink = new Link<ProductRepresentation>("product", "http://www.product.com?id=1");
             var link2 = new Link("related", "http://www.related.com");
             var link3 = curie.CreateLink<CategoryRepresentation>("category", "http://www.category.com");
             
-
-            builder.Register(link, link2, link3);
+            builder.Register(selfLink, link2, link3);
             
             var config = builder.Build();
 
@@ -52,7 +50,7 @@ namespace WebApi.Hal.Tests
         {
             var appender = new ProductRepresentationHypermediaAppender();
             var resource = new ProductRepresentation();
-            var builder = new HypermediaConfigurationBuilder();
+            var builder = new HypermediaContainerBuilder();
 
             builder.RegisterAppender(appender);
 
@@ -68,7 +66,7 @@ namespace WebApi.Hal.Tests
             const string href = "http://api.example.com/products/{id}";
 
             var link = new Link("example-namespace:product", href); 
-            var builder = new HypermediaConfigurationBuilder();
+            var builder = new HypermediaContainerBuilder();
             
             builder.RegisterSelf<ProductRepresentation>(link);
             
@@ -82,7 +80,7 @@ namespace WebApi.Hal.Tests
         [Fact]
         public void CanRegisterAndResolveALinkForASingleRepresentation()
         {
-            var builder = new HypermediaConfigurationBuilder();
+            var builder = new HypermediaContainerBuilder();
             var link = new Link();
 
             builder.RegisterLinks<ProductRepresentation>(link);
@@ -99,7 +97,7 @@ namespace WebApi.Hal.Tests
         {
             var link1 = new Link("foo", "bar");
             var link2 = new Link("baz", "qux");
-            var builder = new HypermediaConfigurationBuilder();
+            var builder = new HypermediaContainerBuilder();
 
             builder.RegisterLinks<ProductRepresentation>(link1, link2);
 
@@ -118,7 +116,7 @@ namespace WebApi.Hal.Tests
 
             var foo = new CuriesLink("foo", href);
             var link = foo.CreateLink("bar", "http://api.example.com/baz");
-            var builder = new HypermediaConfigurationBuilder();
+            var builder = new HypermediaContainerBuilder();
 
             builder.RegisterSelf<ProductRepresentation>(link);
 
@@ -136,7 +134,7 @@ namespace WebApi.Hal.Tests
 
             var foo = new CuriesLink("foo", href);
             var link = foo.CreateLink("bar", "http://api.example.com/baz");
-            var builder = new HypermediaConfigurationBuilder();
+            var builder = new HypermediaContainerBuilder();
 
             builder.RegisterLinks<ProductRepresentation>(link);
 
@@ -159,7 +157,7 @@ namespace WebApi.Hal.Tests
             var link1 = curie1.CreateLink("baz", "http://api.example.com/baz");
             var link2 = curie2.CreateLink("qux", "http://api.company.com/baz");
             
-            var builder = new HypermediaConfigurationBuilder();
+            var builder = new HypermediaContainerBuilder();
             
             builder.RegisterLinks<ProductRepresentation>(link1, link2);
 
