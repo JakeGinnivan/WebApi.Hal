@@ -11,9 +11,8 @@ namespace WebApi.Hal
         readonly IDictionary<Type, Link> selfLinks;
         readonly IDictionary<Type, IList<Link>> hypermedia;
         readonly IDictionary<Type, object> appenders;
-        readonly HypermediaConfigurationMode mode;
 
-        internal HypermediaContainer(IDictionary<Type, Link> selfLinks, IDictionary<Type, IList<Link>> hypermedia, IDictionary<Type, object> appenders, HypermediaConfigurationMode mode)
+        internal HypermediaContainer(IDictionary<Type, Link> selfLinks, IDictionary<Type, IList<Link>> hypermedia, IDictionary<Type, object> appenders)
         {
             if (selfLinks == null) 
                 throw new ArgumentNullException("selfLinks");
@@ -27,7 +26,6 @@ namespace WebApi.Hal
             this.selfLinks = selfLinks;
             this.hypermedia = hypermedia;
             this.appenders = appenders;
-            this.mode = mode;
         }
 
         public void Configure(IResource resource)
@@ -76,10 +74,14 @@ namespace WebApi.Hal
                 var info = GetType().GetMethod("ResolveAppender");
                 var typedInfo = info.MakeGenericMethod(resourceType);
                 var appender = typedInfo.Invoke(this, new object[] {resource});
+
+                if (appender == null) 
+                    return; // no appender registered, so we're done ...
+
                 var appenderType = appender.GetType();
                 var appendMethodInfo = appenderType.GetMethod("Append");
-                
-                appendMethodInfo.Invoke(appender, new object[]{resource, configured});
+
+                appendMethodInfo.Invoke(appender, new object[] {resource, configured});
             }
             catch (Exception e)
             {
@@ -92,7 +94,7 @@ namespace WebApi.Hal
             var type = resource.GetType();
 
             if (!appenders.ContainsKey(type)) 
-                throw new MissingHypermediaBuilderException(type);
+                return null;
             
             return (IHypermediaAppender<T>) appenders[type];
         }
@@ -123,9 +125,6 @@ namespace WebApi.Hal
             if (selfLinks.ContainsKey(type))
                 return selfLinks[type].Rel;
 
-            if (mode == HypermediaConfigurationMode.Strict)
-                throw new MissingSelfLinkException(type);
-
             return type.Name;
         }
 
@@ -147,9 +146,6 @@ namespace WebApi.Hal
                 clone.Rel = Link.RelForSelf;
                 return clone;
             }
-
-            if (mode == HypermediaConfigurationMode.Strict)
-                throw new MissingSelfLinkException(type);
 
             return null;
         }

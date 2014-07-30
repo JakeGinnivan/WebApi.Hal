@@ -11,12 +11,6 @@ namespace WebApi.Hal
         readonly IDictionary<Type, object> appenders = new Dictionary<Type, object>();
         readonly IDictionary<Type, Link> selfLinks = new Dictionary<Type, Link>();
         readonly IDictionary<Type, IList<Link>> hypermedia = new Dictionary<Type, IList<Link>>();
-        readonly HypermediaConfigurationMode mode;
-
-        public HypermediaContainerBuilder(HypermediaConfigurationMode mode = HypermediaConfigurationMode.Loose)
-        {
-            this.mode = mode;
-        }
 
         public void RegisterAppender<T>(IHypermediaAppender<T> appender) where T : class, IResource
         {
@@ -72,7 +66,7 @@ namespace WebApi.Hal
 
         public IHypermediaContainer Build()
         {
-            return new HypermediaContainer(selfLinks, hypermedia, appenders, mode);
+            return new HypermediaContainer(selfLinks, hypermedia, appenders);
         }
     }
 }

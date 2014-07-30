@@ -67,13 +67,9 @@
     <Compile Include="Exceptions\DuplicateCurisLinkRegistrationException.cs" />
     <Compile Include="Exceptions\DuplicateHypermediaResolverRegistrationException.cs" />
     <Compile Include="Exceptions\DuplicateSelfLinkRegistrationException.cs" />
-    <Compile Include="Exceptions\MissingCuriesLinkException.cs" />
-    <Compile Include="Exceptions\MissingHypermediaBuilderException.cs" />
-    <Compile Include="Exceptions\MissingSelfLinkException.cs" />
     <Compile Include="HypermediaContainerBuilderExtensions.cs" />
     <Compile Include="HypermediaContainer.cs" />
     <Compile Include="HypermediaContainerBuilder.cs" />
-    <Compile Include="HypermediaConfigurationMode.cs" />
     <Compile Include="IHypermediaContainer.cs" />
     <Compile Include="IHypermediaAppender.cs" />
     <Compile Include="IHypermediaConfiguration.cs" />
