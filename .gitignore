@@ -101,6 +101,9 @@ packages
 # any logs
 *.log
 
+# any received acceptance test files
+*.received.txt
+
 # our output folder for build artifacts
 artifacts
 

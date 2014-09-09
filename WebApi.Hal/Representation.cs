@@ -21,40 +21,68 @@ namespace WebApi.Hal
 
         [JsonIgnore]
         readonly IDictionary<PropertyInfo, object> embeddedResourceProperties = new Dictionary<PropertyInfo, object>();
-        
+
         [OnSerializing]
         private void OnSerialize(StreamingContext context)
         {
+            if (!ResourceConverter.IsResourceConverterContext(context))
+                return;
+
             // Clear the embeddedResourceProperties in order to make this object re-serializable.
             embeddedResourceProperties.Clear();
 
             RepopulateHyperMedia();
 
-            if (ResourceConverter.IsResourceConverterContext(context))
+            var ctx = (HalJsonConverterContext) context.Context;
+
+            if (ctx.HypermediaConfiguration != null)
             {
-                // put all embedded resources and lists of resources into Embedded for the _embedded serializer
-                var resourceList = new List<IResource>();
-                foreach (var prop in GetType().GetProperties().Where(p => IsEmbeddedResourceType(p.PropertyType)))
-                {
-                    var val = prop.GetValue(this, null);
-                    if (val != null)
-                    {
-                        // remember embedded resource property for restoring after serialization
-                        embeddedResourceProperties.Add(prop, val);
-                        // add embedded resource to collection for the serializtion
-                        var res = val as IResource;
-                        if (res != null)
-                            resourceList.Add(res);
-                        else
-                            resourceList.AddRange((IEnumerable<IResource>) val);
-                        // null out the embedded property so it doesn't serialize separately as a property
-                        prop.SetValue(this, null, null);
-                    }
-                }
-                foreach (var res in resourceList.Where(r => string.IsNullOrEmpty(r.Rel)))
-                    res.Rel = "unknownRel-" + res.GetType().Name;
-                Embedded = resourceList.Count > 0 ? resourceList.ToLookup(r => r.Rel) : null;
+                if (!ctx.IsRoot)
+                    return;
+
+                ctx.HypermediaConfiguration.Configure(this);
             }
+            else
+            {
+                RepopulateHyperMedia();
+                RepopulateEmbeddedResources();
+            }
+
+            if (ctx.IsRoot)
+                ctx.IsRoot = false;
+        }
+
+        internal void RepopulateEmbeddedResources(Func<IResource, string> getRel = null)
+        {
+            // put all embedded resources and lists of resources into Embedded for the _embedded serializer
+            var resourceList = new List<IResource>();
+            foreach (var prop in GetType().GetProperties().Where(p => IsEmbeddedResourceType(p.PropertyType)))
+            {
+                var val = prop.GetValue(this, null);
+                if (val != null)
+                {
+                    // remember embedded resource property for restoring after serialization
+                    embeddedResourceProperties.Add(prop, val);
+                    // add embedded resource to collection for the serializtion
+                    var res = val as IResource;
+                    if (res != null)
+                        resourceList.Add(res);
+                    else
+                        resourceList.AddRange((IEnumerable<IResource>) val);
+                    // null out the embedded property so it doesn't serialize separately as a property
+                    prop.SetValue(this, null, null);
+                }
+            }
+            
+            foreach (var res in resourceList.Where(r => string.IsNullOrEmpty(r.Rel)))
+                res.Rel = "unknownRel-" + res.GetType().Name;
+
+            Embedded = resourceList.Any()
+                ? resourceList.ToLookup(
+                    r => getRel != null
+                        ? getRel(r)
+                        : r.Rel)
+                : null;
         }
 
         [OnSerialized]
@@ -90,8 +118,37 @@ namespace WebApi.Hal
         [JsonIgnore]
         public string LinkName { get; set; }
 
-        public IList<Link> Links { get; set; }
+        public List<Link> Links { get; set; }
 
-        protected internal abstract void CreateHypermedia();
+        protected internal virtual void CreateHypermedia()
+        {
+        }
+
+        internal IEnumerable<Link> GetHypermediaDeep()
+        {
+            foreach (var link in Links)
+                yield return link;
+
+            if (Embedded == null)
+                yield break;
+
+            var embedded = Embedded.SelectMany(x => x).OfType<Representation>().SelectMany(x => x.GetHypermediaDeep());
+
+            foreach (var link in embedded)
+                yield return link;
+        }
+
+        internal void RepopulateAndConfigureDeep(Action<IResource> appendHypermedia, Func<IResource,string> getRel)
+        {
+            RepopulateEmbeddedResources(getRel);
+
+            appendHypermedia(this);
+
+            if (Embedded == null)
+                return;
+
+            foreach (var embedded in Embedded.SelectMany(x => x).OfType<Representation>())
+                embedded.RepopulateAndConfigureDeep(appendHypermedia, getRel);
+        }
     }
 }

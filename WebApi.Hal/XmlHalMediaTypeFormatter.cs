@@ -15,6 +15,8 @@ namespace WebApi.Hal
 {
     public class XmlHalMediaTypeFormatter : BufferedMediaTypeFormatter
     {
+        readonly IHypermediaConfiguration configuration;
+
         public XmlHalMediaTypeFormatter()
         {
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/hal+xml"));
