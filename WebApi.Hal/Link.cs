@@ -34,7 +34,7 @@ namespace WebApi.Hal
         /// <returns>A non templated link</returns>
         public Link CreateLink(string newRel, params object[] parameters)
         {
-            return new Link(newRel, CreateUri(parameters).ToString());
+            return new Link(newRel, CreateUri(parameters).ToString(), Title);
         }
 
         /// <summary>
