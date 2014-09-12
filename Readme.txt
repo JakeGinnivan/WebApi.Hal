@@ -1,5 +1,10 @@
 Release Notes
 
+Version 2.3.0.1
+ - Fix bug introduced in 2.3.0 of non-array embedded Representation getting serialized improperly as array
+ - Serialize link Title
+ - Don't create self link if href is unspecified
+
 Version 2.3.0
  - Serialization of one-item SimpleListRepresentation (now is always an array)
  - Support .net 4.5 (Currently is 4.5.1 for no reason)

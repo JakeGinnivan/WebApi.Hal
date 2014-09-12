@@ -61,6 +61,50 @@ namespace WebApi.Hal.Tests
 
         [Fact]
         [UseReporter(typeof(DiffReporter))]
+        public void organisation_get_json_with_no_href_test()
+        {
+            // arrange
+            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var content = new StringContent(string.Empty);
+            var resourceWithAppPath = new OrganisationWithNoHrefRepresentation(1, "Org Name");
+            var type = resourceWithAppPath.GetType();
+
+            // act
+            using (var stream = new MemoryStream())
+            {
+                mediaFormatter.WriteToStreamAsync(type, resourceWithAppPath, stream, content, null);
+                stream.Seek(0, SeekOrigin.Begin);
+                var serialisedResult = new StreamReader(stream).ReadToEnd();
+
+                // assert
+                Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
+            }
+        }
+
+        [Fact]
+        [UseReporter(typeof(DiffReporter))]
+        public void organisation_get_json_with_link_title_test()
+        {
+            // arrange
+            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var content = new StringContent(string.Empty);
+            var resourceWithAppPath = new OrganisationWithLinkTitleRepresentation(1, "Org Name");
+            var type = resourceWithAppPath.GetType();
+
+            // act
+            using (var stream = new MemoryStream())
+            {
+                mediaFormatter.WriteToStreamAsync(type, resourceWithAppPath, stream, content, null);
+                stream.Seek(0, SeekOrigin.Begin);
+                var serialisedResult = new StreamReader(stream).ReadToEnd();
+
+                // assert
+                Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
+            }
+        }
+
+        [Fact]
+        [UseReporter(typeof(DiffReporter))]
         public void organisation_get_xml_test()
         {
             // arrange
