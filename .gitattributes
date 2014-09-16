@@ -3,6 +3,9 @@
 ###############################################################################
 * text=auto
 
+#Approval tests should not be touched by git
+*.approved.txt  binary
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
