@@ -105,7 +105,7 @@ namespace WebApi.Hal.Tests
 ""Name"": ""Dept. of Redundancy Dept."",
 ""_links"": {
  ""self"": {""href"": ""/api/organisations/3""},
- ""people"": {""href"": ""/api/organisations/3/people""},
+ ""people"": {""href"": ""/api/organisations/3/people"", ""type"":""text/html"", ""profile"":""urn:somevalue""},
  ""brownnoser"": [
    {""href"": ""/api/organisations/3/brown/1""},
    {""href"": ""/api/organisations/3/brown/2""}
@@ -131,6 +131,8 @@ namespace WebApi.Hal.Tests
                 var people = org.Links.Where(l => l.Rel == "people").ToList();
                 Assert.Equal(1, people.Count);
                 Assert.Equal("/api/organisations/3/people", people[0].Href);
+                Assert.Equal("text/html", people[0].Type);
+                Assert.Equal("urn:somevalue", people[0].Profile);
                 var brownnosers = org.Links.Where(l => l.Rel == "brownnoser").ToList();
                 Assert.Equal(2, brownnosers.Count);
                 Assert.Equal("/api/organisations/3/brown/1", brownnosers[0].Href);

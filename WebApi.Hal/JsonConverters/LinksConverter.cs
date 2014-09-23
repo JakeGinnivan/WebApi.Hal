@@ -32,11 +32,10 @@ namespace WebApi.Hal.JsonConverters
                         writer.WritePropertyName("templated");
                         writer.WriteValue(true);
                     }
-                    if (!string.IsNullOrEmpty(link.Title))
-                    {
-                        writer.WritePropertyName("title");
-                        writer.WriteValue(link.Title);
-                    }
+                    WriteIfNotNullOrEmpty(writer, link.Title, "title");
+                    WriteIfNotNullOrEmpty(writer, link.Profile, "profile");
+                    WriteIfNotNullOrEmpty(writer, link.Type, "type"); 
+                   
 
                     writer.WriteEndObject();
                 }
@@ -44,6 +43,15 @@ namespace WebApi.Hal.JsonConverters
                     writer.WriteEndArray();
             }
             writer.WriteEndObject();
+        }
+
+        private static void WriteIfNotNullOrEmpty(JsonWriter writer, string val, string name)
+        {
+            if (!string.IsNullOrEmpty(val))
+            {
+                writer.WritePropertyName(name);
+                writer.WriteValue(val);
+            }
         }
 
         public override bool CanRead
