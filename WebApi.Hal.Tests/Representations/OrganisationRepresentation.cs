@@ -126,4 +126,40 @@
             Links.Add(new Link("someRel", "someHref", "someTitle"));
         }
     }
+
+
+    /// <summary>
+    /// link title
+    /// </summary>
+    public class OrganisationWithCuriesRepresentation : Representation
+    {
+        static readonly Link WithAppPath = new Link("organisation", "~/api/organisations/{0}");
+
+        public OrganisationWithCuriesRepresentation(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
+        public override string Rel
+        {
+            get { return WithAppPath.Rel; }
+            set { }
+        }
+
+        public override string Href
+        {
+            get { return null; }
+            set { }
+        }
+
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        protected override void CreateHypermedia()
+        {
+            Links.Add(new Curie {Name="br", Href="/rels/{rel}"});
+            Links.Add(new Link("someRel", "someHref", "someTitle"));
+        }
+    }
 }

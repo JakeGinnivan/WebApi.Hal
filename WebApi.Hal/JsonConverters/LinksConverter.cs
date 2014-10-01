@@ -10,11 +10,28 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var links = new HashSet<Link>((IList<Link>)value, new LinkEqualityComparer());
+            var pureLinks = ((IList<Link>) value).Where(q => q.GetType() != typeof (Curie)).ToList();
+            var curies = ((IList<Link>)value).Where(q => q.GetType() == typeof(Curie)).ToList();
+            var links = new HashSet<Link>(pureLinks, new LinkEqualityComparer());
+            var curiedLinks = new HashSet<Link>(curies, new LinkEqualityComparer());
             var lookup = links.ToLookup(l => l.Rel);
             if (lookup.Count == 0) return;
 
             writer.WriteStartObject();
+            bool hasCuries = curiedLinks.Count > 0;
+            if (hasCuries)
+            {
+                writer.WritePropertyName("curies");
+                writer.WriteStartArray();
+            
+                foreach (var rel in curiedLinks)
+                {
+                    var curie = rel as Curie;
+                    WriteCurie(writer, curie);
+                }
+            
+                writer.WriteEndArray();
+            }
 
             foreach (var rel in lookup)
             {
@@ -42,6 +59,23 @@ namespace WebApi.Hal.JsonConverters
                 if (rel.Count() > 1)
                     writer.WriteEndArray();
             }
+            writer.WriteEndObject();
+        }
+
+        void WriteCurie(JsonWriter writer, Curie curie)
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("name");
+            writer.WriteValue(curie.Rel);
+            writer.WritePropertyName("href");
+            writer.WriteValue(ResolveUri(curie.Href));
+
+            if (curie.IsTemplated)
+            {
+                writer.WritePropertyName("templated");
+                writer.WriteValue(true);
+            }
+
             writer.WriteEndObject();
         }
 

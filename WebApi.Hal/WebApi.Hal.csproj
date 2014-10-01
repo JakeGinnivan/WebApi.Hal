@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Curie.cs" />
     <Compile Include="Interfaces\IRepresentationList.cs" />
     <Compile Include="Interfaces\IResource.cs" />
     <Compile Include="JsonConverters\EmbeddedResourceConverter.cs" />
