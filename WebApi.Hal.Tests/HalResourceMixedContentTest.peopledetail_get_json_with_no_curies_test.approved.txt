@@ -1,0 +1,57 @@
+﻿{
+  "Id": 1,
+  "Name": "Org Name",
+  "_links": {
+    "self": {
+      "href": "/api/organisations/1"
+    },
+    "people": {
+      "href": "/api/organisations/1/people"
+    }
+  },
+  "_embedded": {
+    "person": [
+      {
+        "Id": 3,
+        "Name": "Dilbert",
+        "OrganisationId": 1,
+        "_links": {
+          "self": {
+            "href": "/api/organisations/1/people/3"
+          }
+        }
+      },
+      {
+        "Id": 4,
+        "Name": "Wally",
+        "OrganisationId": 1,
+        "_links": {
+          "self": {
+            "href": "/api/organisations/1/people/4"
+          }
+        }
+      },
+      {
+        "Id": 5,
+        "Name": "Alice",
+        "OrganisationId": 1,
+        "_links": {
+          "self": {
+            "href": "/api/organisations/1/people/5"
+          }
+        }
+      }
+    ],
+    "boss": {
+      "HasPointyHair": true,
+      "Id": 2,
+      "Name": "Eunice PHB",
+      "OrganisationId": 1,
+      "_links": {
+        "self": {
+          "href": "/api/organisations/1/boss"
+        }
+      }
+    }
+  }
+}
