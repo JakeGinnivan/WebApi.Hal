@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Web.Http;
-using WebApi.Hal.Web.Api;
-using Xunit;
+﻿using Xunit;
 
 namespace WebApi.Hal.Tests
 {

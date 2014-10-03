@@ -87,10 +87,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebApi.Hal.Web\WebApi.Hal.Web.csproj">
-      <Project>{2C93BCF7-6A6B-40FE-80DD-8C9C10427F02}</Project>
-      <Name>WebApi.Hal.Web</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WebApi.Hal\WebApi.Hal.csproj">
       <Project>{8A01C801-D7E6-4ACB-A843-7C3EFB7833F7}</Project>
       <Name>WebApi.Hal</Name>

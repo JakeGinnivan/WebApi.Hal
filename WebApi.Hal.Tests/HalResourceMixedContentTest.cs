@@ -41,7 +41,7 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
+                Approvals.Verify(serialisedResult);
             }
         }
 
@@ -62,7 +62,7 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
+                Approvals.Verify(serialisedResult);
             }
         }
 
