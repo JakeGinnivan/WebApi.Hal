@@ -16,10 +16,11 @@ namespace WebApi.Hal.JsonConverters
             var curiedLinks = new HashSet<Link>(curies, new LinkEqualityComparer());
             var lookup = links.ToLookup(l => l.Rel);
             if (lookup.Count == 0) return;
+            
 
             writer.WriteStartObject();
             bool hasCuries = curiedLinks.Count > 0;
-            if (hasCuries)
+            if (hasCuries && !EmbeddedResourceConverter.IsEmbeddedResourceConverterContext(serializer.Context))
             {
                 writer.WritePropertyName("curies");
                 writer.WriteStartArray();

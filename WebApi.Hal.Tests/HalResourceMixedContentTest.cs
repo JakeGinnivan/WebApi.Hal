@@ -216,6 +216,28 @@ namespace WebApi.Hal.Tests
             }
         }
 
+        [Fact]
+        [UseReporter(typeof(DiffReporter))]
+        public void peopledetail_get_json_with_no_curies_test()
+        {
+            // arrange
+            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var content = new StringContent(string.Empty);
+            resource.People[0].Links.Add(new Curie {Name="br", Href="http://test.me"});
+            var type = resource.GetType();
+
+            // act
+            using (var stream = new MemoryStream())
+            {
+                mediaFormatter.WriteToStreamAsync(type, resource, stream, content, null).Wait();
+                stream.Seek(0, SeekOrigin.Begin);
+                var serialisedResult = new StreamReader(stream).ReadToEnd();
+
+                // assert
+                Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
+            }
+        }
+
         class MySimpleList : SimpleListRepresentation<OrganisationRepresentation>
         {
             protected override void CreateHypermedia()
@@ -265,5 +287,7 @@ namespace WebApi.Hal.Tests
                 Assert.Equal("simple string", orgList.SimpleData);
             }
         }
+
+       
     }
 }

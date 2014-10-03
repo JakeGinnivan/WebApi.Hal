@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Net.Http;
+using System.Text;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using WebApi.Hal.Tests.Representations;
@@ -184,6 +185,47 @@ namespace WebApi.Hal.Tests
                 // assert
                 Approvals.Verify(serialisedResult, s => s.Replace("\r\n", "\n"));
             }
-        } 
+        }
+
+        [Fact]
+        public void curies_post_json_test()
+        {
+            // arrange
+            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var type = typeof(OrganisationRepresentation);
+            const string json = @"
+{""Id"": ""7"",""Name"": ""Org Seven"",
+    
+    ""_links"": {""self"": {""href"": ""/api/organisations/7""},
+
+""curies"": [
+
+    {
+        ""name"": ""br"",
+        ""href"": ""/rels/{rel}"",
+        ""templated"": true
+      }
+    ],},
+  
+}
+";
+
+            // act
+            using (
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
+                )
+            {
+                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+
+                // assert
+                Assert.NotNull(obj);
+                var resource = obj as OrganisationRepresentation;
+                Assert.NotNull(resource);
+                Assert.Equal("Org Seven", resource.Name);
+                Assert.Equal(2, resource.Links.Count);
+                Assert.Equal(typeof(Link), resource.Links[0].GetType());
+                Assert.Equal(typeof(Curie), resource.Links[1].GetType());
+            }
+        }
     }
 }

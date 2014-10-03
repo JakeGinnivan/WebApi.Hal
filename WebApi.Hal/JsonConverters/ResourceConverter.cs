@@ -98,11 +98,23 @@ namespace WebApi.Hal.JsonConverters
 
         static void CreateLinks(JProperty rel, IResource resource)
         {
+            if (rel.Name == "curies")
+            {
+                AddLink<Curie>(rel, resource);
+            }
+            else
+            {
+                AddLink<Link>(rel, resource);
+            }
+        }
+
+        static void AddLink<T>(JProperty rel, IResource resource) where T : Link
+        {
             if (rel.Value.Type == JTokenType.Array)
             {
                 var arr = rel.Value as JArray;
                 if (arr != null)
-                    foreach (var link in arr.Select(item => item.ToObject<Link>()))
+                    foreach (var link in arr.Select(item => item.ToObject<T>()))
                     {
                         link.Rel = rel.Name;
                         resource.Links.Add(link);
@@ -110,7 +122,7 @@ namespace WebApi.Hal.JsonConverters
             }
             else
             {
-                var link = rel.Value.ToObject<Link>();
+                var link = rel.Value.ToObject<T>();
                 link.Rel = rel.Name;
                 resource.Links.Add(link);
             }

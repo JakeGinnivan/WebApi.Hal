@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using WebApi.Hal.Interfaces;
 
@@ -7,11 +8,27 @@ namespace WebApi.Hal.JsonConverters
 {
     public class EmbeddedResourceConverter : JsonConverter
     {
+        const string StreamingContextEmbeddedConverterToken = "hal+json";
+        const StreamingContextStates StreamingContextResourceConverterState = StreamingContextStates.Clone;
+        public static bool IsEmbeddedResourceConverterContext(StreamingContext context)
+        {
+            return context.Context is string &&
+                   (string)context.Context == StreamingContextEmbeddedConverterToken &&
+                   context.State == StreamingContextResourceConverterState;
+        }
+
+        private static StreamingContext GetResourceConverterContext()
+        {
+            return new StreamingContext(StreamingContextResourceConverterState, StreamingContextEmbeddedConverterToken);
+        } 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var resourceList = (IList<EmbeddedResource>)value;
             if (resourceList.Count == 0) return;
-
+            var saveContext = serializer.Context;
+            serializer.Context = GetResourceConverterContext();
+            
+            
             writer.WriteStartObject();
 
             foreach (var rel in resourceList)
@@ -25,6 +42,7 @@ namespace WebApi.Hal.JsonConverters
                     writer.WriteEndArray();
             }
             writer.WriteEndObject();
+            serializer.Context = saveContext;
         }
 
         private static string NormalizeRel(IResource res)
