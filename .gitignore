@@ -105,3 +105,4 @@ packages
 artifacts
 
 WebApi.Hal*.nupkg
+*.received.txt
