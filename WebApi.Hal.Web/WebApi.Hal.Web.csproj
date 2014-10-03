@@ -8,7 +8,7 @@
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2C93BCF7-6A6B-40FE-80DD-8C9C10427F02}</ProjectGuid>
-    <ProjectTypeGuids>{E3E379DF-F4C6-4180-9B81-6769533ABE47};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WebApi.Hal.Web</RootNamespace>
@@ -139,7 +139,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Data\Scripts\Script001.sql" />
     <EmbeddedResource Include="Data\Scripts\Script002_InitialData.sql" />
-    <Content Include="Data\Scripts\Script003.sql" />
+    <EmbeddedResource Include="Data\Scripts\Script003.sql" />
     <Content Include="Global.asax" />
     <Content Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
