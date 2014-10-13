@@ -18,7 +18,7 @@ namespace WebApi.Hal.JsonConverters
         public static bool IsResourceConverterContext(StreamingContext context)
         {
             return context.Context is string &&
-                   (string) context.Context == StreamingContextResourceConverterToken &&
+                   (string)context.Context == StreamingContextResourceConverterToken &&
                    context.State == StreamingContextResourceConverterState;
         }
 
@@ -85,11 +85,28 @@ namespace WebApi.Hal.JsonConverters
                     {
                         if (prop.PropertyType.GenericTypeArguments != null &&
                             prop.PropertyType.GenericTypeArguments.Length > 0)
-                            CreateEmbedded(embeddeds, prop.PropertyType.GenericTypeArguments[0],
-                                newRes => lst.Add(newRes));
+                        {
+                            var resourceList = lst as IList<IResource>;
+                            if (resourceList != null)
+                                CreateEmbedded(embeddeds, prop.PropertyType.GenericTypeArguments[0], newRes => resourceList.Add(newRes), resourceList);
+                            else
+                            {
+                                CreateEmbedded(embeddeds, prop.PropertyType.GenericTypeArguments[0], newRes => lst.Add(newRes));
+                            }
+                        }
                     }
                     else
-                        CreateEmbedded(embeddeds, prop.PropertyType, newRes => prop.SetValue(resource, newRes));
+                    {
+                        var val = prop.GetValue(resource) as IResource;
+                        if (val != null)
+                        {
+                            CreateEmbedded(embeddeds, prop.PropertyType, newRes => prop.SetValue(resource, newRes), val);
+                        }
+                        else
+                        {
+                            CreateEmbedded(embeddeds, prop.PropertyType, newRes => prop.SetValue(resource, newRes));
+                        }
+                    }
                 }
             }
 
@@ -116,9 +133,25 @@ namespace WebApi.Hal.JsonConverters
             }
         }
 
-        static void CreateEmbedded(JToken embeddeds, Type resourceType, Action<IResource> addCreatedResource)
+        static void CreateEmbedded(JToken embeddeds, Type resourceType, Action<IResource> addCreatedResource, IList<IResource> resourcePropertyList)
         {
-            var rel = GetResourceTypeRel(resourceType);
+            if (resourcePropertyList != null && resourcePropertyList.Count > 0 && resourcePropertyList[0] != null && !String.IsNullOrWhiteSpace(resourcePropertyList[0].Rel))
+            {
+                CreateEmbedded(embeddeds, resourceType, addCreatedResource, resourcePropertyList[0].Rel);
+            }
+        }
+        static void CreateEmbedded(JToken embeddeds, Type resourceType, Action<IResource> addCreatedResource, IResource resourcePropertyValue)
+        {
+            if (resourcePropertyValue != null && !String.IsNullOrWhiteSpace(resourcePropertyValue.Rel))
+            {
+                CreateEmbedded(embeddeds, resourceType, addCreatedResource, resourcePropertyValue.Rel);
+            }
+        }
+        static void CreateEmbedded(JToken embeddeds, Type resourceType, Action<IResource> addCreatedResource, string rel = null)
+        {
+            if (rel == null)
+                rel = GetResourceTypeRel(resourceType);
+
             if (!string.IsNullOrEmpty(rel))
             {
                 var tok = embeddeds[rel];
@@ -127,21 +160,21 @@ namespace WebApi.Hal.JsonConverters
                     switch (tok.Type)
                     {
                         case JTokenType.Array:
-                        {
-                            var embeddedJArr = tok as JArray;
-                            if (embeddedJArr != null)
                             {
-                                foreach (var embeddedJObj in embeddedJArr.OfType<JObject>())
-                                    addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
+                                var embeddedJArr = tok as JArray;
+                                if (embeddedJArr != null)
+                                {
+                                    foreach (var embeddedJObj in embeddedJArr.OfType<JObject>())
+                                        addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
+                                }
                             }
-                        }
                             break;
                         case JTokenType.Object:
-                        {
-                            var embeddedJObj = tok as JObject;
-                            if (embeddedJObj != null)
-                                addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
-                        }
+                            {
+                                var embeddedJObj = tok as JObject;
+                                if (embeddedJObj != null)
+                                    addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
+                            }
                             break;
                     }
                 }
