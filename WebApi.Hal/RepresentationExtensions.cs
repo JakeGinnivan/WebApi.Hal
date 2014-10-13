@@ -313,6 +313,7 @@ namespace WebApi.Hal
                 var propValue = prop.GetValue(representation);
                 if (prop.Name.ToLower() == uriParameterName)
                 {
+                    //try set the uriPropertyValue to the value of the current property
                     if (!(propValue is string) && !(propValue is IList) && !(propValue is IDictionary))
                         uriTemplate.SetParameter(uriParameterName, propValue.ToString());
                     else
@@ -323,11 +324,35 @@ namespace WebApi.Hal
                     var subProperty = propValue.GetType()
                         .GetProperty(uriParameterName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                     var subPropertyValue = subProperty.GetValue(propValue);
-                    if (!(subPropertyValue is string) && !(subPropertyValue is IList) &&
-                        !(subPropertyValue is IDictionary))
-                        uriTemplate.SetParameter(uriParameterName, subPropertyValue.ToString());
+
+                    if (subPropertyValue != null)
+                    {
+                        //try to set the uriPropertyValue to a sub-property on the current property with a name matching the uriParameterName
+                        if (!(subPropertyValue is string) && !(subPropertyValue is IList) &&
+                            !(subPropertyValue is IDictionary))
+                            uriTemplate.SetParameter(uriParameterName, subPropertyValue.ToString());
+                        else
+                            uriTemplate.SetParameter(uriParameterName, subPropertyValue);
+                    }
                     else
-                        uriTemplate.SetParameter(uriParameterName, subPropertyValue);
+                    {
+                        //try to set the uriPropertyValue to a property on the current representation with a name matching the uriParameterName
+                        var currentRepresentationMatchingProperty =
+                            representation.GetType()
+                                .GetPropertiesHierarchical()
+                                .FirstOrDefault(repProp => repProp.Name.ToLower() == uriParameterName);
+
+                        if (currentRepresentationMatchingProperty != null)
+                        {
+                            var currentRepresentationMatchingPropertyValue = subProperty.GetValue(representation);
+
+                            if (!(currentRepresentationMatchingPropertyValue is string) && !(currentRepresentationMatchingPropertyValue is IList) &&
+                                !(currentRepresentationMatchingPropertyValue is IDictionary))
+                                uriTemplate.SetParameter(uriParameterName, currentRepresentationMatchingPropertyValue.ToString());
+                            else
+                                uriTemplate.SetParameter(uriParameterName, currentRepresentationMatchingPropertyValue);
+                        }
+                    }
                 }
             }
 
