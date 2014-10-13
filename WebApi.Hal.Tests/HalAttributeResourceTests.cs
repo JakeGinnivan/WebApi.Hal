@@ -29,7 +29,7 @@ namespace WebApi.Hal.Tests
 
         [Fact]
         [UseReporter(typeof(DiffReporter))]
-        public void peopledetail_get_json_test()
+        public void attribute_peopledetail_get_json_test()
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
@@ -50,8 +50,9 @@ namespace WebApi.Hal.Tests
 
         [Fact]
         [UseReporter(typeof(DiffReporter))]
-        public void peopledetail_get_xml_test()
+        public void attribute_peopledetail_get_xml_test()
         {
+            //TODO: modify the XmlHalMediaTypeFormatter so it sets the rels of embedded objects in the same manner as the JsonHalMediaTypeFormatter.
             // arrange
             var mediaFormatter = new XmlHalMediaTypeFormatter();
             var content = new StringContent(string.Empty);
@@ -70,7 +71,7 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void peopledetail_post_json_props_test()
+        public void attribute_peopledetail_post_json_props_test()
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
@@ -97,25 +98,80 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void peopledetail_post_json_links_test()
+        public void attribute_peopledetail_post_json_links_test()
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
             var type = typeof(OrgWithPeopleDetailAttributeRepresentation);
             const string json = @"
 {
-""Id"":""3"",
-""Name"": ""Dept. of Redundancy Dept."",
-""_links"": {
- ""self"": {""href"": ""/api/organisations/3""},
- ""people"": {""href"": ""/api/organisations/3/people""},
- ""brownnoser"": [
-   {""href"": ""/api/organisations/3/brown/1""},
-   {""href"": ""/api/organisations/3/brown/2""}
-        ]
+  ""Id"": 1,
+  ""Name"": ""Org Name"",
+  ""_links"": {
+    ""employees"": [
+      {
+        ""href"": ""/orgs/management/1/2"",
+        ""title"": ""Employees under Boss""
+      },
+      {
+        ""href"": ""/orgs/employees/1"",
+        ""title"": ""Employees in this Org""
+      }
+    ],
+    ""boss"": {
+      ""href"": ""/orgs/management/2"",
+      ""title"": ""The Boss for this Org""
+    },
+    ""self"": {
+      ""href"": ""/orgs/1""
     }
-}
-";
+  },
+  ""_embedded"": {
+    ""people"": [
+      {
+        ""Id"": 3,
+        ""Name"": ""Dilbert"",
+        ""OrganisationId"": 1,
+        ""_links"": {
+          ""self"": {
+            ""href"": ""/employees/3""
+          }
+        }
+      },
+      {
+        ""Id"": 4,
+        ""Name"": ""Wally"",
+        ""OrganisationId"": 1,
+        ""_links"": {
+          ""self"": {
+            ""href"": ""/employees/4""
+          }
+        }
+      },
+      {
+        ""Id"": 5,
+        ""Name"": ""Alice"",
+        ""OrganisationId"": 1,
+        ""_links"": {
+          ""self"": {
+            ""href"": ""/employees/5""
+          }
+        }
+      }
+    ],
+    ""boss"": {
+      ""HasPointyHair"": true,
+      ""Id"": 2,
+      ""Name"": ""Eunice PHB"",
+      ""OrganisationId"": 1,
+      ""_links"": {
+        ""self"": {
+          ""href"": ""/managers/2""
+        }
+      }
+    }
+  }
+}";
 
             // act
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
@@ -129,36 +185,93 @@ namespace WebApi.Hal.Tests
                 Assert.Equal(4, org.Links.Count);
                 var self = org.Links.Where(l => l.Rel == "self").ToList();
                 Assert.Equal(1, self.Count);
-                Assert.Equal("/api/organisations/3", self[0].Href);
+                Assert.Equal("/orgs/1", self[0].Href);
                 Assert.Equal(self[0].Href, org.Href);
-                var people = org.Links.Where(l => l.Rel == "people").ToList();
-                Assert.Equal(1, people.Count);
-                Assert.Equal("/api/organisations/3/people", people[0].Href);
-                var brownnosers = org.Links.Where(l => l.Rel == "brownnoser").ToList();
-                Assert.Equal(2, brownnosers.Count);
-                Assert.Equal("/api/organisations/3/brown/1", brownnosers[0].Href);
-                Assert.Equal("/api/organisations/3/brown/2", brownnosers[1].Href);
+                var people = org.Links.Where(l => l.Rel == "employees").ToList();
+                Assert.Equal(2, people.Count);
+                Assert.Equal("/orgs/management/1/2", people[0].Href);
+                Assert.Equal("/orgs/employees/1", people[1].Href);
+                var boss = org.Links.Where(l => l.Rel == "boss").ToList();
+                Assert.Equal(1, boss.Count);
+                Assert.Equal("/orgs/management/2", boss[0].Href);
             }
         }
 
         [Fact]
-        public void peopledetail_post_json_embedded_singles_test()
+        public void attribute_peopledetail_post_json_embedded_singles_test()
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeFormatter {Indent = true};
             var type = typeof(OrgWithPeopleDetailAttributeRepresentation);
             const string json = @"
 {
-""Id"":""3"",
-""Name"": ""Singles Dept."",
-""_embedded"": {
- ""person"": {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
- ""boss"": {""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}
+  ""Id"": 1,
+  ""Name"": ""Org Name"",
+  ""_links"": {
+    ""employees"": [
+      {
+        ""href"": ""/orgs/management/1/2"",
+        ""title"": ""Employees under Boss""
+      },
+      {
+        ""href"": ""/orgs/employees/1"",
+        ""title"": ""Employees in this Org""
+      }
+    ],
+    ""boss"": {
+      ""href"": ""/orgs/management/2"",
+      ""title"": ""The Boss for this Org""
+    },
+    ""self"": {
+      ""href"": ""/orgs/1""
+    }
+  },
+  ""_embedded"": {
+    ""people"": [
+      {
+        ""Id"": 3,
+        ""Name"": ""Dilbert"",
+        ""OrganisationId"": 1,
+        ""_links"": {
+          ""self"": {
+            ""href"": ""/employees/3""
+          }
+        }
+      },
+      {
+        ""Id"": 4,
+        ""Name"": ""Wally"",
+        ""OrganisationId"": 1,
+        ""_links"": {
+          ""self"": {
+            ""href"": ""/employees/4""
+          }
+        }
+      },
+      {
+        ""Id"": 5,
+        ""Name"": ""Alice"",
+        ""OrganisationId"": 1,
+        ""_links"": {
+          ""self"": {
+            ""href"": ""/employees/5""
+          }
+        }
+      }
+    ],
+    ""boss"": {
+      ""HasPointyHair"": true,
+      ""Id"": 2,
+      ""Name"": ""Eunice PHB"",
+      ""OrganisationId"": 1,
+      ""_links"": {
+        ""self"": {
+          ""href"": ""/managers/2""
+        }
+      }
+    }
   }
-}
-";
+}";
 
             // act
             using (
@@ -172,33 +285,86 @@ namespace WebApi.Hal.Tests
                 var org = obj as OrgWithPeopleDetailAttributeRepresentation;
                 Assert.NotNull(org);
                 Assert.NotNull(org.Boss);
-                Assert.Equal(1, org.People.Count);
+                Assert.Equal(3, org.People.Count);
                 Assert.Equal(1, org.Boss.Links.Count);
             }
         }
 
         [Fact]
-        public void peopledetail_post_json_embedded_arrays_test()
+        public void attribute_peopledetail_post_json_embedded_arrays_test()
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
             var type = typeof(OrgWithPeopleDetailAttributeRepresentation);
             const string json = @"
 {
-""Id"":""3"",
-""Name"": ""Array Dept."",
-""_embedded"": {
- ""person"": [
-   {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
-   {""Id"": ""9"",""Name"": ""Person Nine"",""OrganisationId"": ""3"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/9""}}}
-   ],
- ""boss"": [{""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}]
+  ""Id"": 1,
+  ""Name"": ""Org Name"",
+  ""_links"": {
+    ""employees"": [
+      {
+        ""href"": ""/orgs/management/1/2"",
+        ""title"": ""Employees under Boss""
+      },
+      {
+        ""href"": ""/orgs/employees/1"",
+        ""title"": ""Employees in this Org""
+      }
+    ],
+    ""boss"": {
+      ""href"": ""/orgs/management/2"",
+      ""title"": ""The Boss for this Org""
+    },
+    ""self"": {
+      ""href"": ""/orgs/1""
+    }
+  },
+  ""_embedded"": {
+    ""people"": [
+      {
+        ""Id"": 3,
+        ""Name"": ""Dilbert"",
+        ""OrganisationId"": 1,
+        ""_links"": {
+          ""self"": {
+            ""href"": ""/employees/3""
+          }
+        }
+      },
+      {
+        ""Id"": 4,
+        ""Name"": ""Wally"",
+        ""OrganisationId"": 1,
+        ""_links"": {
+          ""self"": {
+            ""href"": ""/employees/4""
+          }
+        }
+      },
+      {
+        ""Id"": 5,
+        ""Name"": ""Alice"",
+        ""OrganisationId"": 1,
+        ""_links"": {
+          ""self"": {
+            ""href"": ""/employees/5""
+          }
+        }
+      }
+    ],
+    ""boss"": {
+      ""HasPointyHair"": true,
+      ""Id"": 2,
+      ""Name"": ""Eunice PHB"",
+      ""OrganisationId"": 1,
+      ""_links"": {
+        ""self"": {
+          ""href"": ""/managers/2""
+        }
+      }
+    }
   }
-}
-";
+}";
 
             // act
             using (
@@ -212,7 +378,7 @@ namespace WebApi.Hal.Tests
                 var org = obj as OrgWithPeopleDetailAttributeRepresentation;
                 Assert.NotNull(org);
                 Assert.NotNull(org.Boss);
-                Assert.Equal(2, org.People.Count);
+                Assert.Equal(3, org.People.Count);
                 Assert.Equal(1, org.Boss.Links.Count);
             }
         }
@@ -227,7 +393,7 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void simplelist_post_json_test()
+        public void attribute_simplelist_post_json_test()
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
