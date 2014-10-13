@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resource rel="orgs" href="~/orgs/0">
+  <link rel="employees" href="~/orgs/management/1/2" />
+  <link rel="employees" href="~/orgs/employees/1" />
+  <link rel="boss" href="~/orgs/management/2" />
+  <Id>1</Id>
+  <Name>Org Name</Name>
+  <resource rel="employees" href="~/employees/0">
+    <Id>3</Id>
+    <Name>Dilbert</Name>
+    <OrganisationId>1</OrganisationId>
+  </resource>
+  <resource rel="employees" href="~/employees/0">
+    <Id>4</Id>
+    <Name>Wally</Name>
+    <OrganisationId>1</OrganisationId>
+  </resource>
+  <resource rel="employees" href="~/employees/0">
+    <Id>5</Id>
+    <Name>Alice</Name>
+    <OrganisationId>1</OrganisationId>
+  </resource>
+  <resource rel="boss" href="~/managers/0" name="Boss">
+    <HasPointyHair>True</HasPointyHair>
+    <Id>2</Id>
+    <Name>Eunice PHB</Name>
+    <OrganisationId>1</OrganisationId>
+  </resource>
+</resource>

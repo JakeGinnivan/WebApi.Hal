@@ -1,0 +1,68 @@
+﻿{
+  "Id": 1,
+  "Name": "Org Name",
+  "_links": {
+    "employees": [
+      {
+        "href": "/orgs/management/1/2",
+        "title": "Employees under Boss"
+      },
+      {
+        "href": "/orgs/employees/1",
+        "title": "Employees in this Org"
+      }
+    ],
+    "boss": {
+      "href": "/orgs/management/2",
+      "title": "The Boss for this Org"
+    },
+    "self": {
+      "href": "/orgs/1"
+    }
+  },
+  "_embedded": {
+    "people": [
+      {
+        "Id": 3,
+        "Name": "Dilbert",
+        "OrganisationId": 1,
+        "_links": {
+          "self": {
+            "href": "/employees/3"
+          }
+        }
+      },
+      {
+        "Id": 4,
+        "Name": "Wally",
+        "OrganisationId": 1,
+        "_links": {
+          "self": {
+            "href": "/employees/4"
+          }
+        }
+      },
+      {
+        "Id": 5,
+        "Name": "Alice",
+        "OrganisationId": 1,
+        "_links": {
+          "self": {
+            "href": "/employees/5"
+          }
+        }
+      }
+    ],
+    "boss": {
+      "HasPointyHair": true,
+      "Id": 2,
+      "Name": "Eunice PHB",
+      "OrganisationId": 1,
+      "_links": {
+        "self": {
+          "href": "/managers/2"
+        }
+      }
+    }
+  }
+}

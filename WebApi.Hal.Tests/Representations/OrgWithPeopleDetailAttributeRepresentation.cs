@@ -41,6 +41,7 @@ namespace WebApi.Hal.Tests.Representations
         }
     }
 
+    [Self("employees", "~/employees/{id}")]
     public class Employee : AttributeRepresentation
     {
         public Employee(int id, string name, int orgId)
@@ -56,6 +57,7 @@ namespace WebApi.Hal.Tests.Representations
         public int OrganisationId { get; set; }
     }
 
+    [Self("managers", "~/managers/{id}")]
     public class Manager : Employee // it's debatable whether some bosses are people
     {
         public Manager(int id, string name, int orgId, bool hasPointHair)

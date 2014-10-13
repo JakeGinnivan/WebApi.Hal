@@ -106,12 +106,12 @@ namespace WebApi.Hal
 
         }
 
-        public static void SetRelFromRelAttribute(this Representation representation)
-        {
-            var relAttribute = representation.GetType().GetCustomAttribute<RelAttribute>();
+        //public static void SetRelFromRelAttribute(this Representation representation)
+        //{
+        //    var relAttribute = representation.GetType().GetCustomAttribute<RelAttribute>();
 
-            representation.Rel = relAttribute.Rel;
-        }
+        //    representation.Rel = relAttribute.Rel;
+        //}
         
         /// <summary>
         /// This method looks for all properties on the Representation object that are of type Representation.
@@ -134,6 +134,15 @@ namespace WebApi.Hal
                                     return true;
                                 }
                             }
+                            else if (typeof(IEnumerable).IsAssignableFrom(prop.PropertyType) &&
+                                     prop.PropertyType.IsGenericType &&
+                                     prop.PropertyType.GetGenericArguments()[0].IsSubclassOf(typeof (Representation)))
+                            {
+                                if (prop.GetCustomAttribute<RelAttribute>(true) != null)
+                                {
+                                    return true;
+                                }
+                            }
                             return false;
                         });
 
@@ -146,6 +155,17 @@ namespace WebApi.Hal
                     if (relAttribute != null)
                     {
                         propValue.Rel = relAttribute.Rel;
+                    }
+                }
+                else if (typeof(IEnumerable).IsAssignableFrom(prop.PropertyType))
+                {
+                    if (relAttribute != null)
+                    {
+                        var propListValues = prop.GetValue(representation) as IEnumerable<Representation>;
+                        foreach (var rep in propListValues)
+                        {
+                            rep.Rel = relAttribute.Rel;
+                        }
                     }
                 }
                 else
@@ -323,10 +343,10 @@ namespace WebApi.Hal
                 {
                     var subProperty = propValue.GetType()
                         .GetProperty(uriParameterName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                    var subPropertyValue = subProperty.GetValue(propValue);
 
-                    if (subPropertyValue != null)
+                    if (subProperty != null)
                     {
+                        var subPropertyValue = subProperty.GetValue(propValue);
                         //try to set the uriPropertyValue to a sub-property on the current property with a name matching the uriParameterName
                         if (!(subPropertyValue is string) && !(subPropertyValue is IList) &&
                             !(subPropertyValue is IDictionary))
@@ -344,7 +364,7 @@ namespace WebApi.Hal
 
                         if (currentRepresentationMatchingProperty != null)
                         {
-                            var currentRepresentationMatchingPropertyValue = subProperty.GetValue(representation);
+                            var currentRepresentationMatchingPropertyValue = currentRepresentationMatchingProperty.GetValue(representation);
 
                             if (!(currentRepresentationMatchingPropertyValue is string) && !(currentRepresentationMatchingPropertyValue is IList) &&
                                 !(currentRepresentationMatchingPropertyValue is IDictionary))

@@ -94,6 +94,8 @@ namespace WebApi.Hal.JsonConverters
             {
                 foreach (var prop in resourceType.GetProperties().Where(p => Representation.IsEmbeddedResourceType(p.PropertyType)))
                 {
+                    var propertyRelAttribute = prop.GetCustomAttribute<RelAttribute>(true);
+
                     // expects embedded collection of resources is implemented as an IList on the Representation-derived class
                     var lst = prop.GetValue(resource) as IList;
                     if (lst != null)
@@ -101,9 +103,16 @@ namespace WebApi.Hal.JsonConverters
                         if (prop.PropertyType.GenericTypeArguments != null &&
                             prop.PropertyType.GenericTypeArguments.Length > 0)
                         {
-                            var resourceList = lst as IList<IResource>;
-                            if (resourceList != null)
-                                CreateEmbedded(embeddeds, prop.PropertyType.GenericTypeArguments[0], newRes => resourceList.Add(newRes), resourceList);
+                            if (propertyRelAttribute != null && !String.IsNullOrWhiteSpace(propertyRelAttribute.Rel))
+                            {
+                                CreateEmbedded(embeddeds, prop.PropertyType.GenericTypeArguments[0], newRes => lst.Add(newRes), propertyRelAttribute.Rel);
+                            }
+                            else if (
+                                prop.PropertyType.GenericTypeArguments[0].GetInterfaces()
+                                    .Contains(typeof(IResource)))
+                            {
+                                CreateEmbedded(embeddeds, prop.PropertyType.GenericTypeArguments[0], newRes => lst.Add(newRes), lst);
+                            }
                             else
                             {
                                 CreateEmbedded(embeddeds, prop.PropertyType.GenericTypeArguments[0], newRes => lst.Add(newRes));
@@ -148,11 +157,29 @@ namespace WebApi.Hal.JsonConverters
             }
         }
 
-        static void CreateEmbedded(JToken embeddeds, Type resourceType, Action<IResource> addCreatedResource, IList<IResource> resourcePropertyList)
+        static void CreateEmbedded(JToken embeddeds, Type resourceType, Action<IResource> addCreatedResource, IList resourcePropertyList)
         {
-            if (resourcePropertyList != null && resourcePropertyList.Count > 0 && resourcePropertyList[0] != null && !String.IsNullOrWhiteSpace(resourcePropertyList[0].Rel))
+            if (resourcePropertyList != null && resourcePropertyList.Count > 0 && (resourcePropertyList[0] as IResource) != null)
             {
-                CreateEmbedded(embeddeds, resourceType, addCreatedResource, resourcePropertyList[0].Rel);
+                var firstResource = resourcePropertyList[0] as IResource;
+                if (!String.IsNullOrWhiteSpace(firstResource.Rel))
+                    CreateEmbedded(embeddeds, resourceType, addCreatedResource, firstResource.Rel);
+                else
+                {
+                    CreateEmbedded(embeddeds, resourceType, addCreatedResource);
+                }
+            }
+            else
+            {
+                if (resourcePropertyList != null)
+                {
+                    var resourceRel = GetResourceTypeRel(resourcePropertyList.GetType().GenericTypeArguments[0]);
+                    if (!String.IsNullOrWhiteSpace(resourceRel))
+                    {
+                        resourceRel = null;
+                    }
+                    CreateEmbedded(embeddeds, resourceType, addCreatedResource, resourceRel);
+                }
             }
         }
         static void CreateEmbedded(JToken embeddeds, Type resourceType, Action<IResource> addCreatedResource, IResource resourcePropertyValue)
