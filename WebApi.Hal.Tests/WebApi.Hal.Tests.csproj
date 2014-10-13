@@ -69,6 +69,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HalAttributeResourceTests.cs" />
     <Compile Include="HalResourceMixedContentTest.cs" />
     <Compile Include="HalResourceWithPeopleTest.cs" />
     <Compile Include="HalResourceTest.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Representations\OrganisationWithPeopleDetailRepresentation.cs" />
     <Compile Include="Representations\OrganisationWithPeopleRepresentation.cs" />
     <Compile Include="Representations\ProductRepresentation.cs" />
+    <Compile Include="Representations\OrgWithPeopleDetailAttributeRepresentation.cs" />
     <Compile Include="ResolvingHalResourceTest.cs" />
     <Compile Include="UriBuilderTests.cs" />
   </ItemGroup>
