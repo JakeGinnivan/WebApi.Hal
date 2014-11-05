@@ -1,29 +1,95 @@
-#WebApi.Hal
+WebApi.Hal
+==========
 
 Adds support for the Hal Media Type (and Hypermedia) to Asp.net Web Api
 
-## HAL Specification
+HAL Specification
+-----------------
 http://stateless.co/hal_specification.html  
 https://github.com/mikekelly/hal_specification
 
-## Getting Started with WebApi.Hal
+
+Getting Started with WebApi.Hal
+-------------------------------
 First thing first, WebApi.Hal is a media formatter. So to get started you have to register the Hal Media formatters:
 
 	GlobalConfiguration.Configuration.Formatters.Add(new JsonHalMediaTypeFormatter());
 	GlobalConfiguration.Configuration.Formatters.Add(new XmlHalMediaTypeFormatter());
 
-Once those are registered, you can start defining your resources. WebApi.Hal has some important classes you should be aware of.
+Once those are registered, you can start defining your resources. In WebAPI.Hal, you always return `Representations` from your ApiControllers.
 
-### WebApi.Hal.Representation
+Your representations should all inherit from `Representation` or if you are returning a collection 
+a `SimpleListRepresentation<TRepresentation>` or if you are returning a resource with multiple embedded
+resources, inherit from `Representation` and add properties for the embedded resources which might
+include lists of resources of the form `List<MyRepresentation>`. See the sample.
+
+WebApi.Hal.Link
+---------------
+The link class represents hypermedia on a representation. It looks like this:
+
+	public class Link
+	{
+		public string Rel { get; set; }
+		public string Href { get; set; }
+		public string Title { get; set; }
+		public bool IsTemplated { get; set; }
+		public Link CreateLink(...);
+	}
+
+The thing which makes this class special is it's support for templates. For example:
+
+	var link = new Link("beers, "/breweries/{id}/beers");
+
+Notice the {id}, this allows you to return a templated link as hypermedia. But you can also turn it into an absolute link really easily:
+
+	Brewery brewery;
+	link.CreateLink(new { id = brewery.Id });
+
+URI Templates adhere to [RFC6570](http://tools.ietf.org/html/rfc6570), as per the HAL specification.
+
+Register WebAPI routes
+----------------------
+Once you have done the work of defining all your link templates, register your routes in the ordinary MVC WebApi manner.
+See the sample project for an example.
+
+LinkTemplates class
+-------------------
+A nice place to keep your Links is in a static class called LinkTemplates, with nested classes for each resource your application has, for example:
+
+    public static class LinkTemplates {
+		public static class Beers {
+			/// <summary>
+			/// /beers/{id}
+			public static Link Beer { get { return new Link("beer", "/beers/{id}"); } }
+
+			/// <summary>
+            /// /beers?page={page}
+            /// </summary>
+            public static Link GetBeers { get { return new Link("beers", "/beers{?page}"); } }
+		}
+	}
+
+The sample is available at: https://github.com/JakeGinnivan/WebApi.Hal/blob/master/WebApi.Hal.Web/LinkTemplates.cs
+
+WebApi.Hal.Representation
+-------------------------
 This is the base class for all representations your api returns. It has an abstract method you must override, `abstract void CreateHypermedia();` 
 
-In CreateHypermedia() you should register the **self** link, and any hypermedia that that resource should **always** have. Other context sensitive hypermedia should be added in the API controller. Here is an example of the Beer CreateHypermedia override (from the example project, the `BeerResource`):
+In the constructor, set the Rel property, as this generally doesn't change based on context.
 
+In CreateHypermedia() you could register a **self** link, but it's done automatically for you if you don't.
+Register other hypermedia that your resource should **always** have.
+Other context sensitive hypermedia should be added in the API controller.
+
+Here is an example of the Beer CreateHypermedia override (from the example project, the `BeerResource`):
+
+	public Beer()
+	{
+		Rel = LinkTemplates.Beers.Beer.Rel;
+	}
 	protected override void CreateHypermedia()
 	{
-		var selfLink = LinkTemplates.Beers.Beer.CreateLink(new { Id });
-		Href = selfLink.Href;
-		Rel = selfLink.Rel;
+		Href = LinkTemplates.Beers.Beer.CreateLink(new { id = Id }).Href;
 
 		if (StyleId != null)
 			Links.Add(LinkTemplates.BeerStyles.Style.CreateLink(new { id = StyleId }));
@@ -31,57 +97,8 @@ In CreateHypermedia() you should register the **self** link, and any hypermedia 
 			Links.Add(LinkTemplates.Breweries.Brewery.CreateLink(new { id = BreweryId }));
 	}
 
-### WebApi.Hal.RepresentationList<T>
-Instead of returning a list you should return a RepresentationList, which allows you to specify hypermedia for your list (for paging, self, etc)
-
-### WebApi.Hal.Link
-The link class represents hypermedia on a representation. It looks like this:
-
-	public class Link
-	{
-		public string Rel { get; set; }
-		public string Href { get; set; }
-		public bool IsTemplated { get; set; }
-		public Link CreateLink(...);
-	}
-
-The thing which makes this class special is it's support for templates. For example:
-
-	var link = new Link("beers, "/breweries/{id}/beers", isTemplated: true);
-
-Notice the {id}, this allows you to return a templated link as hypermedia. But you can also turn it into an absolute link really easily:
-
-	Brewery brewery;
-	link.CreateLink(id => brewery.Id);
-
-## Link Template Definitions
-One of the simplest ways I have found (so far, I welcome suggestions) is to define a LinkTemplates static class, which contains all your link templates for you to reuse across your API. For example:
-
-	public static class LinkTemplates
-	{
-		public static class Breweries
-		{
-			/// <summary>
-			/// /breweries
-			/// </summary>
-			public static Link GetBreweries { get { return new Link("breweries", "/breweries"); } }
-
-			/// <summary>
-			/// /breweries/{id}
-			/// </summary>
-			public static Link Brewery { get{return new Link("brewery", "/breweries/{id}");} }
-
-			/// <summary>
-			/// /breweries/{id}/beers
-			/// </summary>
-			public static Link AssociatedBeers { get{return new Link("beers", "/breweries/{id}/beers");} }
-		}
-
-		// public static class Styles{...}
-		// public static class Beers{...}
-	}
-
-And put it all together and an API action can look like this:
+Sample controller action
+------------------------
 
 	public BreweryRepresentation Get(int id)
 	{
@@ -98,22 +115,6 @@ And put it all together and an API action can look like this:
 		};
 	}
 
-## Using Links to register WebAPI routes
-Once you have done the work defining all your link templates, you can use them to register your WebAPI routes!
-
-	LinkTemplates.Beers.Beer.RegisterLinkWithWebApi<BeerController>(routes);
-	LinkTemplates.Beers.GetBeers.RegisterLinkWithWebApi<BeersController>(routes);
-
-	LinkTemplates.Breweries.Brewery.RegisterLinkWithWebApi<BreweriesController>(routes);
-	LinkTemplates.Breweries.GetBreweries.RegisterLinkWithWebApi<BreweriesController>(routes);
-	LinkTemplates.Breweries.AssociatedBeers.RegisterLinkWithWebApi<BeersFromBreweryController>(routes);
-
-	LinkTemplates.BeerStyles.Style.RegisterLinkWithWebApi<StylesController>(routes);
-	LinkTemplates.BeerStyles.GetStyles.RegisterLinkWithWebApi<StylesController>(routes);
-	LinkTemplates.BeerStyles.AssociatedBeers.RegisterLinkWithWebApi<StylesController>(routes);
-
-WebAPI.Hal encourages you to separate actions into different controllers, all controllers in the sample only have the default Get, Post, Put, Delete actions
-
 ## Sample Project
 To run the sample project, update the connection string in web.config, then **create** the database. When you hit an API for the first time, the database will be setup using DbUp.
 
@@ -123,3 +124,6 @@ You can use fiddler to explore the API. Make sure you put in an accept header of
 I have more credits to add, but this is the most obvious (as I based my Xml formatter off this project)
 
 https://bitbucket.org/smichelotti/hal-media-type
+
+## Release Notes
+See Readme.txt at http://github.com/JakeGinnivan/WebApi.Hal

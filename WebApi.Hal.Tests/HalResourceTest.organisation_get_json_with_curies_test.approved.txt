@@ -1,0 +1,17 @@
+﻿{
+  "Id": 1,
+  "Name": "Org Name",
+  "_links": {
+    "curies": [
+      {
+        "name": "br",
+        "href": "/rels/{rel}",
+        "templated": true
+      }
+    ],
+    "someRel": {
+      "href": "someHref",
+      "title": "someTitle"
+    }
+  }
+}

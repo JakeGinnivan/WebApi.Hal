@@ -10,11 +10,29 @@ namespace WebApi.Hal.JsonConverters
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var links = new HashSet<Link>((IList<Link>)value, new LinkEqualityComparer());
+            var pureLinks = ((IList<Link>) value).Where(q => q.GetType() != typeof (Curie)).ToList();
+            var curies = ((IList<Link>)value).Where(q => q.GetType() == typeof(Curie)).ToList();
+            var links = new HashSet<Link>(pureLinks, new LinkEqualityComparer());
+            var curiedLinks = new HashSet<Link>(curies, new LinkEqualityComparer());
             var lookup = links.ToLookup(l => l.Rel);
             if (lookup.Count == 0) return;
+            
 
             writer.WriteStartObject();
+            bool hasCuries = curiedLinks.Count > 0;
+            if (hasCuries && !EmbeddedResourceConverter.IsEmbeddedResourceConverterContext(serializer.Context))
+            {
+                writer.WritePropertyName("curies");
+                writer.WriteStartArray();
+            
+                foreach (var rel in curiedLinks)
+                {
+                    var curie = rel as Curie;
+                    WriteCurie(writer, curie);
+                }
+            
+                writer.WriteEndArray();
+            }
 
             foreach (var rel in lookup)
             {
@@ -32,11 +50,10 @@ namespace WebApi.Hal.JsonConverters
                         writer.WritePropertyName("templated");
                         writer.WriteValue(true);
                     }
-                    if (!string.IsNullOrEmpty(link.Title))
-                    {
-                        writer.WritePropertyName("title");
-                        writer.WriteValue(link.Title);
-                    }
+                    WriteIfNotNullOrEmpty(writer, link.Title, "title");
+                    WriteIfNotNullOrEmpty(writer, link.Profile, "profile");
+                    WriteIfNotNullOrEmpty(writer, link.Type, "type"); 
+                   
 
                     writer.WriteEndObject();
                 }
@@ -44,6 +61,32 @@ namespace WebApi.Hal.JsonConverters
                     writer.WriteEndArray();
             }
             writer.WriteEndObject();
+        }
+
+        void WriteCurie(JsonWriter writer, Curie curie)
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("name");
+            writer.WriteValue(curie.Rel);
+            writer.WritePropertyName("href");
+            writer.WriteValue(ResolveUri(curie.Href));
+
+            if (curie.IsTemplated)
+            {
+                writer.WritePropertyName("templated");
+                writer.WriteValue(true);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        private static void WriteIfNotNullOrEmpty(JsonWriter writer, string val, string name)
+        {
+            if (!string.IsNullOrEmpty(val))
+            {
+                writer.WritePropertyName(name);
+                writer.WriteValue(val);
+            }
         }
 
         public override bool CanRead
