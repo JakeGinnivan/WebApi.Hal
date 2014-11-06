@@ -2,7 +2,15 @@
   "_links": {
     "self": {
       "href": "/api/organisations"
-    }
+    },
+    "organisation": [
+      {
+        "href": "/api/organisations/1"
+      },
+      {
+        "href": "/api/organisations/2"
+      }
+    ]
   },
   "_embedded": {
     "organisation": [

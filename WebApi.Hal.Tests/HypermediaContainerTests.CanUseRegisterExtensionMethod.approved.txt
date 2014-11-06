@@ -1,0 +1,22 @@
+﻿{
+  "Id": 0,
+  "Price": 0.0,
+  "_links": {
+    "curies": [
+      {
+        "href": "http://www.helpt.com/{?rel}",
+        "name": "aap",
+        "templated": true
+      }
+    ],
+    "self": {
+      "href": "http://www.product.com?id=1"
+    },
+    "related": {
+      "href": "http://www.related.com"
+    },
+    "aap:category": {
+      "href": "http://www.category.com"
+    }
+  }
+}

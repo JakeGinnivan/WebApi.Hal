@@ -1,0 +1,53 @@
+﻿{
+  "Id": 9,
+  "Title": "Morpheus in a chair statuette",
+  "Price": 20.14,
+  "_links": {
+    "curies": [
+      {
+        "href": "http://api.example.com/docs/{rel}",
+        "name": "example-namespace",
+        "templated": true
+      }
+    ],
+    "self": {
+      "href": "http://api.example.com/products/9"
+    },
+    "example-namespace:related-product": [
+      {
+        "href": "http://api.example.com/products/related-product-00"
+      },
+      {
+        "href": "http://api.example.com/products/related-product-01"
+      },
+      {
+        "href": "http://api.example.com/products/related-product-02"
+      }
+    ],
+    "example-namespace:product-on-sale": [
+      {
+        "href": "http://api.example.com/products/sale/product-on-sale-00"
+      },
+      {
+        "href": "http://api.example.com/products/sale/product-on-sale-01"
+      },
+      {
+        "href": "http://api.example.com/products/sale/product-on-sale-02"
+      }
+    ],
+    "example-namespace:category": {
+      "href": "http://api.example.com/categories/{id}",
+      "templated": true
+    }
+  },
+  "_embedded": {
+    "unknownRel-CategoryRepresentation": {
+      "Title": "Action Figures",
+      "_links": {
+        "self": {
+          "href": "http://api.example.com/categories/99"
+        }
+      }
+    }
+  }
+}

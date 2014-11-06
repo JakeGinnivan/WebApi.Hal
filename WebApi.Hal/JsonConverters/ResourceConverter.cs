@@ -12,19 +12,34 @@ namespace WebApi.Hal.JsonConverters
 {
     public class ResourceConverter : JsonConverter
     {
-        const string StreamingContextResourceConverterToken = "hal+json";
         const StreamingContextStates StreamingContextResourceConverterState = StreamingContextStates.Other;
+
+        readonly IHypermediaResolver hypermediaConfiguration;
+
+        public ResourceConverter()
+        {
+        }
+
+        public ResourceConverter(IHypermediaResolver hypermediaConfiguration)
+        {
+            if (hypermediaConfiguration == null)
+                throw new ArgumentNullException("hypermediaConfiguration");
+
+            this.hypermediaConfiguration = hypermediaConfiguration;
+        }
 
         public static bool IsResourceConverterContext(StreamingContext context)
         {
-            return context.Context is string &&
-                   (string) context.Context == StreamingContextResourceConverterToken &&
-                   context.State == StreamingContextResourceConverterState;
+            return context.Context is HalJsonConverterContext && context.State == StreamingContextResourceConverterState;
         }
 
-        private static StreamingContext GetResourceConverterContext()
+        private StreamingContext GetResourceConverterContext()
         {
-            return new StreamingContext(StreamingContextResourceConverterState, StreamingContextResourceConverterToken);
+            var context = (hypermediaConfiguration == null)
+                ? new HalJsonConverterContext()
+                : new HalJsonConverterContext(hypermediaConfiguration);
+
+            return new StreamingContext(StreamingContextResourceConverterState, context);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -127,21 +142,21 @@ namespace WebApi.Hal.JsonConverters
                     switch (tok.Type)
                     {
                         case JTokenType.Array:
-                        {
-                            var embeddedJArr = tok as JArray;
-                            if (embeddedJArr != null)
                             {
-                                foreach (var embeddedJObj in embeddedJArr.OfType<JObject>())
-                                    addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
+                                var embeddedJArr = tok as JArray;
+                                if (embeddedJArr != null)
+                                {
+                                    foreach (var embeddedJObj in embeddedJArr.OfType<JObject>())
+                                        addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
+                                }
                             }
-                        }
                             break;
                         case JTokenType.Object:
-                        {
-                            var embeddedJObj = tok as JObject;
-                            if (embeddedJObj != null)
-                                addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
-                        }
+                            {
+                                var embeddedJObj = tok as JObject;
+                                if (embeddedJObj != null)
+                                    addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
+                            }
                             break;
                     }
                 }
@@ -151,6 +166,7 @@ namespace WebApi.Hal.JsonConverters
         // this depends on IResource.Rel being set upon construction
         static readonly IDictionary<string, string> ResourceTypeToRel = new Dictionary<string, string>();
         static readonly object ResourceTypeToRelLock = new object();
+
         static string GetResourceTypeRel(Type resourceType)
         {
             if (ResourceTypeToRel.ContainsKey(resourceType.FullName))
