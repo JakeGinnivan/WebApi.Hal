@@ -1,13 +1,55 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
+    public class Link<T> : Link where T : class, IResource
+    {
+        // simply for typing purposes (avoid magic strings) ...
+
+        public Link()
+        {
+        }
+
+        public Link(string rel, string href, CuriesLink curie) : base(rel, href, curie)
+        {
+        }
+
+        public Link(string rel, string href, string title = null) : base(rel, href, title)
+        {
+        }
+    }
+
     public class Link
     {
+        public const string RelForSelf = "self";
+        public const string RelForCuries = "curies";
+
+        static readonly IEqualityComparer<Link> ComparerInstance = new LinkEqualityComparer();
+
+        string linkRelation;
+        readonly CuriesLink curie;
+
         public Link()
         { }
+        
+        public Link(string rel, string href, CuriesLink curie)
+        {
+            if (string.IsNullOrEmpty(rel))
+                throw new ArgumentNullException("rel");
+
+            if (string.IsNullOrEmpty(href))
+                throw new ArgumentNullException("href");
+
+            if (curie == null)
+                throw new ArgumentNullException("curie");
+
+            Rel = rel;
+            Href = href;
+            this.curie = curie;
+        }
 
         public Link(string rel, string href, string title = null)
         {
@@ -16,9 +58,29 @@ namespace WebApi.Hal
             Title = title;
         }
 
-        public string Rel { get; set; }
+        public CuriesLink Curie
+        {
+            get { return curie; }
+        }
+
+        public string Rel
+        {
+            get { return linkRelation; }
+            set
+            {
+                // should be case insensitive when comparing, so default to lower-case (http://tools.ietf.org/html/rfc5988#section-4.1)
+                linkRelation = string.IsNullOrEmpty(value) ? value : value.ToLowerInvariant();
+            }
+        }
+
         public string Href { get; set; }
         public string Title { get; set; }
+        public string Type { get; set; }
+        public string Deprecation { get; set; }
+        public string Name { get; set; }
+        public string Profile { get; set; }
+        public string HrefLang { get; set; }
+        
         public bool IsTemplated
         {
             get { return !string.IsNullOrEmpty(Href) && IsTemplatedRegex.IsMatch(Href); }
@@ -34,9 +96,14 @@ namespace WebApi.Hal
         /// <returns>A non templated link</returns>
         public Link CreateLink(string newRel, params object[] parameters)
         {
-            return new Link(newRel, CreateUri(parameters).ToString(), Title);
-        }
+            var clone = Clone();
 
+            clone.Rel = newRel;
+            clone.Href = CreateUri(parameters).ToString();
+
+            return clone;
+        }
+        
         /// <summary>
         /// If this link is templated, you can use this method to make a non templated copy
         /// </summary>
@@ -71,22 +138,38 @@ namespace WebApi.Hal
 
             return uriTemplate.Resolve();
         }
-    }
 
-    internal class LinkEqualityComparer : IEqualityComparer<Link>
-    {
-        public bool Equals(Link l1, Link l2)
+        /// <summary>
+        /// Performs a shallow clone of the instance
+        /// </summary>
+        /// <returns>Cloned instance</returns>
+        public Link Clone()
         {
-            return string.Compare(l1.Href, l2.Href, StringComparison.OrdinalIgnoreCase) == 0 &&
-                   string.Compare(l1.Rel, l2.Rel, StringComparison.OrdinalIgnoreCase) == 0;
+            return (Link)MemberwiseClone();
         }
 
-
-        public int GetHashCode(Link lnk)
+        sealed class LinkEqualityComparer : IEqualityComparer<Link>
         {
-            var str = (string.IsNullOrEmpty(lnk.Rel) ? "norel" : lnk.Rel) + "~" + (string.IsNullOrEmpty(lnk.Href) ? "nohref" : lnk.Href);
-            var h = str.GetHashCode();
-            return h;
+            public bool Equals(Link l1, Link l2)
+            {
+                return string.Compare(l1.Href, l2.Href, StringComparison.OrdinalIgnoreCase) == 0 &&
+                       string.Compare(l1.Rel, l2.Rel, StringComparison.OrdinalIgnoreCase) == 0;
+            }
+
+
+            public int GetHashCode(Link lnk)
+            {
+                var str = (string.IsNullOrEmpty(lnk.Rel) ? "norel" : lnk.Rel) + "~" + (string.IsNullOrEmpty(lnk.Href) ? "nohref" : lnk.Href);
+                var h = str.GetHashCode();
+                return h;
+            }
+        }
+
+        public static IEqualityComparer<Link> EqualityComparer
+        {
+            get { return ComparerInstance; }
         }
     }
+
+    
 }

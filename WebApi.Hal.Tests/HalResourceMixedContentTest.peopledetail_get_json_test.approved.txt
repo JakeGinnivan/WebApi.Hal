@@ -7,6 +7,20 @@
     },
     "people": {
       "href": "/api/organisations/1/people"
+    },
+    "person": [
+      {
+        "href": "/api/organisations/1/people/3"
+      },
+      {
+        "href": "/api/organisations/1/people/4"
+      },
+      {
+        "href": "/api/organisations/1/people/5"
+      }
+    ],
+    "boss": {
+      "href": "/api/organisations/1/boss"
     }
   },
   "_embedded": {

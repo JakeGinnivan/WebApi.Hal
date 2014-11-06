@@ -2,7 +2,7 @@
   "Id": 1,
   "Name": "Org Name",
   "_links": {
-    "someRel": {
+    "somerel": {
       "href": "someHref",
       "title": "someTitle"
     }
