@@ -389,6 +389,9 @@ namespace WebApi.Hal.Tests
             {
             }
 
+            [Rel("organisation")]
+            public override IList<OrgWithPeopleDetailAttributeRepresentation> ResourceList { get; set; }
+
             public string SimpleData { get; set; }
         }
 
@@ -408,8 +411,7 @@ namespace WebApi.Hal.Tests
     ""_links"": {""self"": {""href"": ""/api/organisations/8""}}}
    ]},
 ""SimpleData"": ""simple string""
-}
-";
+}";
 
             // act
             using (
