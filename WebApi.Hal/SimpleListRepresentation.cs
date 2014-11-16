@@ -15,6 +15,6 @@ namespace WebApi.Hal
             ResourceList = list;
         }
 
-        public IList<TResource> ResourceList { get; set; }
+        public virtual IList<TResource> ResourceList { get; set; }
     }
 }
