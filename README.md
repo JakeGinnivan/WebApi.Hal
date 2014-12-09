@@ -38,7 +38,7 @@ The link class represents hypermedia on a representation. It looks like this:
 
 The thing which makes this class special is it's support for templates. For example:
 
-	var link = new Link("beers, "/breweries/{id}/beers");
+	var link = new Link("beers", "/breweries/{id}/beers");
 
 Notice the {id}, this allows you to return a templated link as hypermedia. But you can also turn it into an absolute link really easily:
 
