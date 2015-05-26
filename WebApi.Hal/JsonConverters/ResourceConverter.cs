@@ -95,16 +95,27 @@ namespace WebApi.Hal.JsonConverters
                 foreach (var prop in resourceType.GetProperties().Where(p => Representation.IsEmbeddedResourceType(p.PropertyType)))
                 {
                     // expects embedded collection of resources is implemented as an IList on the Representation-derived class
-                    var lst = prop.GetValue(resource) as IList;
-                    if (lst != null)
+                    if (typeof (IEnumerable<IResource>).IsAssignableFrom(prop.PropertyType))
                     {
+                        var lst = prop.GetValue(resource) as IList;
+                        if (lst == null)
+                        {
+                            lst = ConstructResource(prop.PropertyType) as IList ??
+                                  Activator.CreateInstance(
+                                      typeof (List<>).MakeGenericType(prop.PropertyType.GenericTypeArguments)) as IList;
+                            if (lst == null) continue;
+                            prop.SetValue(resource, lst);
+                        }
                         if (prop.PropertyType.GenericTypeArguments != null &&
                             prop.PropertyType.GenericTypeArguments.Length > 0)
                             CreateEmbedded(embeddeds, prop.PropertyType.GenericTypeArguments[0],
                                 newRes => lst.Add(newRes));
                     }
                     else
-                        CreateEmbedded(embeddeds, prop.PropertyType, newRes => prop.SetValue(resource, newRes));
+                    {
+                        var prop1 = prop;
+                        CreateEmbedded(embeddeds, prop.PropertyType, newRes => prop1.SetValue(resource, newRes));
+                    }
                 }
             }
 
@@ -177,22 +188,7 @@ namespace WebApi.Hal.JsonConverters
                 {
                     if (ResourceTypeToRel.ContainsKey(resourceType.FullName))
                         return ResourceTypeToRel[resourceType.FullName];
-                    // favor c-tor with zero params, but if it doesn't exist, use c-tor with fewest params and pass all null values
-                    var ctors = resourceType.GetConstructors();
-                    ConstructorInfo useThisCtor = null;
-                    foreach (var ctor in ctors)
-                    {
-                        if (ctor.GetParameters().Length == 0)
-                        {
-                            useThisCtor = ctor;
-                            break;
-                        }
-                        if (useThisCtor == null || useThisCtor.GetParameters().Length > ctor.GetParameters().Length)
-                            useThisCtor = ctor;
-                    }
-                    if (useThisCtor == null) return string.Empty;
-                    var ctorParams = new object[useThisCtor.GetParameters().Length];
-                    var res = useThisCtor.Invoke(ctorParams) as IResource;
+                    var res = ConstructResource(resourceType) as IResource;
                     if (res != null)
                     {
                         var rel = res.Rel;
@@ -206,6 +202,26 @@ namespace WebApi.Hal.JsonConverters
             {
                 return string.Empty;
             }
+        }
+
+        static object ConstructResource(Type resourceType)
+        {
+            // favor c-tor with zero params, but if it doesn't exist, use c-tor with fewest params and pass all null values
+            var ctors = resourceType.GetConstructors();
+            ConstructorInfo useThisCtor = null;
+            foreach (var ctor in ctors)
+            {
+                if (ctor.GetParameters().Length == 0)
+                {
+                    useThisCtor = ctor;
+                    break;
+                }
+                if (useThisCtor == null || useThisCtor.GetParameters().Length > ctor.GetParameters().Length)
+                    useThisCtor = ctor;
+            }
+            if (useThisCtor == null) return null;
+            var ctorParams = new object[useThisCtor.GetParameters().Length];
+            return useThisCtor.Invoke(ctorParams);
         }
 
         public override bool CanConvert(Type objectType)

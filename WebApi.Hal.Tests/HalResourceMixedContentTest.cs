@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -19,6 +20,7 @@ namespace WebApi.Hal.Tests
             {
                 Boss = new Boss(2, "Eunice PHB", 1, true)
             };
+            resource.People = new List<Person>();
             resource.People.Add(new Person(3, "Dilbert", 1));
             resource.People.Add(new Person(4, "Wally", 1));
             resource.People.Add(new Person(5, "Alice", 1));
@@ -211,6 +213,35 @@ namespace WebApi.Hal.Tests
                 Assert.NotNull(org.Boss);
                 Assert.Equal(2, org.People.Count);
                 Assert.Equal(1, org.Boss.Links.Count);
+            }
+        }
+
+        [Fact]
+        public void peopledetail_post_json_embedded_null_test()
+        {
+            // arrange
+            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var type = typeof(OrganisationWithPeopleDetailRepresentation);
+            const string json = @"
+{
+""Id"":""3"",
+""Name"": ""Singles Dept.""
+}
+";
+
+            // act
+            using (
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
+                )
+            {
+                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+
+                // assert
+                Assert.NotNull(obj);
+                var org = obj as OrganisationWithPeopleDetailRepresentation;
+                Assert.NotNull(org);
+                Assert.Null(org.Boss);
+                Assert.Null(org.People);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
@@ -37,8 +38,12 @@ namespace WebApi.Hal.Web.Api
                 Style = new BeerStyleRepresentation {Id = beer.Style.Id, Name = beer.Style.Name},
                 Brewery = new BreweryRepresentation {Id = beer.Brewery.Id, Name = beer.Brewery.Name}
             };
-            foreach (var review in reviews)
-                detail.Reviews.Add(review);
+            if (reviews.Count > 0)
+            {
+                detail.Reviews = new List<ReviewRepresentation>();
+                foreach (var review in reviews)
+                    detail.Reviews.Add(review);
+            }
             return detail;
         }
 

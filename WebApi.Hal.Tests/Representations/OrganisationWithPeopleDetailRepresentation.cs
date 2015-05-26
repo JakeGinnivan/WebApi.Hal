@@ -64,13 +64,12 @@ namespace WebApi.Hal.Tests.Representations
         {
             Id = id;
             Name = name;
-            People = new List<Person>();
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public List<Person> People { get; set; }
+        public IList<Person> People { get; set; }
         public Boss Boss { get; set; }
 
         public override string Rel
