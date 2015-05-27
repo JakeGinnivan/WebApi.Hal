@@ -4,11 +4,6 @@ namespace WebApi.Hal.Web.Api.Resources
 {
     public class BeerDetailRepresentation : Representation
     {
-        public BeerDetailRepresentation()
-        {
-            Reviews = new List<ReviewRepresentation>();
-        }
-
         public int Id { get; set; }
         public string Name { get; set; }
 
