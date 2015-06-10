@@ -33,10 +33,13 @@ namespace WebApi.Hal
         readonly CuriesLink curie;
 
         public Link()
-        { }
+        {
+            ExtendedAttributes = new Dictionary<string, string>();
+        }
         
         public Link(string rel, string href, CuriesLink curie)
         {
+            ExtendedAttributes = new Dictionary<string, string>();
             if (string.IsNullOrEmpty(rel))
                 throw new ArgumentNullException("rel");
 
@@ -53,6 +56,7 @@ namespace WebApi.Hal
 
         public Link(string rel, string href, string title = null)
         {
+            ExtendedAttributes = new Dictionary<string, string>();
             Rel = rel;
             Href = href;
             Title = title;
@@ -80,6 +84,7 @@ namespace WebApi.Hal
         public string Name { get; set; }
         public string Profile { get; set; }
         public string HrefLang { get; set; }
+        public IDictionary<string, string> ExtendedAttributes { get; private set; }
         
         public bool IsTemplated
         {
