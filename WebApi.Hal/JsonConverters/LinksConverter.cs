@@ -93,7 +93,7 @@ namespace WebApi.Hal.JsonConverters
             return typeof(IList<Link>).IsAssignableFrom(objectType);
         }
 
-        public string ResolveUri(string href)
+        public virtual string ResolveUri(string href)
         {
             if (!string.IsNullOrEmpty(href) && VirtualPathUtility.IsAppRelative(href))
                 return HttpContext.Current != null ? VirtualPathUtility.ToAbsolute(href) : href.Replace("~/", "/");
