@@ -5,7 +5,7 @@ using Xunit;
 
 namespace WebApi.Hal.Tests
 {
-    public class HalResponseContentTypeTests : HttpServerFixture
+    public class JsonHalResponseContentTypeTests : HttpServerFixture
     {
         [Fact]
         public void formatter_sets_contenttype_to_applicationhaljson()

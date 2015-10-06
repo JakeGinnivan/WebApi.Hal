@@ -73,7 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HalResourceMixedContentTest.cs" />
-    <Compile Include="HalResponseContentTypeTests.cs" />
+    <Compile Include="JsonHalResponseContentTypeTests.cs" />
     <Compile Include="HalResourceWithPeopleTest.cs" />
     <Compile Include="HalResourceTest.cs" />
     <Compile Include="HypermediaAppenders\CategoryRepresentationHypermediaAppender.cs" />
