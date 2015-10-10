@@ -41,11 +41,12 @@ namespace WebApi.Hal
             
             RepopulateRecursively(ctx.HypermediaResolver, curies);
 
-            Links = curies
-                .Distinct(CuriesLink.EqualityComparer)
-                .Select(x => x.ToLink())
-                .Union(Links)
-                .ToList();
+	        if (Links != null)
+		        Links = curies
+			        .Distinct(CuriesLink.EqualityComparer)
+			        .Select(x => x.ToLink())
+			        .Union(Links)
+			        .ToList();
 
             ctx.IsRoot = false;
         }
@@ -123,7 +124,8 @@ namespace WebApi.Hal
                 property.SetValue(this, null, null);
             }
 
-            curies.AddRange(Links.Where(l => l.Curie != null).Select(l => l.Curie));
+			if (Links != null)
+				curies.AddRange(Links.Where(l => l.Curie != null).Select(l => l.Curie));
 
             if (Embedded.Count == 0)
                 Embedded = null; // avoid the property from being serialized ...
@@ -138,39 +140,45 @@ namespace WebApi.Hal
 
             var embeddedResource = new EmbeddedResource {IsSourceAnArray = true};
 
-            foreach (var resourceItem in resourceList)
-            {
-                embeddedResource.Resources.Add(resourceItem);
+	        foreach (var resourceItem in resourceList)
+	        {
+		        embeddedResource.Resources.Add(resourceItem);
 
-                var representation = resourceItem as Representation;
+		        var representation = resourceItem as Representation;
 
-                if (representation == null)
-                    continue;
+		        if (representation == null)
+			        continue;
 
-                representation.RepopulateRecursively(resolver, curies); // traverse ...
-                Links.Add(representation.ToLink(resolver)); // add a link to embedded to the container ...
-            }
+		        representation.RepopulateRecursively(resolver, curies); // traverse ...
+		        var link = representation.ToLink(resolver);
 
-            Embedded.Add(embeddedResource);
+		        if (link != null)
+			        Links.Add(link); // add a link to embedded to the container ...
+	        }
+
+	        Embedded.Add(embeddedResource);
         }
 
-        void ProcessPropertyValue(IHypermediaResolver resolver, List<CuriesLink> curies, IResource resource)
-        {
-            var embeddedResource = new EmbeddedResource {IsSourceAnArray = false};
-            embeddedResource.Resources.Add(resource);
+	    void ProcessPropertyValue(IHypermediaResolver resolver, List<CuriesLink> curies, IResource resource)
+	    {
+		    var embeddedResource = new EmbeddedResource {IsSourceAnArray = false};
+		    embeddedResource.Resources.Add(resource);
 
-            Embedded.Add(embeddedResource);
+		    Embedded.Add(embeddedResource);
 
-            var representation = resource as Representation;
+		    var representation = resource as Representation;
 
-            if (representation == null) 
-                return; 
+		    if (representation == null)
+			    return;
 
-            representation.RepopulateRecursively(resolver, curies); // traverse ...
-            Links.Add(representation.ToLink(resolver)); // add a link to embedded to the container ...
-        }
+		    representation.RepopulateRecursively(resolver, curies); // traverse ...
+		    var link = representation.ToLink(resolver);
 
-        void ResolveAndAppend(IHypermediaResolver resolver, Type type)
+		    if (link != null)
+			    Links.Add(link); // add a link to embedded to the container ...
+	    }
+
+	    void ResolveAndAppend(IHypermediaResolver resolver, Type type)
         {
             // We need reflection here, because appenders are of type IHypermediaAppender<T> whilst we define this logic in the base class of T
 
@@ -180,19 +188,31 @@ namespace WebApi.Hal
             genericMethod.Invoke(this, new object[] {this, resolver});
         }
 
-        protected static void Append<T>(IResource resource, IHypermediaResolver resolver) where T : class, IResource // called using reflection ...
-        {
-            var typed = resource as T;
+	    protected static void Append<T>(IResource resource, IHypermediaResolver resolver) where T : class, IResource
+		    // called using reflection ...
+	    {
+		    var typed = resource as T;
 
-            var appender = resolver.ResolveAppender(typed);
-            var configured = resolver.ResolveLinks(typed).ToList();
+		    var appender = resolver.ResolveAppender(typed);
+		    var configured = resolver.ResolveLinks(typed).ToList();
+		    var link = resolver.ResolveSelf(typed);
 
-            configured.Insert(0, resolver.ResolveSelf(typed));
+		    if (link != null)
+			    configured.Insert(0, link);
 
-            appender.Append(typed, configured);
-        }
+		    if (configured.Any() && (appender != null))
+		    {
+			    if (typed.Links == null)
+				    typed.Links = new List<Link>(); // make sure resource.Links.Add() can safely be called inside the appender
 
-        internal static bool IsEmbeddedResourceType(Type type)
+			    appender.Append(typed, configured);
+
+			    if ((typed.Links != null) && !typed.Links.Any())
+				    typed.Links = null; // prevent _links property serialisation
+			}
+	    }
+
+	    internal static bool IsEmbeddedResourceType(Type type)
         {
             return typeof (IResource).IsAssignableFrom(type) ||
                    typeof (IEnumerable<IResource>).IsAssignableFrom(type);
@@ -200,11 +220,17 @@ namespace WebApi.Hal
 
         public void RepopulateHyperMedia()
         {
-            CreateHypermedia();
+			if (Links == null)
+				Links = new List<Link>(); // make sure resource.Links.Add() can safely be called inside the overload
 
-            if (!string.IsNullOrEmpty(Href) && Links.Count(l=>l.Rel == "self") == 0)
+			CreateHypermedia();
+			
+			if (!string.IsNullOrEmpty(Href) && Links.Count(l=>l.Rel == "self") == 0)
                 Links.Insert(0, new Link { Rel = "self", Href = Href });
-        }
+			
+			if ((Links != null) && !Links.Any())
+				Links = null; // prevent _links property serialisation
+		}
 
         [JsonIgnore]
         public virtual string Rel { get; set; }
