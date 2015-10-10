@@ -1,5 +1,4 @@
 ﻿{
   "Id": 1,
-  "Name": "Org Name",
-  "_links": null
+  "Name": "Org Name"
 }

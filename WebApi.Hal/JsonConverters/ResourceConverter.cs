@@ -45,14 +45,21 @@ namespace WebApi.Hal.JsonConverters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var resource = (IResource)value;
+			var linksBackup = resource.Links;
 
-            var saveContext = serializer.Context;
+			if (!linksBackup.Any())
+				resource.Links = null; // avoid serialization
+
+			var saveContext = serializer.Context;
             serializer.Context = GetResourceConverterContext();
             serializer.Converters.Remove(this);
             serializer.Serialize(writer, resource);
             serializer.Converters.Add(this);
             serializer.Context = saveContext;
-        }
+
+			if (!linksBackup.Any())
+				resource.Links = linksBackup;
+		}
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
                                         JsonSerializer serializer)
