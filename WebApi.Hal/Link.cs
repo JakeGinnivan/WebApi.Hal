@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 using WebApi.Hal.Interfaces;
+using System.Collections;
 
 namespace WebApi.Hal
 {
@@ -131,8 +133,32 @@ namespace WebApi.Hal
                 {
                     var name = substitution.Name;
                     var value = substitution.GetValue(parameter, null);
-                    var substituionValue = value == null ? null : value.ToString();
-                    uriTemplate.SetParameter(name, substituionValue);
+                    if (value == null)
+                    {
+                        // Skip
+                    }
+                    else if (value is string)
+                    {
+                        uriTemplate.SetParameter(name, value);
+                    }
+                    else if (value is System.Collections.IEnumerable)
+                    {
+                        if (value is System.Collections.IDictionary)
+                        {
+                            var substitutionValue = ((value) as IEnumerable).Cast<DictionaryEntry>().ToDictionary(x => x.Key.ToString(), x => x.Value.ToString());
+                            uriTemplate.SetParameter(name, substitutionValue);
+                        }
+                        else
+                        {
+                            var substitutionValue = ((value) as IEnumerable).Cast<object>().Select(x => x.ToString());
+                            uriTemplate.SetParameter(name, substitutionValue);
+                        }
+                    }
+                    else
+                    {
+                        var substitutionValue = value.ToString();
+                        uriTemplate.SetParameter(name, substitutionValue);
+                    }
                 }
             }
 
