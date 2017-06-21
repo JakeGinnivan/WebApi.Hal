@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Collections.Generic;
+using Xunit;
 
 namespace WebApi.Hal.Tests
 {
@@ -57,6 +58,45 @@ namespace WebApi.Hal.Tests
             Assert.Equal("/beers?searchTerm=test", link.Href);
         }
 
+        [Fact]
+        public void create_link_handles_expansion()
+        {
+            // arrange
+            var templateLink = new Link("beers", "/beers{?searchTerm}");
+
+            // act
+            var link = templateLink.CreateLink(new {searchTerm = new[] {"test1", "test2"}});
+
+            // assert
+            Assert.Equal("/beers?searchTerm=test1,test2", link.Href);
+        }
+
+        [Fact]
+        public void create_link_handles_expansion2()
+        {
+            // arrange
+            var templateLink = new Link("beers", "/beers{?searchTerm*}");
+
+            // act
+            var link = templateLink.CreateLink(new {searchTerm = new[] {"test1", "test2"}});
+
+            // assert
+            Assert.Equal("/beers?searchTerm=test1&searchTerm=test2", link.Href);
+        }
+
+        [Fact]
+        public void create_link_handles_non_string_objects()
+        {
+            // arrange
+            var templateLink = new Link("beers", "/beers{?searchTerm}");
+
+            // act
+            var link = templateLink.CreateLink(new {searchTerm = new object()});
+
+            // assert somewhat useless behaviour
+            Assert.Equal("/beers?searchTerm=System.Object", link.Href);
+        }
+        
         [Fact]
         public void create_link_handles_spaces()
         {

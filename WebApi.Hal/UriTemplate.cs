@@ -213,46 +213,40 @@ namespace WebApi.Hal
 
             object value = _Parameters[varname];
 
-            // Handle Strings
-            if (value is string)
+            // Handle Lists
+            var list = value as IEnumerable<string>;
+            if (list != null)
             {
-                var stringValue = (string)value;
-                if (varSpec.OperatorInfo.Named)
+                if (varSpec.OperatorInfo.Named && !varSpec.Explode) // exploding will prefix with list name
                 {
-                    AppendName(varname, varSpec.OperatorInfo, string.IsNullOrEmpty(stringValue));
+                    AppendName(varname, varSpec.OperatorInfo, !list.Any());
                 }
-                AppendValue(stringValue, varSpec.PrefixLength, varSpec.OperatorInfo.AllowReserved);
+
+                AppendList(varSpec.OperatorInfo, varSpec.Explode, varname, list);
+                return true;
             }
-            else
+
+            // Handle associative arrays
+            var dictionary = value as IDictionary<string, string>;
+            if (dictionary != null)
             {
-                // Handle Lists
-                var list = value as IEnumerable<string>;
-                if (list != null)
+                if (varSpec.OperatorInfo.Named && !varSpec.Explode) // exploding will prefix with list name
                 {
-                    if (varSpec.OperatorInfo.Named && !varSpec.Explode) // exploding will prefix with list name
-                    {
-                        AppendName(varname, varSpec.OperatorInfo, list.Count() == 0);
-                    }
-
-                    AppendList(varSpec.OperatorInfo, varSpec.Explode, varname, list);
+                    AppendName(varname, varSpec.OperatorInfo, dictionary.Count == 0);
                 }
-                else
-                {
+                AppendDictionary(varSpec.OperatorInfo, varSpec.Explode, dictionary);
 
-                    // Handle associative arrays
-                    var dictionary = value as IDictionary<string, string>;
-                    if (dictionary != null)
-                    {
-                        if (varSpec.OperatorInfo.Named && !varSpec.Explode) // exploding will prefix with list name
-                        {
-                            AppendName(varname, varSpec.OperatorInfo, dictionary.Count() == 0);
-                        }
-                        AppendDictionary(varSpec.OperatorInfo, varSpec.Explode, dictionary);
-                    }
-
-                }
-
+                return true;
             }
+
+            // Default (treat everything else as a string)
+            var stringValue = value.ToString();
+            if (varSpec.OperatorInfo.Named)
+            {
+                AppendName(varname, varSpec.OperatorInfo, string.IsNullOrEmpty(stringValue));
+            }
+            AppendValue(stringValue, varSpec.PrefixLength, varSpec.OperatorInfo.AllowReserved);
+
             return true;
         }
 

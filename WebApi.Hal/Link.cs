@@ -131,8 +131,7 @@ namespace WebApi.Hal
                 {
                     var name = substitution.Name;
                     var value = substitution.GetValue(parameter, null);
-                    var substituionValue = value == null ? null : value.ToString();
-                    uriTemplate.SetParameter(name, substituionValue);
+                    uriTemplate.SetParameter(name, value);
                 }
             }
 
