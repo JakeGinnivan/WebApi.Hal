@@ -8,15 +8,16 @@ namespace WebApi.Hal
 {
     public class Hypermedia : IHypermediaResolver, IHypermediaBuilder
     {
-        readonly IDictionary<Type, Link> selfLinks = new Dictionary<Type, Link>();
-        readonly IDictionary<Type, IList<Link>> hypermedia = new Dictionary<Type, IList<Link>>();
-        readonly IDictionary<Type, object> appenders = new Dictionary<Type, object>();
-
-        Hypermedia()
-        {
-        }
+        private readonly IDictionary<Type, Link> selfLinks = new Dictionary<Type, Link>();
+        private readonly IDictionary<Type, IList<Link>> hypermedia = new Dictionary<Type, IList<Link>>();
+        private readonly IDictionary<Type, object> appenders = new Dictionary<Type, object>();
 
         public static IHypermediaBuilder CreateBuilder()
+        {
+            return new Hypermedia();
+        }
+
+        public static IHypermediaResolver CreateResolver()
         {
             return new Hypermedia();
         }
@@ -24,7 +25,7 @@ namespace WebApi.Hal
         public void RegisterAppender<T>(IHypermediaAppender<T> appender) where T : class, IResource
         {
             if (appender == null)
-                throw new ArgumentNullException("appender");
+                throw new ArgumentNullException(nameof(appender));
 
             var type = typeof(T);
 
@@ -37,7 +38,7 @@ namespace WebApi.Hal
         public void RegisterSelf<T>(Link link) where T : IResource
         {
             if (link == null)
-                throw new ArgumentNullException("link");
+                throw new ArgumentNullException(nameof(link));
 
             var type = typeof(T);
 
@@ -50,7 +51,7 @@ namespace WebApi.Hal
         public void RegisterSelf<T>(Link<T> link) where T : class, IResource
         {
             if (link == null)
-                throw new ArgumentNullException("link");
+                throw new ArgumentNullException(nameof(link));
 
             var type = typeof(T);
 
@@ -63,7 +64,7 @@ namespace WebApi.Hal
         public void RegisterLinks<T>(params Link[] links) where T : class, IResource
         {
             if (links == null)
-                throw new ArgumentNullException("links");
+                throw new ArgumentNullException(nameof(links));
 
             var type = typeof(T);
 

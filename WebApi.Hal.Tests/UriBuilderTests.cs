@@ -119,7 +119,7 @@ namespace WebApi.Hal.Tests
             var link = templateLink.CreateLink(new {name = "BeerName"});
 
             // assert
-            Assert.Equal(link.Title, "Beer");
+            Assert.Equal("Beer", link.Title);
         }
     }
 }

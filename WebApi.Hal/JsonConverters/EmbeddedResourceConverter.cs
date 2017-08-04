@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Newtonsoft.Json;
 using WebApi.Hal.Interfaces;
 
@@ -33,10 +34,7 @@ namespace WebApi.Hal.JsonConverters
             return "unknownRel-" + res.GetType().Name;
         }
 
-        public override bool CanRead
-        {
-            get { return false; }
-        }
+        public override bool CanRead => false;
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
                                         JsonSerializer serializer)

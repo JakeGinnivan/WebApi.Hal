@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,11 +11,6 @@ namespace WebApi.Hal
 {
     public abstract class Representation : IResource
     {
-        protected Representation()
-        {
-            Links = new List<Link>();
-        }
-
         [JsonProperty("_embedded")]
         private IList<EmbeddedResource> Embedded { get; set; }
 
@@ -28,12 +22,8 @@ namespace WebApi.Hal
         {
             // Clear the embeddedResourceProperties in order to make this object re-serializable.
             embeddedResourceProperties.Clear();
-
-            if (!ResourceConverter.IsResourceConverterContext(context))
-                return;
             
-            var ctx = (HalJsonConverterContext)context.Context;
-
+            var ctx = HalJsonConverterContext.Create();
             if (!ctx.IsRoot) 
                 return;
             
@@ -54,12 +44,9 @@ namespace WebApi.Hal
         [OnSerialized]
         private void OnSerialized(StreamingContext context)
         {
-            if (ResourceConverter.IsResourceConverterContext(context))
-            {
-                // restore embedded resource properties
-                foreach (var prop in embeddedResourceProperties.Keys)
-                    prop.SetValue(this, embeddedResourceProperties[prop], null);
-            }
+            // restore embedded resource properties
+            foreach (var prop in embeddedResourceProperties.Keys)
+                prop.SetValue(this, embeddedResourceProperties[prop], null);
         }
 
         Link ToLink(IHypermediaResolver resolver)
@@ -193,14 +180,19 @@ namespace WebApi.Hal
 	    {
 		    var typed = resource as T;
 
-		    var appender = resolver.ResolveAppender(typed);
-		    var configured = resolver.ResolveLinks(typed).ToList();
-		    var link = resolver.ResolveSelf(typed);
+	        if (typed == null)
+	        {
+	            throw new ArgumentOutOfRangeException(nameof(resource), "resource must be of type " + typeof(T));
+	        }
+
+		    IHypermediaAppender<T> appender = resolver.ResolveAppender(typed);
+		    List<Link> configured = resolver.ResolveLinks(typed).ToList();
+		    Link link = resolver.ResolveSelf(typed);
 
 		    if (link != null)
 			    configured.Insert(0, link);
 
-		    if (configured.Any() && (appender != null))
+		    if (configured.Count > 0 && (appender != null))
 		    {
 			    if (typed.Links == null)
 				    typed.Links = new List<Link>(); // make sure resource.Links.Add() can safely be called inside the appender
@@ -241,7 +233,7 @@ namespace WebApi.Hal
         [JsonIgnore]
         public string LinkName { get; set; }
 
-        public IList<Link> Links { get; set; }
+        public IList<Link> Links { get; set; } = new List<Link>();
 
         protected internal virtual void CreateHypermedia()
         {

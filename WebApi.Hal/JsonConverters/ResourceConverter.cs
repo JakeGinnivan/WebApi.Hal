@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WebApi.Hal.Interfaces;
@@ -12,8 +11,6 @@ namespace WebApi.Hal.JsonConverters
 {
     public class ResourceConverter : JsonConverter
     {
-        const StreamingContextStates StreamingContextResourceConverterState = StreamingContextStates.Other;
-
         readonly IHypermediaResolver hypermediaConfiguration;
 
         public ResourceConverter()
@@ -23,23 +20,11 @@ namespace WebApi.Hal.JsonConverters
         public ResourceConverter(IHypermediaResolver hypermediaConfiguration)
         {
             if (hypermediaConfiguration == null)
-                throw new ArgumentNullException("hypermediaConfiguration");
+            {
+                throw new ArgumentNullException(nameof(hypermediaConfiguration));
+            }
 
             this.hypermediaConfiguration = hypermediaConfiguration;
-        }
-
-        public static bool IsResourceConverterContext(StreamingContext context)
-        {
-            return context.Context is HalJsonConverterContext && context.State == StreamingContextResourceConverterState;
-        }
-
-        private StreamingContext GetResourceConverterContext()
-        {
-            var context = (hypermediaConfiguration == null)
-                ? new HalJsonConverterContext()
-                : new HalJsonConverterContext(hypermediaConfiguration);
-
-            return new StreamingContext(StreamingContextResourceConverterState, context);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -47,17 +32,14 @@ namespace WebApi.Hal.JsonConverters
             var resource = (IResource)value;
 			var linksBackup = resource.Links;
 
-			if (!linksBackup.Any())
-				resource.Links = null; // avoid serialization
+            if (linksBackup.Count == 0)
+                resource.Links = null; // avoid serialization
 
-			var saveContext = serializer.Context;
-            serializer.Context = GetResourceConverterContext();
             serializer.Converters.Remove(this);
             serializer.Serialize(writer, resource);
             serializer.Converters.Add(this);
-            serializer.Context = saveContext;
 
-			if (!linksBackup.Any())
+			if (linksBackup.Count == 0)
 				resource.Links = linksBackup;
 		}
 
@@ -68,10 +50,10 @@ namespace WebApi.Hal.JsonConverters
             return CreateResource(JObject.Load(reader), objectType);
         }
 
-        const string HalLinksName = "_links";
-        const string HalEmbeddedName = "_embedded";
+        private const string HalLinksName = "_links";
+        private const string HalEmbeddedName = "_embedded";
 
-        static IResource CreateResource(JObject jObj, Type resourceType)
+        private static IResource CreateResource(JObject jObj, Type resourceType)
         {
             // remove _links and _embedded so those don't try to deserialize, because we know they will fail
             JToken links;
@@ -133,8 +115,7 @@ namespace WebApi.Hal.JsonConverters
         {
             if (rel.Value.Type == JTokenType.Array)
             {
-                var arr = rel.Value as JArray;
-                if (arr != null)
+                if (rel.Value is JArray arr)
                     foreach (var link in arr.Select(item => item.ToObject<Link>()))
                     {
                         link.Rel = rel.Name;
@@ -195,8 +176,7 @@ namespace WebApi.Hal.JsonConverters
                 {
                     if (ResourceTypeToRel.ContainsKey(resourceType.FullName))
                         return ResourceTypeToRel[resourceType.FullName];
-                    var res = ConstructResource(resourceType) as IResource;
-                    if (res != null)
+                    if (ConstructResource(resourceType) is IResource res)
                     {
                         var rel = res.Rel;
                         ResourceTypeToRel.Add(resourceType.FullName, rel);
@@ -233,15 +213,10 @@ namespace WebApi.Hal.JsonConverters
 
         public override bool CanConvert(Type objectType)
         {
-            return IsResource(objectType) && !IsResourceList(objectType);
+            return IsResource(objectType);
         }
 
-        static bool IsResourceList(Type objectType)
-        {
-            return typeof(IRepresentationList).IsAssignableFrom(objectType);
-        }
-
-        static bool IsResource(Type objectType)
+        private static bool IsResource(Type objectType)
         {
             return typeof(Representation).IsAssignableFrom(objectType);
         }

@@ -9,7 +9,7 @@ namespace WebApi.Hal
         {
             var sb = new StringBuilder();
 
-            int previousIndex = 0;
+            var previousIndex = 0;
             int index = str.IndexOf(oldValue, comparison);
             while (index != -1)
             {

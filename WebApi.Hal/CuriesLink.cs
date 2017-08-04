@@ -8,17 +8,15 @@ namespace WebApi.Hal
 {
     public class CuriesLink
     {
-        const string CuriesRelExpression = "rel";
-
-        static readonly IEqualityComparer<CuriesLink> ComparerInstance = new NameEqualityComparer();
+        private const string CuriesRelExpression = "rel";
 
         public CuriesLink(string name, string href)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             if (string.IsNullOrEmpty(href))
-                throw new ArgumentNullException("href");
+                throw new ArgumentNullException(nameof(href));
 
             if (!IsValidCuriesHref(href))
                 throw new ArgumentException("The provided href is not a valid uri template: " + href, href);
@@ -27,16 +25,16 @@ namespace WebApi.Hal
             Href = href;
         }
 
-        public string Name { get; private set; }
-        public string Href { get; private set; }
+        public string Name { get; }
+        public string Href { get; }
 
-        string CreateLinkRelation(string name)
+        private string CreateLinkRelation(string name)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             if (name.Contains(":"))
-                throw new ArgumentException("Specified link relation already contains ':' " + name, "name");
+                throw new ArgumentException("Specified link relation already contains ':' " + name, nameof(name));
 
             return string.Concat(Name, ":", name);
         }
@@ -110,12 +108,9 @@ namespace WebApi.Hal
             };
         }
 
-        public static IEqualityComparer<CuriesLink> EqualityComparer
-        {
-            get { return ComparerInstance; }
-        }
+        public static IEqualityComparer<CuriesLink> EqualityComparer { get; } = new NameEqualityComparer();
 
-        sealed class NameEqualityComparer : IEqualityComparer<CuriesLink>
+        private sealed class NameEqualityComparer : IEqualityComparer<CuriesLink>
         {
             public bool Equals(CuriesLink x, CuriesLink y)
             {
@@ -128,9 +123,7 @@ namespace WebApi.Hal
 
             public int GetHashCode(CuriesLink obj)
             {
-                return (obj.Name != null
-                    ? obj.Name.GetHashCode()
-                    : 0);
+                return obj.Name?.GetHashCode() ?? 0;
             }
         }
     }

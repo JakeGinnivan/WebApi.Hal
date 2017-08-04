@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using WebApi.Hal.Interfaces;
 
@@ -27,10 +28,7 @@ namespace WebApi.Hal
         public const string RelForSelf = "self";
         public const string RelForCuries = "curies";
 
-        static readonly IEqualityComparer<Link> ComparerInstance = new LinkEqualityComparer();
-
-        string linkRelation;
-        readonly CuriesLink curie;
+        private string linkRelation;
 
         public Link()
         { }
@@ -38,17 +36,17 @@ namespace WebApi.Hal
         public Link(string rel, string href, CuriesLink curie)
         {
             if (string.IsNullOrEmpty(rel))
-                throw new ArgumentNullException("rel");
+                throw new ArgumentNullException(nameof(rel));
 
             if (string.IsNullOrEmpty(href))
-                throw new ArgumentNullException("href");
+                throw new ArgumentNullException(nameof(href));
 
             if (curie == null)
-                throw new ArgumentNullException("curie");
+                throw new ArgumentNullException(nameof(curie));
 
             Rel = rel;
             Href = href;
-            this.curie = curie;
+            this.Curie = curie;
         }
 
         public Link(string rel, string href, string title = null)
@@ -58,10 +56,7 @@ namespace WebApi.Hal
             Title = title;
         }
 
-        public CuriesLink Curie
-        {
-            get { return curie; }
-        }
+        public CuriesLink Curie { get; }
 
         public string Rel
         {
@@ -81,12 +76,9 @@ namespace WebApi.Hal
         public string Profile { get; set; }
         public string HrefLang { get; set; }
         
-        public bool IsTemplated
-        {
-            get { return !string.IsNullOrEmpty(Href) && IsTemplatedRegex.IsMatch(Href); }
-        }
+        public bool IsTemplated => !string.IsNullOrEmpty(Href) && isTemplatedRegex.IsMatch(Href);
 
-        private static readonly Regex IsTemplatedRegex = new Regex(@"{.+}", RegexOptions.Compiled);
+        private static readonly Regex isTemplatedRegex = new Regex(@"{.+}", RegexOptions.Compiled);
 
         /// <summary>
         /// If this link is templated, you can use this method to make a non templated copy
@@ -129,9 +121,9 @@ namespace WebApi.Hal
             {
                 foreach (var substitution in parameter.GetType().GetProperties())
                 {
-                    var name = substitution.Name;
-                    var value = substitution.GetValue(parameter, null);
-                    var substituionValue = value == null ? null : value.ToString();
+                    string name = substitution.Name;
+                    object value = substitution.GetValue(parameter, null);
+                    string substituionValue = value?.ToString();
                     uriTemplate.SetParameter(name, substituionValue);
                 }
             }
@@ -148,7 +140,7 @@ namespace WebApi.Hal
             return (Link)MemberwiseClone();
         }
 
-        sealed class LinkEqualityComparer : IEqualityComparer<Link>
+        private sealed class LinkEqualityComparer : IEqualityComparer<Link>
         {
             public bool Equals(Link l1, Link l2)
             {
@@ -165,10 +157,7 @@ namespace WebApi.Hal
             }
         }
 
-        public static IEqualityComparer<Link> EqualityComparer
-        {
-            get { return ComparerInstance; }
-        }
+        public static IEqualityComparer<Link> EqualityComparer { get; } = new LinkEqualityComparer();
     }
 
     

@@ -13,17 +13,21 @@ namespace WebApi.Hal.JsonConverters
 
         public HalJsonConverterContext(IHypermediaResolver hypermediaResolver) : this()
         {
-            if (hypermediaResolver == null) 
-                throw new ArgumentNullException("hypermediaResolver");
+            if (hypermediaResolver == null)
+            {
+                throw new ArgumentNullException(nameof(hypermediaResolver));
+            }
 
-            this.hypermediaResolver = hypermediaResolver;
+            this.HypermediaResolver = hypermediaResolver;
         }
 
-        public IHypermediaResolver HypermediaResolver
-        {
-            get { return hypermediaResolver; }
-        }
+        public IHypermediaResolver HypermediaResolver { get; }
 
         public bool IsRoot { get; set; }
+
+        public static HalJsonConverterContext Create()
+        {
+            return new HalJsonConverterContext(Hypermedia.CreateResolver());
+        }
     }
 }

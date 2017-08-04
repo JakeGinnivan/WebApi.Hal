@@ -12,10 +12,11 @@ namespace WebApi.Hal
     /// </summary>
     public class UriTemplate
     {
-        const string _UriReservedSymbols = ":/?#[]@!$&'()*+,;=";
-        const string _UriUnreservedSymbols = "-._~";
+        private const string UriReservedSymbols = ":/?#[]@!$&'()*+,;=";
+        private const string UriUnreservedSymbols = "-._~";
 
-        static Dictionary<char, OperatorInfo> _Operators = new Dictionary<char, OperatorInfo>() {
+        private static readonly Dictionary<char, OperatorInfo> operators = new Dictionary<char, OperatorInfo>
+        {
             {'\0', new OperatorInfo {Default = true, First = "", Seperator = ',', Named = false, IfEmpty = "",AllowReserved = false}},
             {'+', new OperatorInfo {Default = false, First = "", Seperator = ',', Named = false, IfEmpty = "",AllowReserved = true}},
             {'.', new OperatorInfo {Default = false, First = ".", Seperator = '.', Named = false, IfEmpty = "",AllowReserved = false}},
@@ -26,61 +27,61 @@ namespace WebApi.Hal
             {'#', new OperatorInfo {Default = false, First = "#", Seperator = ',', Named = false, IfEmpty = "",AllowReserved = true}}
         };
 
-        readonly string _template;
-        readonly Dictionary<string, object> _Parameters = new Dictionary<string, object>();
+        private readonly string template;
+        private readonly Dictionary<string, object> parameters = new Dictionary<string, object>();
 
-        enum States
+        private enum States
         {
             CopyingLiterals,
             ParsingExpression
         }
 
-        bool _ErrorDetected = false;
-        StringBuilder _Result;
-        List<string> _ParameterNames;
+        private bool errorDetected;
+        private StringBuilder result;
+        private List<string> parameterNames;
 
         public UriTemplate(string template)
         {
-            _template = template;
+            this.template = template;
         }
 
 
         public void SetParameter(string name, object value)
         {
-            _Parameters[name] = value;
+            parameters[name] = value;
         }
 
         public void SetParameter(string name, string value)
         {
-            _Parameters[name] = value;
+            parameters[name] = value;
         }
 
         public void SetParameter(string name, IEnumerable<string> value)
         {
-            _Parameters[name] = value;
+            parameters[name] = value;
         }
 
         public void SetParameter(string name, IDictionary<string, string> value)
         {
-            _Parameters[name] = value;
+            parameters[name] = value;
         }
 
 
         public IEnumerable<string> GetParameterNames()
         {
-            var parameterNames = new List<string>();
-            _ParameterNames = parameterNames;
+            var names = new List<string>();
+            parameterNames = names;
             Resolve();
-            _ParameterNames = null;
-            return parameterNames;
+            parameterNames = null;
+            return names;
         }
 
         public string Resolve()
         {
             var currentState = States.CopyingLiterals;
-            _Result = new StringBuilder();
+            result = new StringBuilder();
             StringBuilder currentExpression = null;
-            foreach (var character in _template.ToCharArray())
+            foreach (char character in template)
             {
                 switch (currentState)
                 {
@@ -92,11 +93,11 @@ namespace WebApi.Hal
                         }
                         else if (character == '}')
                         {
-                            throw new ArgumentException("Malformed template, unexpected } : " + _Result.ToString());
+                            throw new ArgumentException("Malformed template, unexpected } : " + result);
                         }
                         else
                         {
-                            _Result.Append(character);
+                            result.Append(character);
                         }
                         break;
                     case States.ParsingExpression:
@@ -108,7 +109,7 @@ namespace WebApi.Hal
                         }
                         else
                         {
-                            currentExpression.Append(character);
+                            currentExpression?.Append(character);
                         }
 
                         break;
@@ -116,32 +117,32 @@ namespace WebApi.Hal
             }
             if (currentState == States.ParsingExpression)
             {
-                _Result.Append("{");
-                _Result.Append(currentExpression.ToString());
+                result.Append("{");
+                result.Append(currentExpression);
 
-                throw new ArgumentException("Malformed template, missing } : " + _Result.ToString());
+                throw new ArgumentException("Malformed template, missing } : " + result);
             }
 
-            if (_ErrorDetected)
+            if (errorDetected)
             {
-                throw new ArgumentException("Malformed template : " + _Result.ToString());
+                throw new ArgumentException("Malformed template : " + result);
             }
-            return _Result.ToString();
+            return result.ToString();
         }
 
-        void ProcessExpression(StringBuilder currentExpression)
+        private void ProcessExpression(StringBuilder currentExpression)
         {
 
             if (currentExpression.Length == 0)
             {
-                _ErrorDetected = true;
-                _Result.Append("{}");
+                errorDetected = true;
+                result.Append("{}");
                 return;
             }
 
             OperatorInfo op = GetOperator(currentExpression[0]);
 
-            var firstChar = op.Default ? 0 : 1;
+            int firstChar = op.Default ? 0 : 1;
 
 
             var varSpec = new VarSpec(op);
@@ -166,7 +167,7 @@ namespace WebApi.Hal
                         i--;
                         break;
                     case ',':
-                        var success = ProcessVariable(varSpec);
+                        bool success = ProcessVariable(varSpec);
                         bool isFirst = varSpec.First;
                         // Reset for new variable
                         varSpec = new VarSpec(op);
@@ -182,7 +183,7 @@ namespace WebApi.Hal
                         }
                         else
                         {
-                            _ErrorDetected = true;
+                            errorDetected = true;
                         }
                         break;
                 }
@@ -191,32 +192,32 @@ namespace WebApi.Hal
 
         }
 
-        bool ProcessVariable(VarSpec varSpec)
+        private bool ProcessVariable(VarSpec varSpec)
         {
-            var varname = varSpec.VarName.ToString();
-            if (_ParameterNames != null) _ParameterNames.Add(varname);
+            string varname = varSpec.VarName.ToString();
+            parameterNames?.Add(varname);
 
-            if (!_Parameters.ContainsKey(varname)
-                || _Parameters[varname] == null
-                || (_Parameters[varname] is IList && ((IList)_Parameters[varname]).Count == 0)
-                || (_Parameters[varname] is IDictionary && ((IDictionary)_Parameters[varname]).Count == 0))
+            if (!parameters.ContainsKey(varname)
+                || parameters[varname] == null
+                || (parameters[varname] is IList && ((IList)parameters[varname]).Count == 0)
+                || (parameters[varname] is IDictionary && ((IDictionary)parameters[varname]).Count == 0))
                 return false;
 
             if (varSpec.First)
             {
-                _Result.Append(varSpec.OperatorInfo.First);
+                result.Append(varSpec.OperatorInfo.First);
             }
             else
             {
-                _Result.Append(varSpec.OperatorInfo.Seperator);
+                result.Append(varSpec.OperatorInfo.Seperator);
             }
 
-            object value = _Parameters[varname];
+            object value = parameters[varname];
 
             // Handle Strings
-            if (value is string)
+            var stringValue = value as string;
+            if (stringValue != null)
             {
-                var stringValue = (string)value;
                 if (varSpec.OperatorInfo.Named)
                 {
                     AppendName(varname, varSpec.OperatorInfo, string.IsNullOrEmpty(stringValue));
@@ -231,7 +232,7 @@ namespace WebApi.Hal
                 {
                     if (varSpec.OperatorInfo.Named && !varSpec.Explode) // exploding will prefix with list name
                     {
-                        AppendName(varname, varSpec.OperatorInfo, list.Count() == 0);
+                        AppendName(varname, varSpec.OperatorInfo, !list.Any());
                     }
 
                     AppendList(varSpec.OperatorInfo, varSpec.Explode, varname, list);
@@ -245,7 +246,7 @@ namespace WebApi.Hal
                     {
                         if (varSpec.OperatorInfo.Named && !varSpec.Explode) // exploding will prefix with list name
                         {
-                            AppendName(varname, varSpec.OperatorInfo, dictionary.Count() == 0);
+                            AppendName(varname, varSpec.OperatorInfo, !dictionary.Any());
                         }
                         AppendDictionary(varSpec.OperatorInfo, varSpec.Explode, dictionary);
                     }
@@ -257,50 +258,42 @@ namespace WebApi.Hal
         }
 
 
-        void AppendDictionary(OperatorInfo op, bool explode, IDictionary<string, string> dictionary)
+        private void AppendDictionary(OperatorInfo op, bool explode, IDictionary<string, string> dictionary)
         {
             foreach (string key in dictionary.Keys)
             {
-                _Result.Append(key);
-                if (explode) _Result.Append('=');
-                else _Result.Append(',');
+                result.Append(key);
+                result.Append(explode ? '=' : ',');
                 AppendValue(dictionary[key], 0, op.AllowReserved);
 
-                if (explode)
-                {
-                    _Result.Append(op.Seperator);
-                }
-                else
-                {
-                    _Result.Append(',');
-                }
+                result.Append(explode ? op.Seperator : ',');
             }
-            if (dictionary.Count() > 0)
+            if (dictionary.Any())
             {
-                _Result.Remove(_Result.Length - 1, 1);
+                result.Remove(result.Length - 1, 1);
             }
         }
 
-        void AppendList(OperatorInfo op, bool explode, string variable, IEnumerable<string> list)
+        private void AppendList(OperatorInfo op, bool explode, string variable, IEnumerable<string> list)
         {
             foreach (string item in list)
             {
                 if (op.Named && explode)
                 {
-                    _Result.Append(variable);
-                    _Result.Append("=");
+                    result.Append(variable);
+                    result.Append("=");
                 }
                 AppendValue(item, 0, op.AllowReserved);
 
-                _Result.Append(explode ? op.Seperator : ',');
+                result.Append(explode ? op.Seperator : ',');
             }
-            if (list.Count() > 0)
+            if (list.Any())
             {
-                _Result.Remove(_Result.Length - 1, 1);
+                result.Remove(result.Length - 1, 1);
             }
         }
 
-        void AppendValue(string value, int prefixLength, bool allowReserved)
+        private void AppendValue(string value, int prefixLength, bool allowReserved)
         {
 
             if (prefixLength != 0)
@@ -311,34 +304,27 @@ namespace WebApi.Hal
                 }
             }
 
-            _Result.Append(Encode(value, allowReserved));
+            result.Append(Encode(value, allowReserved));
 
         }
 
-        void AppendName(string variable, OperatorInfo op, bool valueIsEmpty)
+        private void AppendName(string variable, OperatorInfo op, bool valueIsEmpty)
         {
-            _Result.Append(variable);
-            if (valueIsEmpty)
-            {
-                _Result.Append(op.IfEmpty);
-            }
-            else
-            {
-                _Result.Append("=");
-            }
+            result.Append(variable);
+            result.Append(valueIsEmpty ? op.IfEmpty : "=");
         }
 
 
-        bool IsVarNameChar(char c)
+        private bool IsVarNameChar(char c)
         {
-            return ((c >= 'A' && c <= 'z') //Alpha
-                    || (c >= '0' && c <= '9') // Digit
-                    || c == '_'
-                    || c == '%'
-                    || c == '.');
+            return (c >= 'A' && c <= 'z') //Alpha
+                   || (c >= '0' && c <= '9') // Digit
+                   || c == '_'
+                   || c == '%'
+                   || c == '.';
         }
 
-        static string Encode(string p, bool allowReserved)
+        private static string Encode(string p, bool allowReserved)
         {
 
             var result = new StringBuilder();
@@ -346,9 +332,9 @@ namespace WebApi.Hal
             {
                 if ((c >= 'A' && c <= 'z') //Alpha
                     || (c >= '0' && c <= '9') // Digit
-                    || _UriUnreservedSymbols.IndexOf(c) != -1
+                    || UriUnreservedSymbols.IndexOf(c) != -1
                     // Unreserved symbols  - These should never be percent encoded
-                    || (allowReserved && _UriReservedSymbols.IndexOf(c) != -1))
+                    || (allowReserved && UriReservedSymbols.IndexOf(c) != -1))
                 // Reserved symbols - should be included if requested (+)
                 {
                     result.Append(c);
@@ -358,10 +344,10 @@ namespace WebApi.Hal
 #if PCL
                          result.Append(HexEscape(c));  
 #else
-                    var s = c.ToString();
+                    string s = c.ToString();
 
-                    var chars = s.Normalize(NormalizationForm.FormC).ToCharArray();
-                    foreach (var ch in chars)
+                    char[] chars = s.Normalize(NormalizationForm.FormC).ToCharArray();
+                    foreach (char ch in chars)
                     {
                         result.Append(HexEscape(ch));
                     }
@@ -379,14 +365,14 @@ namespace WebApi.Hal
         {
             var esc = new char[3];
             esc[0] = '%';
-            esc[1] = HexDigits[(((int)c & 240) >> 4)];
-            esc[2] = HexDigits[((int)c & 15)];
+            esc[1] = hexDigits[(c & 240) >> 4];
+            esc[2] = hexDigits[c & 15];
             return new string(esc);
         }
 
-        static readonly char[] HexDigits = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+        private static readonly char[] hexDigits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-        static OperatorInfo GetOperator(char operatorIndicator)
+        private static OperatorInfo GetOperator(char operatorIndicator)
         {
             OperatorInfo op;
             switch (operatorIndicator)
@@ -399,11 +385,11 @@ namespace WebApi.Hal
                 case '&':
                 case '?':
                 case '.':
-                    op = _Operators[operatorIndicator];
+                    op = operators[operatorIndicator];
                     break;
 
                 default:
-                    op = _Operators['\0'];
+                    op = operators['\0'];
                     break;
             }
             return op;
@@ -423,21 +409,18 @@ namespace WebApi.Hal
 
         public class VarSpec
         {
-            readonly OperatorInfo _operatorInfo;
             public StringBuilder VarName = new StringBuilder();
-            public bool Explode = false;
-            public int PrefixLength = 0;
+            public bool Explode;
+            public int PrefixLength;
             public bool First = true;
 
             public VarSpec(OperatorInfo operatorInfo)
             {
-                _operatorInfo = operatorInfo;
+                OperatorInfo = operatorInfo;
             }
 
-            public OperatorInfo OperatorInfo
-            {
-                get { return _operatorInfo; }
-            }
+            public OperatorInfo OperatorInfo { get; }
         }
     }
+
 }

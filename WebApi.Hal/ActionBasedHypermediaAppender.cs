@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
     public sealed class ActionBasedHypermediaAppender<T> : IHypermediaAppender<T> where T : class, IResource
     {
-        readonly Action<T, IEnumerable<Link>> appendAction;
+        private readonly Action<T, IEnumerable<Link>> appendAction;
 
         public ActionBasedHypermediaAppender(Action<T, IEnumerable<Link>> appendAction)
         {
-            if (appendAction == null) 
-                throw new ArgumentNullException("appendAction");
+            if (appendAction == null)
+            {
+                throw new ArgumentNullException(nameof(appendAction));
+            }
 
             this.appendAction = appendAction;
         }
