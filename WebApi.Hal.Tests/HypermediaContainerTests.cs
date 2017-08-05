@@ -1,8 +1,6 @@
 ﻿using System.Buffers;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Assent;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.HypermediaAppenders;
@@ -31,9 +29,7 @@ namespace WebApi.Hal.Tests
 
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings(), ArrayPool<char>.Shared);
-            var content = new StringContent(string.Empty);
-            var type = representation.GetType();
+                new JsonSerializerSettings(), ArrayPool<char>.Shared, config);
 
             // act
             using (var stream = new StringWriter())

@@ -1,10 +1,6 @@
 ﻿using System.Buffers;
 using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Assent;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
@@ -26,8 +22,6 @@ namespace WebApi.Hal.Tests
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
                 new JsonSerializerSettings(), ArrayPool<char>.Shared);
-            var content = new StringContent(string.Empty);
-            var type = resource.GetType();
 
             // act
             using (var stream = new StringWriter())
@@ -47,9 +41,7 @@ namespace WebApi.Hal.Tests
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
                 new JsonSerializerSettings(), ArrayPool<char>.Shared);
-            var content = new StringContent(string.Empty);
             var resourceWithAppPath = new OrganisationWithAppPathRepresentation(1, "Org Name");
-            var type = resourceWithAppPath.GetType();
 
             // act
             using (var stream = new StringWriter())
@@ -70,7 +62,6 @@ namespace WebApi.Hal.Tests
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
                 new JsonSerializerSettings(), ArrayPool<char>.Shared);
             var resourceWithAppPath = new OrganisationWithNoHrefRepresentation(1, "Org Name");
-            var type = resourceWithAppPath.GetType();
 
             // act
             using (var stream = new StringWriter())
@@ -91,7 +82,6 @@ namespace WebApi.Hal.Tests
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
                 new JsonSerializerSettings(), ArrayPool<char>.Shared);
             var resourceWithAppPath = new OrganisationWithLinkTitleRepresentation(1, "Org Name");
-            var type = resourceWithAppPath.GetType();
 
             // act
             using (var stream = new StringWriter())
@@ -110,7 +100,6 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new XmlHalMediaTypeOutputFormatter();
-            var type = resource.GetType();
 
             // act
             using (var stream = new Utf8StringWriter())

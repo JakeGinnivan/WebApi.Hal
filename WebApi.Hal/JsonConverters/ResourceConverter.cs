@@ -66,11 +66,9 @@ namespace WebApi.Hal.JsonConverters
         private static IResource CreateResource(JObject jObj, Type resourceType)
         {
             // remove _links and _embedded so those don't try to deserialize, because we know they will fail
-            JToken links;
-            if (jObj.TryGetValue(HalLinksName, out links))
+            if (jObj.TryGetValue(HalLinksName, out JToken links))
                 jObj.Remove(HalLinksName);
-            JToken embeddeds;
-            if (jObj.TryGetValue(HalEmbeddedName, out embeddeds))
+            if (jObj.TryGetValue(HalEmbeddedName, out JToken embeddeds))
                 jObj.Remove(HalEmbeddedName);
 
             // create value properties in base object
@@ -152,8 +150,7 @@ namespace WebApi.Hal.JsonConverters
                     {
                         case JTokenType.Array:
                             {
-                                var embeddedJArr = tok as JArray;
-                                if (embeddedJArr != null)
+                                if (tok is JArray embeddedJArr)
                                 {
                                     foreach (var embeddedJObj in embeddedJArr.OfType<JObject>())
                                         addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
@@ -162,8 +159,7 @@ namespace WebApi.Hal.JsonConverters
                             break;
                         case JTokenType.Object:
                             {
-                                var embeddedJObj = tok as JObject;
-                                if (embeddedJObj != null)
+                                if (tok is JObject embeddedJObj)
                                     addCreatedResource(CreateResource(embeddedJObj, resourceType)); // recursion
                             }
                             break;

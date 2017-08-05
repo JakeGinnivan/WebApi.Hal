@@ -171,8 +171,7 @@ namespace WebApi.Hal
             }
 
             // Second, determine if resource is of Generic Resource List Type , list out all the items
-            var representationList = representation as IRepresentationList;
-            if (representationList != null)
+            if (representation is IRepresentationList representationList)
             {
                 foreach (var item in representationList.Cast<Representation>())
                 {
@@ -219,8 +218,7 @@ namespace WebApi.Hal
                 }
                 else if (typeof(IEnumerable<Representation>).IsAssignableFrom(property.PropertyType))
                 {
-                    var halResourceList = property.GetValue(representation, null) as IEnumerable<Representation>;
-                    if (halResourceList != null)
+                    if (property.GetValue(representation, null) is IEnumerable<Representation> halResourceList)
                         foreach (var item in halResourceList)
                             WriteHalResource(item, writer);
                 }

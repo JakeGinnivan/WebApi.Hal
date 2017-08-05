@@ -1,11 +1,7 @@
 ﻿using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Assent;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
@@ -36,8 +32,6 @@ namespace WebApi.Hal.Tests
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
                 new JsonSerializerSettings(), ArrayPool<char>.Shared);
-            var content = new StringContent(string.Empty);
-            var type = resource.GetType();
 
             // act
             using (var stream = new StringWriter())
@@ -56,8 +50,6 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new XmlHalMediaTypeOutputFormatter();
-            var content = new StringContent(string.Empty);
-            var type = resource.GetType();
 
             // act
             using (var stream = new Utf8StringWriter())
@@ -78,14 +70,14 @@ namespace WebApi.Hal.Tests
 //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
 //                new JsonSerializerSettings(), ArrayPool<char>.Shared);
 
-//            var type = typeof (OrganisationWithPeopleDetailRepresentation);
+//            var type = typeof(OrganisationWithPeopleDetailRepresentation);
 //            const string json = @"
 //{
 //""Id"":""5"",
 //""Name"": ""Waterproof Fire Department""
 //}
 //";
-
+            
 //            // act
 //            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
 //            {
@@ -100,159 +92,159 @@ namespace WebApi.Hal.Tests
 //            }
 //        }
 
-//        [Fact]
-//        public void peopledetail_post_json_links_test()
-//        {
-//            // arrange
-//            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-//                new JsonSerializerSettings(), ArrayPool<char>.Shared);
-//            var type = typeof(OrganisationWithPeopleRepresentation);
-//            const string json = @"
-//{
-//""Id"":""3"",
-//""Name"": ""Dept. of Redundancy Dept."",
-//""_links"": {
-// ""self"": {""href"": ""/api/organisations/3""},
-// ""people"": {""href"": ""/api/organisations/3/people""},
-// ""brownnoser"": [
-//   {""href"": ""/api/organisations/3/brown/1""},
-//   {""href"": ""/api/organisations/3/brown/2""}
-//        ]
-//    }
-//}
-//";
+        //        [Fact]
+        //        public void peopledetail_post_json_links_test()
+        //        {
+        //            // arrange
+        //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+        //                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+        //            var type = typeof(OrganisationWithPeopleRepresentation);
+        //            const string json = @"
+        //{
+        //""Id"":""3"",
+        //""Name"": ""Dept. of Redundancy Dept."",
+        //""_links"": {
+        // ""self"": {""href"": ""/api/organisations/3""},
+        // ""people"": {""href"": ""/api/organisations/3/people""},
+        // ""brownnoser"": [
+        //   {""href"": ""/api/organisations/3/brown/1""},
+        //   {""href"": ""/api/organisations/3/brown/2""}
+        //        ]
+        //    }
+        //}
+        //";
 
-//            // act
-//            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
-//            {
-//                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+        //            // act
+        //            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+        //            {
+        //                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
 
-//                // assert
-//                Assert.NotNull(obj);
-//                var org = obj as OrganisationWithPeopleRepresentation;
-//                Assert.NotNull(org);
-//                Assert.Equal(4, org.Links.Count);
-//                var self = org.Links.Where(l => l.Rel == "self").ToList();
-//                Assert.Equal(1, self.Count);
-//                Assert.Equal("/api/organisations/3", self[0].Href);
-//                Assert.Equal(self[0].Href, org.Href);
-//                var people = org.Links.Where(l => l.Rel == "people").ToList();
-//                Assert.Equal(1, people.Count);
-//                Assert.Equal("/api/organisations/3/people", people[0].Href);
-//                var brownnosers = org.Links.Where(l => l.Rel == "brownnoser").ToList();
-//                Assert.Equal(2, brownnosers.Count);
-//                Assert.Equal("/api/organisations/3/brown/1", brownnosers[0].Href);
-//                Assert.Equal("/api/organisations/3/brown/2", brownnosers[1].Href);
-//            }
-//        }
+        //                // assert
+        //                Assert.NotNull(obj);
+        //                var org = obj as OrganisationWithPeopleRepresentation;
+        //                Assert.NotNull(org);
+        //                Assert.Equal(4, org.Links.Count);
+        //                var self = org.Links.Where(l => l.Rel == "self").ToList();
+        //                Assert.Equal(1, self.Count);
+        //                Assert.Equal("/api/organisations/3", self[0].Href);
+        //                Assert.Equal(self[0].Href, org.Href);
+        //                var people = org.Links.Where(l => l.Rel == "people").ToList();
+        //                Assert.Equal(1, people.Count);
+        //                Assert.Equal("/api/organisations/3/people", people[0].Href);
+        //                var brownnosers = org.Links.Where(l => l.Rel == "brownnoser").ToList();
+        //                Assert.Equal(2, brownnosers.Count);
+        //                Assert.Equal("/api/organisations/3/brown/1", brownnosers[0].Href);
+        //                Assert.Equal("/api/organisations/3/brown/2", brownnosers[1].Href);
+        //            }
+        //        }
 
-//        [Fact]
-//        public void peopledetail_post_json_embedded_singles_test()
-//        {
-//            // arrange
-//            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-//                new JsonSerializerSettings(), ArrayPool<char>.Shared);
-//            var type = typeof(OrganisationWithPeopleDetailRepresentation);
-//            const string json = @"
-//{
-//""Id"":""3"",
-//""Name"": ""Singles Dept."",
-//""_embedded"": {
-// ""person"": {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
-//    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
-// ""boss"": {""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
-//    ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}
-//  }
-//}
-//";
+        //        [Fact]
+        //        public void peopledetail_post_json_embedded_singles_test()
+        //        {
+        //            // arrange
+        //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+        //                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+        //            var type = typeof(OrganisationWithPeopleDetailRepresentation);
+        //            const string json = @"
+        //{
+        //""Id"":""3"",
+        //""Name"": ""Singles Dept."",
+        //""_embedded"": {
+        // ""person"": {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
+        //    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
+        // ""boss"": {""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
+        //    ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}
+        //  }
+        //}
+        //";
 
-//            // act
-//            using (
-//                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
-//                )
-//            {
-//                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+        //            // act
+        //            using (
+        //                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
+        //                )
+        //            {
+        //                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
 
-//                // assert
-//                Assert.NotNull(obj);
-//                var org = obj as OrganisationWithPeopleDetailRepresentation;
-//                Assert.NotNull(org);
-//                Assert.NotNull(org.Boss);
-//                Assert.Equal(1, org.People.Count);
-//                Assert.Equal(1, org.Boss.Links.Count);
-//            }
-//        }
+        //                // assert
+        //                Assert.NotNull(obj);
+        //                var org = obj as OrganisationWithPeopleDetailRepresentation;
+        //                Assert.NotNull(org);
+        //                Assert.NotNull(org.Boss);
+        //                Assert.Equal(1, org.People.Count);
+        //                Assert.Equal(1, org.Boss.Links.Count);
+        //            }
+        //        }
 
-//        [Fact]
-//        public void peopledetail_post_json_embedded_arrays_test()
-//        {
-//            // arrange
-//            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-//                new JsonSerializerSettings(), ArrayPool<char>.Shared);
-//            var type = typeof(OrganisationWithPeopleDetailRepresentation);
-//            const string json = @"
-//{
-//""Id"":""3"",
-//""Name"": ""Array Dept."",
-//""_embedded"": {
-// ""person"": [
-//   {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
-//    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
-//   {""Id"": ""9"",""Name"": ""Person Nine"",""OrganisationId"": ""3"",
-//    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/9""}}}
-//   ],
-// ""boss"": [{""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
-//    ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}]
-//  }
-//}
-//";
+        //        [Fact]
+        //        public void peopledetail_post_json_embedded_arrays_test()
+        //        {
+        //            // arrange
+        //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+        //                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+        //            var type = typeof(OrganisationWithPeopleDetailRepresentation);
+        //            const string json = @"
+        //{
+        //""Id"":""3"",
+        //""Name"": ""Array Dept."",
+        //""_embedded"": {
+        // ""person"": [
+        //   {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
+        //    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
+        //   {""Id"": ""9"",""Name"": ""Person Nine"",""OrganisationId"": ""3"",
+        //    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/9""}}}
+        //   ],
+        // ""boss"": [{""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
+        //    ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}]
+        //  }
+        //}
+        //";
 
-//            // act
-//            using (
-//                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
-//                )
-//            {
-//                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+        //            // act
+        //            using (
+        //                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
+        //                )
+        //            {
+        //                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
 
-//                // assert
-//                Assert.NotNull(obj);
-//                var org = obj as OrganisationWithPeopleDetailRepresentation;
-//                Assert.NotNull(org);
-//                Assert.NotNull(org.Boss);
-//                Assert.Equal(2, org.People.Count);
-//                Assert.Equal(1, org.Boss.Links.Count);
-//            }
-//        }
+        //                // assert
+        //                Assert.NotNull(obj);
+        //                var org = obj as OrganisationWithPeopleDetailRepresentation;
+        //                Assert.NotNull(org);
+        //                Assert.NotNull(org.Boss);
+        //                Assert.Equal(2, org.People.Count);
+        //                Assert.Equal(1, org.Boss.Links.Count);
+        //            }
+        //        }
 
-//        [Fact]
-//        public void peopledetail_post_json_embedded_null_test()
-//        {
-//            // arrange
-//            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-//                new JsonSerializerSettings(), ArrayPool<char>.Shared);
-//            var type = typeof(OrganisationWithPeopleDetailRepresentation);
-//            const string json = @"
-//{
-//""Id"":""3"",
-//""Name"": ""Singles Dept.""
-//}
-//";
+        //        [Fact]
+        //        public void peopledetail_post_json_embedded_null_test()
+        //        {
+        //            // arrange
+        //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+        //                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+        //            var type = typeof(OrganisationWithPeopleDetailRepresentation);
+        //            const string json = @"
+        //{
+        //""Id"":""3"",
+        //""Name"": ""Singles Dept.""
+        //}
+        //";
 
-//            // act
-//            using (
-//                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
-//                )
-//            {
-//                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+        //            // act
+        //            using (
+        //                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
+        //                )
+        //            {
+        //                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
 
-//                // assert
-//                Assert.NotNull(obj);
-//                var org = obj as OrganisationWithPeopleDetailRepresentation;
-//                Assert.NotNull(org);
-//                Assert.Null(org.Boss);
-//                Assert.Null(org.People);
-//            }
-//        }
+        //                // assert
+        //                Assert.NotNull(obj);
+        //                var org = obj as OrganisationWithPeopleDetailRepresentation;
+        //                Assert.NotNull(org);
+        //                Assert.Null(org.Boss);
+        //                Assert.Null(org.People);
+        //            }
+        //        }
 
         class MySimpleList : SimpleListRepresentation<OrganisationRepresentation>
         {

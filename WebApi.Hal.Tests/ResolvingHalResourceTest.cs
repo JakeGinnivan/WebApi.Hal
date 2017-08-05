@@ -1,10 +1,6 @@
 ﻿using System.Buffers;
 using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Assent;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.HypermediaAppenders;
 using WebApi.Hal.Tests.Representations;
@@ -35,29 +31,27 @@ namespace WebApi.Hal.Tests
         }
         
         [Fact]
-        public async Task ProperlySerializesRepresentationToJson()
+        public void ProperlySerializesRepresentationToJson()
         {
-			// arrange
-			var example = new CuriesLink("example-namespace", "http://api.example.com/docs/{rel}");
-			var productLink = example.CreateLink("product", "http://api.example.com/products/{id}");
-			var relatedProductLink = example.CreateLink("related-product", productLink.Href);
-			var saleProductLink = example.CreateLink("product-on-sale", "http://api.example.com/products/sale/{id}");
-			var categoryLink = example.CreateLink("category", "http://api.example.com/categories/{id}");
+            // arrange
+            var example = new CuriesLink("example-namespace", "http://api.example.com/docs/{rel}");
+            var productLink = example.CreateLink("product", "http://api.example.com/products/{id}");
+            var relatedProductLink = example.CreateLink("related-product", productLink.Href);
+            var saleProductLink = example.CreateLink("product-on-sale", "http://api.example.com/products/sale/{id}");
+            var categoryLink = example.CreateLink("category", "http://api.example.com/categories/{id}");
 
-			var builder = Hypermedia.CreateBuilder();
+            var builder = Hypermedia.CreateBuilder();
 
-			builder.RegisterAppender(new ProductRepresentationHypermediaAppender());
-			builder.RegisterAppender(new CategoryRepresentationHypermediaAppender());
+            builder.RegisterAppender(new ProductRepresentationHypermediaAppender());
+            builder.RegisterAppender(new CategoryRepresentationHypermediaAppender());
 
-			builder.RegisterSelf<ProductRepresentation>(productLink);
-			builder.RegisterSelf<CategoryRepresentation>(categoryLink);
-			builder.RegisterLinks<ProductRepresentation>(relatedProductLink, saleProductLink);
+            builder.RegisterSelf<ProductRepresentation>(productLink);
+            builder.RegisterSelf<CategoryRepresentation>(categoryLink);
+            builder.RegisterLinks<ProductRepresentation>(relatedProductLink, saleProductLink);
 
-			var config = builder.Build();
+            var config = builder.Build();
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings(), ArrayPool<char>.Shared);
-            var content = new StringContent(string.Empty);
-            var type = representation.GetType();
+                new JsonSerializerSettings(), ArrayPool<char>.Shared, config);
 
             // act
             using (var stream = new StringWriter())
@@ -78,10 +72,7 @@ namespace WebApi.Hal.Tests
 			var builder = Hypermedia.CreateBuilder();
 			var config = builder.Build();
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
-
-            var content = new StringContent(string.Empty);
-			var type = representation.GetType();
+                new JsonSerializerSettings(), ArrayPool<char>.Shared, config);
 
             // act
             using (var stream = new StringWriter())
