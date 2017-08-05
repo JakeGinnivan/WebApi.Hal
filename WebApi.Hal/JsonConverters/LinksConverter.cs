@@ -95,6 +95,8 @@ namespace WebApi.Hal.JsonConverters
 
         public virtual string ResolveUri(string href)
         {
+            if (!string.IsNullOrEmpty(href) && href.StartsWith("~"))
+                return href.Replace("~/", "/");
             return href;
         }
     }

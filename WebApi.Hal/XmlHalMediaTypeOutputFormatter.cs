@@ -58,7 +58,8 @@ namespace WebApi.Hal
 
             var settings = new XmlWriterSettings
             {
-                Indent = true
+                Indent = true,
+                Encoding = Encoding.UTF8
             };
             using (var xmlWriter = XmlWriter.Create(writer, settings))
             {

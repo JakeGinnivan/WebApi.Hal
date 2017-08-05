@@ -21,7 +21,7 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public async Task organisation_get_json_test()
+        public void organisation_get_json_test()
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
@@ -30,20 +30,11 @@ namespace WebApi.Hal.Tests
             var type = resource.GetType();
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new StringWriter())
             {
-                var context = new DefaultHttpContext();
-                context.Response.Body = stream;
+                mediaFormatter.WriteObject(stream, resource);
 
-                await mediaFormatter.WriteResponseBodyAsync(
-                  new Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext(
-                      context,
-                         (writeStream, effectiveEncoding) => new StreamWriter(writeStream, effectiveEncoding),
-                         type,
-                         resource), Encoding.UTF8);
-
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                string serialisedResult = stream.ToString();
 
                 // assert
                 this.Assent(serialisedResult);
@@ -51,7 +42,7 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public async Task organisation_get_xml_test()
+        public void organisation_get_xml_test()
         {
             // arrange
             var mediaFormatter = new XmlHalMediaTypeOutputFormatter();
@@ -60,20 +51,11 @@ namespace WebApi.Hal.Tests
             var type = resource.GetType();
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new Utf8StringWriter())
             {
-                var context = new DefaultHttpContext();
-                context.Response.Body = stream;
+                mediaFormatter.WriteObject(stream, resource);
 
-                await mediaFormatter.WriteResponseBodyAsync(
-                    new Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext(
-                        context,
-                        (writeStream, effectiveEncoding) => new StreamWriter(writeStream, effectiveEncoding),
-                        type,
-                        resource));
-
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                string serialisedResult = stream.ToString();
 
                 // assert
                 this.Assent(serialisedResult);

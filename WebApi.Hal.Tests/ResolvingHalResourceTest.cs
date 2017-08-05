@@ -60,19 +60,11 @@ namespace WebApi.Hal.Tests
             var type = representation.GetType();
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new StringWriter())
             {
-                var context = new DefaultHttpContext();
-                context.Response.Body = stream;
+                mediaFormatter.WriteObject(stream, representation);
 
-                await mediaFormatter.WriteResponseBodyAsync(
-                    new Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext(
-                        context,
-                      (writeStream, effectiveEncoding) => new StreamWriter(writeStream, effectiveEncoding),
-                      type,
-                      representation), Encoding.UTF8);
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                string serialisedResult = stream.ToString();
 
                 // assert
                 this.Assent(serialisedResult);
@@ -80,7 +72,7 @@ namespace WebApi.Hal.Tests
         }
 
 		[Fact]
-		public async Task ProperlySerializesRepresentationWithoutLinksToJson()
+		public void ProperlySerializesRepresentationWithoutLinksToJson()
 		{
 			// arrange
 			var builder = Hypermedia.CreateBuilder();
@@ -91,25 +83,16 @@ namespace WebApi.Hal.Tests
             var content = new StringContent(string.Empty);
 			var type = representation.GetType();
 
-			// act
-			using (var stream = new MemoryStream())
-			{
-                var context = new DefaultHttpContext();
-                context.Response.Body = stream;
+            // act
+            using (var stream = new StringWriter())
+            {
+                mediaFormatter.WriteObject(stream, representation);
 
-                await mediaFormatter.WriteResponseBodyAsync(
-                    new Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext(
-                        context,
-                          (writeStream, effectiveEncoding) => new StreamWriter(writeStream, effectiveEncoding),
-                          type,
-                          representation), Encoding.UTF8);
+                string serialisedResult = stream.ToString();
 
-                stream.Seek(0, SeekOrigin.Begin);
-				var serialisedResult = new StreamReader(stream).ReadToEnd();
-
-				// assert
-				this.Assent(serialisedResult);
-			}
-		}
+                // assert
+                this.Assent(serialisedResult);
+            }
+        }
 	}
 }

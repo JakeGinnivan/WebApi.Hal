@@ -11,19 +11,24 @@ namespace WebApi.Hal
 {
     public abstract class Representation : IResource
     {
+        public IList<Link> Links { get; set; } = new List<Link>();
+
         [JsonProperty("_embedded")]
         private IList<EmbeddedResource> Embedded { get; set; }
 
         [JsonIgnore]
         readonly IDictionary<PropertyInfo, object> embeddedResourceProperties = new Dictionary<PropertyInfo, object>();
 
+        [JsonIgnore]
+        public HalJsonConverterContext ConverterContext { get; set; }
+
         [OnSerializing]
         private void OnSerialize(StreamingContext context)
         {
             // Clear the embeddedResourceProperties in order to make this object re-serializable.
             embeddedResourceProperties.Clear();
-            
-            var ctx = HalJsonConverterContext.Create();
+
+            var ctx = ConverterContext != null ? ConverterContext : HalJsonConverterContext.Create();
             if (!ctx.IsRoot) 
                 return;
             
@@ -44,9 +49,12 @@ namespace WebApi.Hal
         [OnSerialized]
         private void OnSerialized(StreamingContext context)
         {
-            // restore embedded resource properties
-            foreach (var prop in embeddedResourceProperties.Keys)
-                prop.SetValue(this, embeddedResourceProperties[prop], null);
+            if (ConverterContext != null)
+            {
+                // restore embedded resource properties
+                foreach (var prop in embeddedResourceProperties.Keys)
+                    prop.SetValue(this, embeddedResourceProperties[prop], null);
+            }
         }
 
         Link ToLink(IHypermediaResolver resolver)
@@ -100,12 +108,10 @@ namespace WebApi.Hal
                 // remember embedded resource property for restoring after serialization
                 embeddedResourceProperties.Add(property, value);
 
-                var resource = value as IResource;
-
-                if (resource != null)
+                if (value is IResource resource)
                     ProcessPropertyValue(resolver, curies, resource);
                 else
-                    ProcessPropertyValue(resolver, curies, (IEnumerable<IResource>) value);
+                    ProcessPropertyValue(resolver, curies, (IEnumerable<IResource>)value);
 
                 // null out the embedded property so it doesn't serialize separately as a property
                 property.SetValue(this, null, null);
@@ -232,8 +238,6 @@ namespace WebApi.Hal
 
         [JsonIgnore]
         public string LinkName { get; set; }
-
-        public IList<Link> Links { get; set; } = new List<Link>();
 
         protected internal virtual void CreateHypermedia()
         {

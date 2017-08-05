@@ -2,10 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Assent;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.HypermediaAppenders;
 using WebApi.Hal.Tests.Representations;
@@ -18,7 +16,7 @@ namespace WebApi.Hal.Tests
         readonly ProductRepresentation representation = new ProductRepresentation();
 
         [Fact]
-        public async Task CanUseRegisterExtensionMethod()
+        public void CanUseRegisterExtensionMethod()
         {
             var curie = new CuriesLink("aap", "http://www.helpt.com/{?rel}");
 
@@ -38,20 +36,11 @@ namespace WebApi.Hal.Tests
             var type = representation.GetType();
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new StringWriter())
             {
-                var context = new DefaultHttpContext();
-                context.Response.Body = stream;
+                mediaFormatter.WriteObject(stream, representation);
 
-                await mediaFormatter.WriteResponseBodyAsync(
-                    new Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext(
-                        context,
-                      (writeStream, effectiveEncoding) => new StreamWriter(writeStream, effectiveEncoding),
-                      type,
-                      representation), Encoding.UTF8);
-
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                string serialisedResult = stream.ToString();
 
                 // assert
                 this.Assent(serialisedResult);

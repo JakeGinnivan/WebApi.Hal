@@ -11,8 +11,6 @@ namespace WebApi.Hal.JsonConverters
 {
     public class ResourceConverter : JsonConverter
     {
-        readonly IHypermediaResolver hypermediaConfiguration;
-
         public ResourceConverter()
         {
         }
@@ -24,7 +22,18 @@ namespace WebApi.Hal.JsonConverters
                 throw new ArgumentNullException(nameof(hypermediaConfiguration));
             }
 
-            this.hypermediaConfiguration = hypermediaConfiguration;
+            HypermediaResolver = hypermediaConfiguration;
+        }
+
+        public IHypermediaResolver HypermediaResolver { get; }
+
+        private HalJsonConverterContext GetResourceConverterContext()
+        {
+            var context = (HypermediaResolver == null)
+                ? new HalJsonConverterContext()
+                : new HalJsonConverterContext(HypermediaResolver);
+
+            return context;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -35,6 +44,7 @@ namespace WebApi.Hal.JsonConverters
             if (linksBackup.Count == 0)
                 resource.Links = null; // avoid serialization
 
+            resource.ConverterContext = GetResourceConverterContext();
             serializer.Converters.Remove(this);
             serializer.Serialize(writer, resource);
             serializer.Converters.Add(this);

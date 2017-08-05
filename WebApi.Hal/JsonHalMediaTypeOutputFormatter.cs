@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -17,10 +18,13 @@ namespace WebApi.Hal
 
         private readonly LinksConverter _linksConverter = new LinksConverter();
 
-        private readonly ResourceConverter _resourceConverter = new ResourceConverter();
+        private readonly ResourceConverter _resourceConverter;
         private readonly EmbeddedResourceConverter _embeddedResourceConverter = new EmbeddedResourceConverter();
 
-        public JsonHalMediaTypeOutputFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, IHypermediaResolver hypermediaResolver) : 
+        public JsonHalMediaTypeOutputFormatter(
+            JsonSerializerSettings serializerSettings, 
+            ArrayPool<char> charPool, 
+            IHypermediaResolver hypermediaResolver) : 
             base(serializerSettings, charPool)
         {
             if (hypermediaResolver == null)
@@ -32,9 +36,12 @@ namespace WebApi.Hal
             Initialize();
         }
 
-        public JsonHalMediaTypeOutputFormatter(JsonSerializerSettings serializerSettings, ArrayPool<char> charPool) :
+        public JsonHalMediaTypeOutputFormatter(
+            JsonSerializerSettings serializerSettings, 
+            ArrayPool<char> charPool) :
             base(serializerSettings, charPool)
         {
+            _resourceConverter = new ResourceConverter();
             Initialize();
         }
 
@@ -45,7 +52,12 @@ namespace WebApi.Hal
             SerializerSettings.Converters.Add(_resourceConverter);
             SerializerSettings.Converters.Add(_embeddedResourceConverter);
             SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-            SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            SerializerSettings.Formatting = Formatting.Indented;
+        }
+        
+        protected override bool CanWriteType(Type type)
+        {
+            return typeof(Representation).IsAssignableFrom(type);
         }
     }
 }

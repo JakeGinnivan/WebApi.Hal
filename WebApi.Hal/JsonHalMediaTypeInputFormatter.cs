@@ -11,7 +11,7 @@ namespace WebApi.Hal
     public class JsonHalMediaTypeInputFormatter : JsonInputFormatter
     {
         private readonly LinksConverter _linksConverter = new LinksConverter();
-        private readonly ResourceConverter _resourceConverter = new ResourceConverter();
+        private readonly ResourceConverter _resourceConverter;
         private readonly EmbeddedResourceConverter _embeddedResourceConverter = new EmbeddedResourceConverter();
 
         public JsonHalMediaTypeInputFormatter(
@@ -29,6 +29,7 @@ namespace WebApi.Hal
         public JsonHalMediaTypeInputFormatter(
             ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider) : base(logger, serializerSettings, charPool, objectPoolProvider)
         {
+            _resourceConverter = new ResourceConverter();
             Initialize();
         }
 
