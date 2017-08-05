@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-using ApprovalTests;
-using ApprovalTests.Reporters;
+using Assent;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.HypermediaAppenders;
@@ -18,7 +18,6 @@ namespace WebApi.Hal.Tests
         readonly ProductRepresentation representation = new ProductRepresentation();
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public async Task CanUseRegisterExtensionMethod()
         {
             var curie = new CuriesLink("aap", "http://www.helpt.com/{?rel}");
@@ -49,13 +48,13 @@ namespace WebApi.Hal.Tests
                         context,
                       (writeStream, effectiveEncoding) => new StreamWriter(writeStream, effectiveEncoding),
                       type,
-                      representation));
+                      representation), Encoding.UTF8);
 
                 stream.Seek(0, SeekOrigin.Begin);
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 

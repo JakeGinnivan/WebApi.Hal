@@ -3,8 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using ApprovalTests;
-using ApprovalTests.Reporters;
+using Assent;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.HypermediaAppenders;
@@ -36,7 +35,6 @@ namespace WebApi.Hal.Tests
         }
         
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public async Task ProperlySerializesRepresentationToJson()
         {
 			// arrange
@@ -77,12 +75,11 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
 		[Fact]
-		[UseReporter(typeof(DiffReporter))]
 		public async Task ProperlySerializesRepresentationWithoutLinksToJson()
 		{
 			// arrange
@@ -111,7 +108,7 @@ namespace WebApi.Hal.Tests
 				var serialisedResult = new StreamReader(stream).ReadToEnd();
 
 				// assert
-				Approvals.Verify(serialisedResult);
+				this.Assent(serialisedResult);
 			}
 		}
 	}

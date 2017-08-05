@@ -1,12 +1,10 @@
 ﻿using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using ApprovalTests;
-using ApprovalTests.Reporters;
+using Assent;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.Representations;
@@ -24,14 +22,15 @@ namespace WebApi.Hal.Tests
             {
                 Boss = new Boss(2, "Eunice PHB", 1, true)
             };
-            resource.People = new List<Person>();
-            resource.People.Add(new Person(3, "Dilbert", 1));
-            resource.People.Add(new Person(4, "Wally", 1));
-            resource.People.Add(new Person(5, "Alice", 1));
+            resource.People = new List<Person>
+            {
+                new Person(3, "Dilbert", 1),
+                new Person(4, "Wally", 1),
+                new Person(5, "Alice", 1)
+            };
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public async Task peopledetail_get_json_test()
         {
             // arrange
@@ -57,12 +56,11 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public async Task peopledetail_get_xml_test()
         {
             // arrange
@@ -87,7 +85,7 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 

@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
 
       <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
       <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ApprovalTests" Version="3.0.13" />
-    <PackageReference Include="ApprovalUtilities" Version="3.0.13" />
+    <PackageReference Include="Assent" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />

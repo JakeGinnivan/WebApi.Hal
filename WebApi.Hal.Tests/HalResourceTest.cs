@@ -3,8 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using ApprovalTests;
-using ApprovalTests.Reporters;
+using Assent;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.Representations;
@@ -22,7 +21,6 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public async Task organisation_get_json_test()
         {
             // arrange
@@ -53,12 +51,11 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public async Task organisation_get_json_with_app_path_test()
         {
             // arrange
@@ -85,12 +82,11 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public async Task organisation_get_json_with_no_href_test()
         {
             // arrange
@@ -117,12 +113,11 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public async Task organisation_get_json_with_link_title_test()
         {
             // arrange
@@ -149,12 +144,11 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public async Task organisation_get_xml_test()
         {
             // arrange
@@ -179,7 +173,7 @@ namespace WebApi.Hal.Tests
                 var serialisedResult = new StreamReader(stream).ReadToEnd();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         } 
     }
