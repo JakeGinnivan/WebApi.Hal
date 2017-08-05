@@ -28,7 +28,10 @@ namespace WebApi.Hal
             // Clear the embeddedResourceProperties in order to make this object re-serializable.
             embeddedResourceProperties.Clear();
 
-            var ctx = ConverterContext != null ? ConverterContext : HalJsonConverterContext.Create();
+            if (ConverterContext == null)
+                return;
+
+            var ctx = ConverterContext;
             if (!ctx.IsRoot) 
                 return;
             
