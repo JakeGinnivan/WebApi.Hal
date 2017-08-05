@@ -39,7 +39,6 @@ namespace WebApi.Hal
             SerializerSettings.Converters.Add(_resourceConverter);
             SerializerSettings.Converters.Add(_embeddedResourceConverter);
             SerializerSettings.NullValueHandling = NullValueHandling.Include;
-            SerializerSettings.Formatting = Formatting.Indented;
         }
     }
 }

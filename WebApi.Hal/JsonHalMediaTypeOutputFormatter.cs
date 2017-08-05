@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Buffers;
-using System.IO;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using WebApi.Hal.JsonConverters;
 
 namespace WebApi.Hal
@@ -52,7 +48,6 @@ namespace WebApi.Hal
             SerializerSettings.Converters.Add(_resourceConverter);
             SerializerSettings.Converters.Add(_embeddedResourceConverter);
             SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-            SerializerSettings.Formatting = Formatting.Indented;
         }
         
         protected override bool CanWriteType(Type type)

@@ -31,7 +31,7 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
 
             // act
             using (var stream = new StringWriter())
@@ -68,7 +68,7 @@ namespace WebApi.Hal.Tests
 //        {
 //            // arrange
 //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-//                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+//                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
 
 //            var type = typeof(OrganisationWithPeopleDetailRepresentation);
 //            const string json = @"
@@ -97,7 +97,7 @@ namespace WebApi.Hal.Tests
         //        {
         //            // arrange
         //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-        //                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+        //                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
         //            var type = typeof(OrganisationWithPeopleRepresentation);
         //            const string json = @"
         //{
@@ -143,7 +143,7 @@ namespace WebApi.Hal.Tests
         //        {
         //            // arrange
         //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-        //                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+        //                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
         //            var type = typeof(OrganisationWithPeopleDetailRepresentation);
         //            const string json = @"
         //{
@@ -180,7 +180,7 @@ namespace WebApi.Hal.Tests
         //        {
         //            // arrange
         //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-        //                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+        //                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
         //            var type = typeof(OrganisationWithPeopleDetailRepresentation);
         //            const string json = @"
         //{
@@ -221,7 +221,7 @@ namespace WebApi.Hal.Tests
         //        {
         //            // arrange
         //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-        //                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+        //                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
         //            var type = typeof(OrganisationWithPeopleDetailRepresentation);
         //            const string json = @"
         //{
@@ -260,7 +260,7 @@ namespace WebApi.Hal.Tests
 //        {
 //            // arrange
 //            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-//                 new JsonSerializerSettings(), ArrayPool<char>.Shared);
+//                 new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
 //            var type = typeof(MySimpleList);
 //            const string json = @"
 //{

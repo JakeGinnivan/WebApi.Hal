@@ -54,7 +54,7 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
 
             // act
             using (var stream = new StringWriter())
@@ -73,7 +73,7 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings(), ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
             var content = new StringContent(string.Empty);
             var type = oneitemrepresentation.GetType();
 

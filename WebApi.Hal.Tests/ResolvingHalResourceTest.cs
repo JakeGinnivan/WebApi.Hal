@@ -51,7 +51,7 @@ namespace WebApi.Hal.Tests
 
             var config = builder.Build();
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings(), ArrayPool<char>.Shared, config);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, config);
 
             // act
             using (var stream = new StringWriter())
@@ -72,7 +72,7 @@ namespace WebApi.Hal.Tests
 			var builder = Hypermedia.CreateBuilder();
 			var config = builder.Build();
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings(), ArrayPool<char>.Shared, config);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, config);
 
             // act
             using (var stream = new StringWriter())
