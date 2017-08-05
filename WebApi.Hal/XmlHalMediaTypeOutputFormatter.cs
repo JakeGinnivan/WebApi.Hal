@@ -1,16 +1,16 @@
-using Microsoft.AspNetCore.Mvc.Formatters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using WebApi.Hal.Interfaces;
-using System.Threading.Tasks;
-using System.Text;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
+using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {

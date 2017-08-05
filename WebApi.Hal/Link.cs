@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Tavis.UriTemplates;
 using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal

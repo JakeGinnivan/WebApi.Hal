@@ -44,12 +44,14 @@ namespace WebApi.Hal.JsonConverters
             if (linksBackup.Count == 0)
                 resource.Links = null; // avoid serialization
 
+            var saveContext = serializer.Context;
             resource.ConverterContext = GetResourceConverterContext();
             serializer.Converters.Remove(this);
             serializer.Serialize(writer, resource);
             serializer.Converters.Add(this);
+            serializer.Context = saveContext;
 
-			if (linksBackup.Count == 0)
+            if (linksBackup.Count == 0)
 				resource.Links = linksBackup;
 		}
 
