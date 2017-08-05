@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 
 namespace WebApi.Hal.Web.Api
 {
-    public class BeerDetailController : ApiController
+    public class BeerDetailController : Controller
     {
         readonly IBeerDbContext beerDbContext;
 

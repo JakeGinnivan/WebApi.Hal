@@ -1,9 +1,0 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WebApi.Hal.Web.Properties" GeneratedClassName="Settings">
-  <Profiles />
-  <Settings>
-    <Setting Name="BeerDatabase" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">database=BeerDatabase;server=.\SQLEXPRESS;trusted_connection=true;</Value>
-    </Setting>
-  </Settings>
-</SettingsFile>

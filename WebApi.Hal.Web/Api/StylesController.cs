@@ -1,13 +1,11 @@
 ﻿using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 
 namespace WebApi.Hal.Web.Api
 {
-    public class StylesController : ApiController
+    public class StylesController : Controller
     {
         readonly IBeerDbContext beerDbContext;
 
@@ -30,11 +28,11 @@ namespace WebApi.Hal.Web.Api
             return new BeerStyleListRepresentation(beerStyles);
         }
 
-        public HttpResponseMessage Get(int id)
+        public IActionResult Get(int id)
         {
             var beerStyle = beerDbContext.Styles.SingleOrDefault(s => s.Id == id);
             if (beerStyle == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
+                return NotFound();
 
             var beerStyleResource = new BeerStyleRepresentation
             {
@@ -42,7 +40,7 @@ namespace WebApi.Hal.Web.Api
                 Name = beerStyle.Name
             };
 
-            return Request.CreateResponse(HttpStatusCode.OK, beerStyleResource);
+            return Ok(beerStyleResource);
         }
     }
 }

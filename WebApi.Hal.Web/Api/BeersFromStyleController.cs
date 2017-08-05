@@ -1,12 +1,12 @@
 ﻿using System.Linq;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 using WebApi.Hal.Web.Data.Queries;
 
 namespace WebApi.Hal.Web.Api
 {
-    public class BeersFromStyleController : ApiController
+    public class BeersFromStyleController : Controller
     {
         readonly IRepository repository;
 
