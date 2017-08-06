@@ -161,11 +161,11 @@ namespace WebApi.Hal.Tests
                 Assert.NotNull(org);
                 Assert.Equal(4, org.Links.Count);
                 var self = org.Links.Where(l => l.Rel == "self").ToList();
-                Assert.Equal(1, self.Count);
+                Assert.Single(self);
                 Assert.Equal("/api/organisations/3", self[0].Href);
                 Assert.Equal(self[0].Href, org.Href);
                 var people = org.Links.Where(l => l.Rel == "people").ToList();
-                Assert.Equal(1, people.Count);
+                Assert.Single(people);
                 Assert.Equal("/api/organisations/3/people", people[0].Href);
                 var brownnosers = org.Links.Where(l => l.Rel == "brownnoser").ToList();
                 Assert.Equal(2, brownnosers.Count);

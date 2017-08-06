@@ -1,0 +1,42 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DebugType>portable</DebugType>
+
+    <Company>Jake Ginnivan</Company>
+    <Description>Enabled Hypermedia support in Asp.net Web API using the HAL mediatype</Description>
+    <Copyright>Copyright © Jake Ginnvan 2012</Copyright>
+    <PackageProjectUrl>https://github.com/JakeGinnivan/WebApi.Hal</PackageProjectUrl>
+    <PackageLicenseUrl>$(PackageProjectUrl)/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageReleaseNotes>$(PackageProjectUrl)/releases</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
+  </PropertyGroup>
+  <PropertyGroup>
+      <Major>1</Major>
+      <Minor>0</Minor>
+      <Revision>0</Revision>
+
+      <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
+      <BuildNumber Condition=" '$(BUILD_NUMBER)' != '' ">$(BUILD_NUMBER)</BuildNumber>
+      <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
+
+      <!-- Remove for release -->
+      <PrereleaseLabel>-beta</PrereleaseLabel>
+
+      <BuildSuffix Condition=" '$(PrereleaseLabel)' != '' ">$(PrereleaseLabel)-$(BuildNumber)</BuildSuffix>
+      <BuildSuffix Condition=" '$(BuildSuffix)' == '' "></BuildSuffix>
+
+      <AssemblyVersion>$(Major).0.0.0</AssemblyVersion>
+      <AssemblyFileVersion>$(Major).$(Minor).$(Revision).$(BuildNumber)</AssemblyFileVersion>
+      <InformationalVersion>$(Major).$(Minor).$(Revision)$(BuildSuffix)</InformationalVersion>
+      <PackageVersion>$(Major).$(Minor).$(Revision)$(BuildSuffix)</PackageVersion>
+  </PropertyGroup>
+</Project>

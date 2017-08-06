@@ -99,7 +99,7 @@ namespace WebApi.Hal.Tests
             var config = builder.Build();
             var hypermedia = config.ResolveLinks(representation);
 
-            Assert.Equal(1, hypermedia.Count());
+            Assert.Single(hypermedia);
             Assert.Equal(link, hypermedia.First(), Link.EqualityComparer);
         }
 
