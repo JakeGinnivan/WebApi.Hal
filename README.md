@@ -120,7 +120,7 @@ To run the sample project, update the connection string in web.config, then **cr
 
 You can use fiddler to explore the API. Make sure you put in an accept header of `application/hal+json`. Try hitting `http://localhost:51665/beers` with that accept header, and see what happens
 
-##Credits
+## Credits
 I have more credits to add, but this is the most obvious (as I based my Xml formatter off this project)
 
 https://bitbucket.org/smichelotti/hal-media-type
