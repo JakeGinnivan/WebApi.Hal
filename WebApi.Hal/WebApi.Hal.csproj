@@ -4,6 +4,9 @@
   
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <Version>3.0.0-pre-1</Version>
+    <Copyright>Copyright © Jake Ginnvan 2017</Copyright>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
