@@ -1,11 +1,11 @@
 ﻿using System.Linq;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
 
 namespace WebApi.Hal.Web.Api
 {
-    public class BreweriesController : ApiController
+    public class BreweriesController : Controller
     {
         readonly IBeerDbContext beerDbContext;
 

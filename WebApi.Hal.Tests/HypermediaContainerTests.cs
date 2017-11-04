@@ -1,8 +1,8 @@
-﻿using System.IO;
+﻿using System.Buffers;
+using System.IO;
 using System.Linq;
-using System.Net.Http;
-using ApprovalTests;
-using ApprovalTests.Reporters;
+using Assent;
+using Newtonsoft.Json;
 using WebApi.Hal.Tests.HypermediaAppenders;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
@@ -14,7 +14,6 @@ namespace WebApi.Hal.Tests
         readonly ProductRepresentation representation = new ProductRepresentation();
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public void CanUseRegisterExtensionMethod()
         {
             var curie = new CuriesLink("aap", "http://www.helpt.com/{?rel}");
@@ -29,19 +28,18 @@ namespace WebApi.Hal.Tests
             var config = builder.Build();
 
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter(config) { Indent = true };
-            var content = new StringContent(string.Empty);
-            var type = representation.GetType();
+            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, config);
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new StringWriter())
             {
-                mediaFormatter.WriteToStreamAsync(type, representation, stream, content, null);
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                mediaFormatter.WriteObject(stream, representation);
+
+                string serialisedResult = stream.ToString();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
@@ -101,7 +99,7 @@ namespace WebApi.Hal.Tests
             var config = builder.Build();
             var hypermedia = config.ResolveLinks(representation);
 
-            Assert.Equal(1, hypermedia.Count());
+            Assert.Single(hypermedia);
             Assert.Equal(link, hypermedia.First(), Link.EqualityComparer);
         }
 

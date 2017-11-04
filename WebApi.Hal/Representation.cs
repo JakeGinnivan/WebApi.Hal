@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,10 +11,7 @@ namespace WebApi.Hal
 {
     public abstract class Representation : IResource
     {
-        protected Representation()
-        {
-            Links = new List<Link>();
-        }
+        public IList<Link> Links { get; set; } = new List<Link>();
 
         [JsonProperty("_embedded")]
         private IList<EmbeddedResource> Embedded { get; set; }
@@ -23,17 +19,19 @@ namespace WebApi.Hal
         [JsonIgnore]
         readonly IDictionary<PropertyInfo, object> embeddedResourceProperties = new Dictionary<PropertyInfo, object>();
 
+        [JsonIgnore]
+        public HalJsonConverterContext ConverterContext { get; set; }
+
         [OnSerializing]
         private void OnSerialize(StreamingContext context)
         {
             // Clear the embeddedResourceProperties in order to make this object re-serializable.
             embeddedResourceProperties.Clear();
 
-            if (!ResourceConverter.IsResourceConverterContext(context))
+            if (ConverterContext == null)
                 return;
-            
-            var ctx = (HalJsonConverterContext)context.Context;
 
+            var ctx = ConverterContext;
             if (!ctx.IsRoot) 
                 return;
             
@@ -54,7 +52,7 @@ namespace WebApi.Hal
         [OnSerialized]
         private void OnSerialized(StreamingContext context)
         {
-            if (ResourceConverter.IsResourceConverterContext(context))
+            if (ConverterContext != null)
             {
                 // restore embedded resource properties
                 foreach (var prop in embeddedResourceProperties.Keys)
@@ -113,12 +111,10 @@ namespace WebApi.Hal
                 // remember embedded resource property for restoring after serialization
                 embeddedResourceProperties.Add(property, value);
 
-                var resource = value as IResource;
-
-                if (resource != null)
+                if (value is IResource resource)
                     ProcessPropertyValue(resolver, curies, resource);
                 else
-                    ProcessPropertyValue(resolver, curies, (IEnumerable<IResource>) value);
+                    ProcessPropertyValue(resolver, curies, (IEnumerable<IResource>)value);
 
                 // null out the embedded property so it doesn't serialize separately as a property
                 property.SetValue(this, null, null);
@@ -193,14 +189,19 @@ namespace WebApi.Hal
 	    {
 		    var typed = resource as T;
 
-		    var appender = resolver.ResolveAppender(typed);
-		    var configured = resolver.ResolveLinks(typed).ToList();
-		    var link = resolver.ResolveSelf(typed);
+	        if (typed == null)
+	        {
+	            throw new ArgumentOutOfRangeException(nameof(resource), "resource must be of type " + typeof(T));
+	        }
+
+		    IHypermediaAppender<T> appender = resolver.ResolveAppender(typed);
+		    List<Link> configured = resolver.ResolveLinks(typed).ToList();
+		    Link link = resolver.ResolveSelf(typed);
 
 		    if (link != null)
 			    configured.Insert(0, link);
 
-		    if (configured.Any() && (appender != null))
+		    if (configured.Count > 0 && (appender != null))
 		    {
 			    if (typed.Links == null)
 				    typed.Links = new List<Link>(); // make sure resource.Links.Add() can safely be called inside the appender
@@ -240,8 +241,6 @@ namespace WebApi.Hal
 
         [JsonIgnore]
         public string LinkName { get; set; }
-
-        public IList<Link> Links { get; set; }
 
         protected internal virtual void CreateHypermedia()
         {

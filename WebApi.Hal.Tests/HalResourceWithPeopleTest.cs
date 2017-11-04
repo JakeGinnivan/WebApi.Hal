@@ -1,7 +1,7 @@
-﻿using System.IO;
-using System.Net.Http;
-using ApprovalTests;
-using ApprovalTests.Reporters;
+﻿using System.Buffers;
+using System.IO;
+using Assent;
+using Newtonsoft.Json;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
 
@@ -17,44 +17,39 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public void organisation_get_json_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
-            var content = new StringContent(string.Empty);
-            var type = resource.GetType();
+            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new StringWriter())
             {
-                mediaFormatter.WriteToStreamAsync(type, resource, stream, content, null).Wait();
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                mediaFormatter.WriteObject(stream, resource);
+
+                string serialisedResult = stream.ToString();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public void organisation_get_xml_test()
         {
             // arrange
-            var mediaFormatter = new XmlHalMediaTypeFormatter();
-            var content = new StringContent(string.Empty);
-            var type = resource.GetType();
+            var mediaFormatter = new XmlHalMediaTypeOutputFormatter();
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new Utf8StringWriter())
             {
-                mediaFormatter.WriteToStreamAsync(type, resource, stream, content, null);
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                mediaFormatter.WriteObject(stream, resource);
+
+                string serialisedResult = stream.ToString();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         } 
     }

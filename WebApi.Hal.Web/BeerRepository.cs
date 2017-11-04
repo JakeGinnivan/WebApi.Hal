@@ -6,7 +6,7 @@ namespace WebApi.Hal.Web
 {
     public class BeerRepository : IRepository
     {
-        readonly IBeerDbContext beerDbContext;
+        private readonly IBeerDbContext beerDbContext;
 
         public BeerRepository(IBeerDbContext beerDbContext)
         {

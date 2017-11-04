@@ -1,4 +1,4 @@
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using WebApi.Hal.Web.Models;
 
 namespace WebApi.Hal.Web.Data

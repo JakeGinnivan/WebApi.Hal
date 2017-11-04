@@ -1,10 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System.Buffers;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
-using ApprovalTests;
-using ApprovalTests.Reporters;
+using System.Threading.Tasks;
+using Assent;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.ObjectPool;
+using Newtonsoft.Json;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
 
@@ -20,60 +27,62 @@ namespace WebApi.Hal.Tests
             {
                 Boss = new Boss(2, "Eunice PHB", 1, true)
             };
-            resource.People = new List<Person>();
-            resource.People.Add(new Person(3, "Dilbert", 1));
-            resource.People.Add(new Person(4, "Wally", 1));
-            resource.People.Add(new Person(5, "Alice", 1));
+            resource.People = new List<Person>
+            {
+                new Person(3, "Dilbert", 1),
+                new Person(4, "Wally", 1),
+                new Person(5, "Alice", 1)
+            };
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public void peopledetail_get_json_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
-            var content = new StringContent(string.Empty);
-            var type = resource.GetType();
+            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new StringWriter())
             {
-                mediaFormatter.WriteToStreamAsync(type, resource, stream, content, null).Wait();
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                mediaFormatter.WriteObject(stream, resource);
+
+                string serialisedResult = stream.ToString();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public void peopledetail_get_xml_test()
         {
             // arrange
-            var mediaFormatter = new XmlHalMediaTypeFormatter();
-            var content = new StringContent(string.Empty);
-            var type = resource.GetType();
+            var mediaFormatter = new XmlHalMediaTypeOutputFormatter();
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new Utf8StringWriter())
             {
-                mediaFormatter.WriteToStreamAsync(type, resource, stream, content, null);
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                mediaFormatter.WriteObject(stream, resource);
+
+                string serialisedResult = stream.ToString();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
         [Fact]
-        public void peopledetail_post_json_props_test()
+        public async Task peopledetail_post_json_props_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
-            var type = typeof (OrganisationWithPeopleDetailRepresentation);
+            var mediaFormatter = new JsonHalMediaTypeInputFormatter(
+                NullLogger.Instance,
+                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                ArrayPool<char>.Shared,
+                new DefaultObjectPoolProvider());
+
+            var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
 {
 ""Id"":""5"",
@@ -82,13 +91,23 @@ namespace WebApi.Hal.Tests
 ";
 
             // act
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+            using (
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
+                )
             {
-                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+                var context = new DefaultHttpContext();
+                context.Request.Body = stream;
+                var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
+                    context,
+                    type.ToString(),
+                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    CreateDefaultProvider().GetMetadataForType(type),
+                    (s, encoding) => new StreamReader(s, encoding)
+                    ));
 
                 // assert
-                Assert.NotNull(obj);
-                var org = obj as OrganisationWithPeopleDetailRepresentation;
+                Assert.NotNull(obj.Model);
+                var org = obj.Model as OrganisationWithPeopleDetailRepresentation;
                 Assert.NotNull(org);
                 Assert.Equal(5, org.Id);
                 Assert.Equal("Waterproof Fire Department", org.Name);
@@ -96,42 +115,57 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void peopledetail_post_json_links_test()
+        public async Task peopledetail_post_json_links_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var mediaFormatter = new JsonHalMediaTypeInputFormatter(
+                NullLogger.Instance,
+                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                ArrayPool<char>.Shared,
+                new DefaultObjectPoolProvider());
+
             var type = typeof(OrganisationWithPeopleRepresentation);
             const string json = @"
-{
-""Id"":""3"",
-""Name"": ""Dept. of Redundancy Dept."",
-""_links"": {
- ""self"": {""href"": ""/api/organisations/3""},
- ""people"": {""href"": ""/api/organisations/3/people""},
- ""brownnoser"": [
-   {""href"": ""/api/organisations/3/brown/1""},
-   {""href"": ""/api/organisations/3/brown/2""}
-        ]
-    }
-}
-";
+        {
+        ""Id"":""3"",
+        ""Name"": ""Dept. of Redundancy Dept."",
+        ""_links"": {
+         ""self"": {""href"": ""/api/organisations/3""},
+         ""people"": {""href"": ""/api/organisations/3/people""},
+         ""brownnoser"": [
+           {""href"": ""/api/organisations/3/brown/1""},
+           {""href"": ""/api/organisations/3/brown/2""}
+                ]
+            }
+        }
+        ";
 
             // act
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+            using (
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
+                )
             {
-                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+                var context = new DefaultHttpContext();
+                context.Request.Body = stream;
+                var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
+                    context,
+                    type.ToString(),
+                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    CreateDefaultProvider().GetMetadataForType(type),
+                    (s, encoding) => new StreamReader(s, encoding)
+                    ));
 
                 // assert
-                Assert.NotNull(obj);
-                var org = obj as OrganisationWithPeopleRepresentation;
+                Assert.NotNull(obj.Model);
+                var org = obj.Model as OrganisationWithPeopleRepresentation;
                 Assert.NotNull(org);
                 Assert.Equal(4, org.Links.Count);
                 var self = org.Links.Where(l => l.Rel == "self").ToList();
-                Assert.Equal(1, self.Count);
+                Assert.Single(self);
                 Assert.Equal("/api/organisations/3", self[0].Href);
                 Assert.Equal(self[0].Href, org.Href);
                 var people = org.Links.Where(l => l.Rel == "people").ToList();
-                Assert.Equal(1, people.Count);
+                Assert.Single(people);
                 Assert.Equal("/api/organisations/3/people", people[0].Href);
                 var brownnosers = org.Links.Where(l => l.Rel == "brownnoser").ToList();
                 Assert.Equal(2, brownnosers.Count);
@@ -141,34 +175,47 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void peopledetail_post_json_embedded_singles_test()
+        public async Task peopledetail_post_json_embedded_singles_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter {Indent = true};
+            var mediaFormatter = new JsonHalMediaTypeInputFormatter(
+                NullLogger.Instance,
+                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                ArrayPool<char>.Shared,
+                new DefaultObjectPoolProvider());
+
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
-{
-""Id"":""3"",
-""Name"": ""Singles Dept."",
-""_embedded"": {
- ""person"": {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
- ""boss"": {""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}
-  }
-}
-";
+        {
+        ""Id"":""3"",
+        ""Name"": ""Singles Dept."",
+        ""_embedded"": {
+         ""person"": {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
+            ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
+         ""boss"": {""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
+            ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}
+          }
+        }
+        ";
 
             // act
             using (
                 var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
                 )
             {
-                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+                var context = new DefaultHttpContext();
+                context.Request.Body = stream;
+                var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
+                    context,
+                    type.ToString(),
+                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    CreateDefaultProvider().GetMetadataForType(type),
+                    (s, encoding) => new StreamReader(s, encoding)
+                    ));
 
                 // assert
-                Assert.NotNull(obj);
-                var org = obj as OrganisationWithPeopleDetailRepresentation;
+                Assert.NotNull(obj.Model);
+                var org = obj.Model as OrganisationWithPeopleDetailRepresentation;
                 Assert.NotNull(org);
                 Assert.NotNull(org.Boss);
                 Assert.Equal(1, org.People.Count);
@@ -177,38 +224,51 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void peopledetail_post_json_embedded_arrays_test()
+        public async Task peopledetail_post_json_embedded_arrays_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var mediaFormatter = new JsonHalMediaTypeInputFormatter(
+                NullLogger.Instance,
+                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                ArrayPool<char>.Shared,
+                new DefaultObjectPoolProvider());
+
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
-{
-""Id"":""3"",
-""Name"": ""Array Dept."",
-""_embedded"": {
- ""person"": [
-   {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
-   {""Id"": ""9"",""Name"": ""Person Nine"",""OrganisationId"": ""3"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/people/9""}}}
-   ],
- ""boss"": [{""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
-    ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}]
-  }
-}
-";
+        {
+        ""Id"":""3"",
+        ""Name"": ""Array Dept."",
+        ""_embedded"": {
+         ""person"": [
+           {""Id"": ""7"",""Name"": ""Person Seven"",""OrganisationId"": ""3"",
+            ""_links"": {""self"": {""href"": ""/api/organisations/3/people/7""}}},
+           {""Id"": ""9"",""Name"": ""Person Nine"",""OrganisationId"": ""3"",
+            ""_links"": {""self"": {""href"": ""/api/organisations/3/people/9""}}}
+           ],
+         ""boss"": [{""Id"": ""8"",""Name"": ""Person Eight"",""OrganisationId"": ""3"",""HasPointyHair"":""true"",
+            ""_links"": {""self"": {""href"": ""/api/organisations/3/boss""}}}]
+          }
+        }
+        ";
 
             // act
             using (
                 var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
                 )
             {
-                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+                var context = new DefaultHttpContext();
+                context.Request.Body = stream;
+                var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
+                    context,
+                    type.ToString(),
+                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    CreateDefaultProvider().GetMetadataForType(type),
+                    (s, encoding) => new StreamReader(s, encoding)
+                    ));
 
                 // assert
-                Assert.NotNull(obj);
-                var org = obj as OrganisationWithPeopleDetailRepresentation;
+                Assert.NotNull(obj.Model);
+                var org = obj.Model as OrganisationWithPeopleDetailRepresentation;
                 Assert.NotNull(org);
                 Assert.NotNull(org.Boss);
                 Assert.Equal(2, org.People.Count);
@@ -217,28 +277,41 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void peopledetail_post_json_embedded_null_test()
+        public async Task peopledetail_post_json_embedded_null_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var mediaFormatter = new JsonHalMediaTypeInputFormatter(
+                NullLogger.Instance,
+                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                ArrayPool<char>.Shared,
+                new DefaultObjectPoolProvider());
+
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
-{
-""Id"":""3"",
-""Name"": ""Singles Dept.""
-}
-";
+        {
+        ""Id"":""3"",
+        ""Name"": ""Singles Dept.""
+        }
+        ";
 
             // act
             using (
                 var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
                 )
             {
-                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+                var context = new DefaultHttpContext();
+                context.Request.Body = stream;
+                var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
+                    context,
+                    type.ToString(),
+                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    CreateDefaultProvider().GetMetadataForType(type),
+                    (s, encoding) => new StreamReader(s, encoding)
+                    ));
 
                 // assert
-                Assert.NotNull(obj);
-                var org = obj as OrganisationWithPeopleDetailRepresentation;
+                Assert.NotNull(obj.Model);
+                var org = obj.Model as OrganisationWithPeopleDetailRepresentation;
                 Assert.NotNull(org);
                 Assert.Null(org.Boss);
                 Assert.Null(org.People);
@@ -255,10 +328,15 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        public void simplelist_post_json_test()
+        public async Task simplelist_post_json_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var mediaFormatter = new JsonHalMediaTypeInputFormatter(
+                NullLogger.Instance,
+                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                ArrayPool<char>.Shared,
+                new DefaultObjectPoolProvider());
+
             var type = typeof(MySimpleList);
             const string json = @"
 {
@@ -278,11 +356,19 @@ namespace WebApi.Hal.Tests
                 var stream = new MemoryStream(Encoding.UTF8.GetBytes(json))
                 )
             {
-                var obj = mediaFormatter.ReadFromStreamAsync(type, stream, null, null).Result;
+                var context = new DefaultHttpContext();
+                context.Request.Body = stream;
+                var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
+                    context,
+                    type.ToString(),
+                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    CreateDefaultProvider().GetMetadataForType(type),
+                    (s, encoding) => new StreamReader(s, encoding)
+                    ));
 
                 // assert
-                Assert.NotNull(obj);
-                var orgList = obj as MySimpleList;
+                Assert.NotNull(obj.Model);
+                var orgList = obj.Model as MySimpleList;
                 Assert.NotNull(orgList);
                 Assert.Equal(2, orgList.ResourceList.Count);
                 Assert.Equal(7, orgList.ResourceList[0].Id);
@@ -293,6 +379,18 @@ namespace WebApi.Hal.Tests
                 Assert.Equal("/api/organisations/8", orgList.ResourceList[1].Href);
                 Assert.Equal("simple string", orgList.SimpleData);
             }
+        }
+
+        public static IModelMetadataProvider CreateDefaultProvider()
+        {
+            var detailsProviders = new IMetadataDetailsProvider[]
+            {
+                new DefaultBindingMetadataProvider(),
+                new DefaultValidationMetadataProvider()
+            };
+
+            var compositeDetailsProvider = new DefaultCompositeMetadataDetailsProvider(detailsProviders);
+            return new DefaultModelMetadataProvider(compositeDetailsProvider);
         }
     }
 }

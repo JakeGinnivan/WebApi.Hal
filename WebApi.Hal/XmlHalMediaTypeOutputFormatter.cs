@@ -3,56 +3,83 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Net.Http.Headers;
 using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    public class XmlHalMediaTypeFormatter : BufferedMediaTypeFormatter
+    public class XmlHalMediaTypeOutputFormatter : OutputFormatter
     {
-        public XmlHalMediaTypeFormatter()
+        private const string _mediaTypeHeaderValueName = "application/hal+xml";
+        
+        public XmlHalMediaTypeOutputFormatter()
         {
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/hal+xml"));
+            Initialize();
+        }
+        
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+            
+            var response = context.HttpContext.Response;
+            var contentType = context.ContentType;
+            var encoding = (contentType.HasValue ? (Encoding)Enum.Parse(typeof(Encoding), contentType.Value) : null) ?? Encoding.UTF8;
+            var memoryStream = new MemoryStream();
+            using (var textWriter = context.WriterFactory(memoryStream, encoding))
+            {
+                WriteObject(textWriter, context.Object);
+                await textWriter.FlushAsync();
+                memoryStream.Position = 0;
+                await memoryStream.CopyToAsync(response.Body);
+            }
         }
 
-        public override object ReadFromStream(Type type, Stream stream, HttpContent content, IFormatterLogger formatterLogger)
+        public void WriteObject(TextWriter writer, object value)
         {
-            if (!typeof(Representation).IsAssignableFrom(type))
+            if (writer == null)
             {
-                return null;
+                throw new ArgumentNullException(nameof(writer));
             }
 
-            var xml = XElement.Load(stream);
-            return ReadHalResource(type, xml);
-        }
-
-        public override void WriteToStream(Type type, object value, Stream stream, HttpContent content)
-        {
-            var resource = value as Representation;
-            if (resource == null)
+            var representation = value as Representation;
+            if (representation == null)
             {
                 return;
             }
 
-            var settings = new XmlWriterSettings { Indent = true };
-
-            var writer = XmlWriter.Create(stream, settings);
-            WriteHalResource(resource, writer);
-            writer.Flush();
+            var settings = new XmlWriterSettings
+            {
+                Indent = true,
+                Encoding = Encoding.UTF8
+            };
+            using (var xmlWriter = XmlWriter.Create(writer, settings))
+            {
+                WriteHalResource(representation, xmlWriter);
+                xmlWriter.Flush();
+            };
         }
-
+        
+        private void Initialize()
+        {
+            SupportedMediaTypes.Add(new MediaTypeHeaderValue(_mediaTypeHeaderValueName));
+        }
+        
         /// <summary>
         /// ReadHalResource will
         /// </summary>
         /// <param name="type">Type of resource - Must be of type ApiResource</param>
         /// <param name="xml">xelement for the type</param>
         /// <returns>returns deserialized object</returns>
-        static object ReadHalResource(Type type, XElement xml)
+        private static object ReadHalResource(Type type, XElement xml)
         {
             Representation representation;
 
@@ -99,7 +126,7 @@ namespace WebApi.Hal
             return representation;
         }
 
-        static void SetProperties(Type type, XElement xml, Representation representation)
+        private static void SetProperties(Type type, XElement xml, Representation representation)
         {
             foreach (var property in type.GetPublicInstanceProperties())
             {
@@ -118,14 +145,14 @@ namespace WebApi.Hal
             }
         }
 
-        static void CreateSelfHypermedia(Type type, XElement xml, Representation representation)
+        private static void CreateSelfHypermedia(Type type, XElement xml, Representation representation)
         {
             type.GetProperty("Rel").SetValue(representation, xml.Attribute("rel").Value, null);
             type.SetPropertyValue("Href", xml.Attribute("href"), representation);
             type.SetPropertyValue("LinkName", xml.Attribute("name"), representation);
         }
 
-        static void WriteHalResource(Representation representation, XmlWriter writer, string propertyName = null)
+        private static void WriteHalResource(Representation representation, XmlWriter writer, string propertyName = null)
         {
             if (representation == null)
             {
@@ -144,8 +171,7 @@ namespace WebApi.Hal
             }
 
             // Second, determine if resource is of Generic Resource List Type , list out all the items
-            var representationList = representation as IRepresentationList;
-            if (representationList != null)
+            if (representation is IRepresentationList representationList)
             {
                 foreach (var item in representationList.Cast<Representation>())
                 {
@@ -169,7 +195,7 @@ namespace WebApi.Hal
             writer.WriteEndElement();
         }
 
-        static void WriteResourceProperties(Representation representation, XmlWriter writer)
+        private static void WriteResourceProperties(Representation representation, XmlWriter writer)
         {
             // Only simple type and nested ApiResource type will be handled : for any other type, exception will be thrown
             // including List<ApiResource> as representation of List would require properties rel, href and linkname
@@ -184,23 +210,22 @@ namespace WebApi.Hal
                         writer.WriteElementString(property.Name, propertyString);
                     }
                 }
-                else if (typeof (Representation).IsAssignableFrom(property.PropertyType) &&
+                else if (typeof(Representation).IsAssignableFrom(property.PropertyType) &&
                          property.GetIndexParameters().Length == 0)
                 {
                     var halResource = property.GetValue(representation, null);
-                    WriteHalResource((Representation) halResource, writer, property.Name);
+                    WriteHalResource((Representation)halResource, writer, property.Name);
                 }
-                else if (typeof (IEnumerable<Representation>).IsAssignableFrom(property.PropertyType))
+                else if (typeof(IEnumerable<Representation>).IsAssignableFrom(property.PropertyType))
                 {
-                    var halResourceList = property.GetValue(representation, null) as IEnumerable<Representation>;
-                    if (halResourceList != null)
+                    if (property.GetValue(representation, null) is IEnumerable<Representation> halResourceList)
                         foreach (var item in halResourceList)
                             WriteHalResource(item, writer);
                 }
             }
         }
 
-        static string GetPropertyString(PropertyInfo property, object instance)
+        private static string GetPropertyString(PropertyInfo property, object instance)
         {
             var propertyValue = property.GetValue(instance, null);
             if (propertyValue != null)
@@ -209,16 +234,6 @@ namespace WebApi.Hal
             }
 
             return null;
-        }
-
-        public override bool CanReadType(Type type)
-        {
-            return typeof(Representation).IsAssignableFrom(type);
-        }
-
-        public override bool CanWriteType(Type type)
-        {
-            return typeof(Representation).IsAssignableFrom(type);
         }
     }
 }

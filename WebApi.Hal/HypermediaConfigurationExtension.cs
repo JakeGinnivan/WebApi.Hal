@@ -10,10 +10,10 @@ namespace WebApi.Hal
         public static void Register<T>(this IHypermediaBuilder builder, Link<T> selfLink, IHypermediaAppender<T> appender, params Link[] links) where T : class, IResource
         {
             if (selfLink == null)
-                throw new ArgumentNullException("selfLink");
+                throw new ArgumentNullException(nameof(selfLink));
 
             if (appender == null)
-                throw new ArgumentNullException("appender");
+                throw new ArgumentNullException(nameof(appender));
 
             builder.RegisterSelf(selfLink);
             builder.RegisterAppender(appender);
@@ -23,10 +23,10 @@ namespace WebApi.Hal
         public static void Register<T>(this IHypermediaBuilder builder, Link<T> selfLink, Action<T, IEnumerable<Link>> appender, params Link[] links) where T : class, IResource
         {
             if (selfLink == null)
-                throw new ArgumentNullException("selfLink");
+                throw new ArgumentNullException(nameof(selfLink));
 
             if (appender == null)
-                throw new ArgumentNullException("appender");
+                throw new ArgumentNullException(nameof(appender));
 
             builder.RegisterSelf(selfLink);
             builder.RegisterAppender(new ActionBasedHypermediaAppender<T>(appender));
@@ -36,7 +36,7 @@ namespace WebApi.Hal
         public static void Register<T>(this IHypermediaBuilder builder, Link<T> selfLink, params Link[] links) where T : class, IResource
         {
             if (selfLink == null)
-                throw new ArgumentNullException("selfLink");
+                throw new ArgumentNullException(nameof(selfLink));
 
             builder.RegisterSelf(selfLink);
             builder.RegisterLinks<T>(links);

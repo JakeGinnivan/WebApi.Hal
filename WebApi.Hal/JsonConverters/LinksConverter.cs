@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Reflection;
 using Newtonsoft.Json;
 
 namespace WebApi.Hal.JsonConverters
@@ -95,8 +95,8 @@ namespace WebApi.Hal.JsonConverters
 
         public virtual string ResolveUri(string href)
         {
-            if (!string.IsNullOrEmpty(href) && VirtualPathUtility.IsAppRelative(href))
-                return HttpContext.Current != null ? VirtualPathUtility.ToAbsolute(href) : href.Replace("~/", "/");
+            if (!string.IsNullOrEmpty(href) && href.StartsWith("~"))
+                return href.Replace("~/", "/");
             return href;
         }
     }

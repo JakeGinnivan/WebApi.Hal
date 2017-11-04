@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Buffers;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using ApprovalTests;
-using ApprovalTests.Reporters;
+using Assent;
+using Newtonsoft.Json;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
 
@@ -31,67 +32,60 @@ namespace WebApi.Hal.Tests
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public void organisation_list_get_xml_test()
         {
             // arrange
-            var mediaFormatter = new XmlHalMediaTypeFormatter();
-            var content = new StringContent(string.Empty);
-            var type = representation.GetType();
+            var mediaFormatter = new XmlHalMediaTypeOutputFormatter();
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new Utf8StringWriter())
             {
-                mediaFormatter.WriteToStream(type, representation, stream, content);
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                mediaFormatter.WriteObject(stream, representation);
+
+                string serialisedResult = stream.ToString();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public void organisation_list_get_json_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
-            var content = new StringContent(string.Empty);
-            var type = representation.GetType();
+            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new StringWriter())
             {
-                mediaFormatter.WriteToStreamAsync(type, representation, stream, content, null).Wait();
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                mediaFormatter.WriteObject(stream, representation);
+
+                string serialisedResult = stream.ToString();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
-
-
         }
 
         [Fact]
-        [UseReporter(typeof(DiffReporter))]
         public void one_item_organisation_list_get_json_test()
         {
             // arrange
-            var mediaFormatter = new JsonHalMediaTypeFormatter { Indent = true };
+            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
             var content = new StringContent(string.Empty);
             var type = oneitemrepresentation.GetType();
 
             // act
-            using (var stream = new MemoryStream())
+            using (var stream = new StringWriter())
             {
-                mediaFormatter.WriteToStreamAsync(type, oneitemrepresentation, stream, content, null).Wait();
-                stream.Seek(0, SeekOrigin.Begin);
-                var serialisedResult = new StreamReader(stream).ReadToEnd();
+                mediaFormatter.WriteObject(stream, oneitemrepresentation);
+
+                string serialisedResult = stream.ToString();
 
                 // assert
-                Approvals.Verify(serialisedResult);
+                this.Assent(serialisedResult);
             }
         }
     }
