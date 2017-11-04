@@ -122,10 +122,10 @@ namespace WebApi.Hal
             {
                 foreach (var substitution in parameter.GetType().GetProperties())
                 {
-                    string name = substitution.Name;
-                    object value = substitution.GetValue(parameter, null);
-                    string substituionValue = value?.ToString();
-                    uriTemplate.SetParameter(name, substituionValue);
+
+                    var name = substitution.Name;
+                    var value = substitution.GetValue(parameter, null);
+                    uriTemplate.SetParameter(name, value);
                 }
             }
 
