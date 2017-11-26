@@ -58,6 +58,9 @@ _ReSharper*
 # NCrunch
 .*crunch*.local.xml
 
+# Rider
+.idea/
+
 # Installshield output folder 
 [Ee]xpress
 
