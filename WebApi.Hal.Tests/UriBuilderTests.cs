@@ -161,5 +161,31 @@ namespace WebApi.Hal.Tests
             // assert
             Assert.Equal("Beer", link.Title);
         }
+
+        [Fact]
+        public void create_link_absolute_uri_encode_space()
+        {
+            // arrange
+            var templatedLink = new Link("somerel", "http://localhost/beers/{path}");
+
+            // act
+            var resolvedLink = templatedLink.CreateLink(new { path = "a b" });
+
+            // assert
+            Assert.Equal("http://localhost/beers/a%20b", resolvedLink.Href);
+        }
+
+        [Fact]
+        public void create_link_relative_uri_encode_space()
+        {
+            // arrange
+            var templatedLink = new Link("somerel", "/beers/{path}");
+
+            // act
+            var resolvedLink = templatedLink.CreateLink(new { path = "a b" });
+
+            // assert
+            Assert.Equal("/beers/a%20b", resolvedLink.Href);
+        }
     }
 }

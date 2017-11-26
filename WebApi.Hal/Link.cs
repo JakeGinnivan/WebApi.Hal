@@ -92,7 +92,9 @@ namespace WebApi.Hal
             var clone = Clone();
 
             clone.Rel = newRel;
-            clone.Href = CreateUri(parameters).ToString();
+
+            var uri = CreateUri(parameters);
+            clone.Href = uri.IsAbsoluteUri ? uri.AbsoluteUri : uri.OriginalString;
 
             return clone;
         }
