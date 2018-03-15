@@ -53,7 +53,7 @@
             /// <summary>
             /// /beers/{id}
             /// </summary>
-            public static Link Beer { get { return new Link("beer", "~/beers/{id}"); } }
+            public static Link Beer { get { return new Link("beer", "~/beer/{id}"); } }
         }
 
         public static class BeerDetails

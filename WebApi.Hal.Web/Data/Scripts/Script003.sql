@@ -1,9 +1,10 @@
 ﻿create table Reviews
 (
-	Id int identity PRIMARY KEY,
-	Beer_Id int FOREIGN KEY REFERENCES Beers(Id) NULL,
+	Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	Beer_Id int NULL,
 	[Title] ntext NULL,
-	[Content] ntext NULL
+	[Content] ntext NULL,
+	FOREIGN KEY (Beer_Id) REFERENCES Beers(Id)
 )
 go
 

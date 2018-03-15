@@ -5,6 +5,7 @@ using WebApi.Hal.Web.Data;
 
 namespace WebApi.Hal.Web.Api
 {
+    [Route("[controller]")]
     public class BreweriesController : Controller
     {
         readonly IBeerDbContext beerDbContext;
@@ -14,29 +15,33 @@ namespace WebApi.Hal.Web.Api
             this.beerDbContext = beerDbContext;
         }
 
+        [HttpGet]
+        // GET breweries
         public BreweryListRepresentation Get()
         {
-            var breweries = beerDbContext.Styles
-                .ToList()
-                .Select(s => new BreweryRepresentation
-                {
-                    Id = s.Id,
-                    Name = s.Name
-                })
-                .ToList();
+            var breweries = beerDbContext.BeerStyles
+                                         .ToList()
+                                         .Select(s => new BreweryRepresentation
+                                                      {
+                                                          Id = s.Id,
+                                                          Name = s.Name
+                                                      })
+                                         .ToList();
 
             return new BreweryListRepresentation(breweries);
         }
 
+        [HttpGet("{id}")]
+        // GET breweries/5
         public BreweryRepresentation Get(int id)
         {
             var brewery = beerDbContext.Breweries.Find(id);
 
             return new BreweryRepresentation
-            {
-                Id = brewery.Id,
-                Name = brewery.Name
-            };
+                   {
+                       Id = brewery.Id,
+                       Name = brewery.Name
+                   };
         }
     }
 }

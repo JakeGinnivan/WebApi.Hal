@@ -7,6 +7,7 @@ using WebApi.Hal.Web.Data;
 
 namespace WebApi.Hal.Web.Api
 {
+    [Route("[controller]")]
     public class BeerDetailController : Controller
     {
         readonly IBeerDbContext beerDbContext;
@@ -16,38 +17,46 @@ namespace WebApi.Hal.Web.Api
             this.beerDbContext = beerDbContext;
         }
 
+        [HttpGet("{id}")]
         // GET beerdetail/5
         public BeerDetailRepresentation Get(int id)
         {
-            var beer = beerDbContext.Beers.Include("Brewery").Include("Style").Single(br => br.Id == id); // lazy loading isn't on for this query; force loading
+            var beer = beerDbContext.Beers
+                                    .Include("Brewery") // lazy loading isn't on for this query; force loading
+                                    .Include("BeerStyle")
+                                    .Single(br => br.Id == id);
+
             var reviews = beerDbContext.Reviews
-                .Where(r=>r.Beer_Id == id)
-                .ToList()
-                .Select(s => new ReviewRepresentation
-                {
-                    Id = s.Id,
-                    Beer_Id = s.Beer_Id,
-                    Title = s.Title,
-                    Content = s.Content
-                })
-                .ToList();
+                                       .Where(r => r.Beer_Id == id)
+                                       .ToList()
+                                       .Select(s => new ReviewRepresentation
+                                                    {
+                                                        Id = s.Id,
+                                                        Beer_Id = s.Beer_Id,
+                                                        Title = s.Title,
+                                                        Content = s.Content
+                                                    })
+                                       .ToList();
 
             var detail = new BeerDetailRepresentation
-            {
-                Id = beer.Id,
-                Name = beer.Name,
-                Style = new BeerStyleRepresentation {Id = beer.Style.Id, Name = beer.Style.Name},
-                Brewery = new BreweryRepresentation {Id = beer.Brewery.Id, Name = beer.Brewery.Name}
-            };
+                         {
+                             Id = beer.Id,
+                             Name = beer.Name,
+                             Style = new BeerStyleRepresentation {Id = beer.Style.Id, Name = beer.Style.Name},
+                             Brewery = new BreweryRepresentation {Id = beer.Brewery.Id, Name = beer.Brewery.Name}
+                         };
+
             if (reviews.Count > 0)
             {
                 detail.Reviews = new List<ReviewRepresentation>();
                 foreach (var review in reviews)
                     detail.Reviews.Add(review);
             }
+
             return detail;
         }
 
+        [HttpPut("{id}")]
         // PUT beerdetail/5
         public void Put(int id, BeerDetailRepresentation beer)
         {

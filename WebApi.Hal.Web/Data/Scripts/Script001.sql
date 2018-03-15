@@ -1,6 +1,6 @@
 ﻿create table BeerStyles
 (
-	Id int identity PRIMARY KEY,
+	Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	Name nvarchar(100) NOT NULL,
 	[Description] ntext NULL
 )
@@ -8,7 +8,7 @@ go
 
 create table Breweries
 (
-	Id int identity PRIMARY KEY,
+	Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	Name nvarchar(100) NOT NULL,
 	[Address] nvarchar(255) NULL,
 	City nvarchar(100) NULL,
@@ -22,10 +22,12 @@ go
 
 create table Beers
 (
-	Id int identity PRIMARY KEY,
+	Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	Name nvarchar(100) NOT NULL,
-	Style_Id int FOREIGN KEY REFERENCES BeerStyles(Id) NULL,
-	Brewery_Id int FOREIGN KEY REFERENCES Breweries(Id) NULL,
-	Abv decimal(3,2) NULL
+	Style_Id int NULL,
+	Brewery_Id int NULL,
+	Abv decimal(3,2) NULL,
+	FOREIGN KEY (Style_Id) REFERENCES BeerStyles(Id),
+	FOREIGN KEY (Brewery_Id) REFERENCES Breweries(Id)
 )
 go
