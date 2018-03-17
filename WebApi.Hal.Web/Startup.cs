@@ -19,17 +19,21 @@ namespace WebApi.Hal.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<BeerDbContext>((oa) => oa.UseSqlite("Data Source=beer.db"));
-            
+
             services.AddScoped<IRepository, BeerRepository>();
 
             services.AddMvc();
 
-            services.Configure<MvcJsonOptions>(options => {
+            services.Configure<MvcJsonOptions>(options =>
+            {
                 options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
 
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, FormattersMvcOptionsSetup>());
+
+            services.TryAddSingleton<IBeerDbContext, BeerDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,10 +53,10 @@ namespace WebApi.Hal.Web
                 var context = serviceScope.ServiceProvider.GetService<BeerDbContext>();
 
                 DeployChanges.To
-                    .SQLiteDatabase("Data Source=beer.db")
-                    .WithScriptsEmbeddedInAssembly(typeof(Startup).GetTypeInfo().Assembly)
-                    .Build()
-                    .PerformUpgrade();
+                             .SQLiteDatabase("Data Source=beer.db")
+                             .WithScriptsEmbeddedInAssembly(typeof(Startup).GetTypeInfo().Assembly)
+                             .Build()
+                             .PerformUpgrade();
             }
         }
     }

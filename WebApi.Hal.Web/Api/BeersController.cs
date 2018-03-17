@@ -1,6 +1,4 @@
 ﻿using System.Linq;
-using System.Net;
-using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
@@ -9,6 +7,7 @@ using WebApi.Hal.Web.Models;
 
 namespace WebApi.Hal.Web.Api
 {
+    [Route("[controller]")]
     public class BeersController : Controller
     {
         public const int PageSize = 5;
@@ -20,6 +19,7 @@ namespace WebApi.Hal.Web.Api
             this.repository = repository;
         }
 
+        [HttpGet]
         // GET beers
         public BeerListRepresentation Get(int page = 1)
         {
@@ -30,7 +30,8 @@ namespace WebApi.Hal.Web.Api
             return resourceList;
         }
 
-        [HttpGet]
+        [HttpGet("Search")]
+        // GET beers/Search?searchTerm=Roger
         public BeerListRepresentation Search(string searchTerm, int page = 1)
         {
             var beers = repository.Find(new GetBeersQuery(b => b.Name.Contains(searchTerm)), page, PageSize);
@@ -39,24 +40,28 @@ namespace WebApi.Hal.Web.Api
             if (page > beers.TotalPages) page = beers.TotalPages;
 
             //var link = LinkTemplates.Beers.SearchBeers.CreateLink(new { searchTerm, page });
-            var beersResource = new BeerListRepresentation(beers.ToList(), beers.TotalResults, beers.TotalPages, page,
+            var beersResource = new BeerListRepresentation(beers.ToList(),
+                                                           beers.TotalResults,
+                                                           beers.TotalPages,
+                                                           page,
                                                            LinkTemplates.Beers.SearchBeers,
-                                                           new { searchTerm })
-            {
-                Page = page,
-                TotalResults = beers.TotalResults
-            };
+                                                           new {searchTerm})
+                                {
+                                    Page = page,
+                                    TotalResults = beers.TotalResults
+                                };
 
             return beersResource;
         }
 
+        [HttpPost]
         // POST beers
         public IActionResult Post(BeerRepresentation value)
         {
             var newBeer = new Beer(value.Name);
             repository.Add(newBeer);
 
-            return Created(LinkTemplates.Beers.Beer.CreateUri(new { id = newBeer.Id }), newBeer);
+            return Created(LinkTemplates.Beers.Beer.CreateUri(new {id = newBeer.Id}), newBeer);
         }
     }
 }

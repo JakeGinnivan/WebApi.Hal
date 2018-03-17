@@ -55,12 +55,14 @@ namespace WebApi.Hal.Web
             // Register JsonPatchInputFormatter before JsonInputFormatter, otherwise
             // JsonInputFormatter would consume "application/json-patch+json" requests
             // before JsonPatchInputFormatter gets to see them.
-            var jsonInputPatchLogger = _loggerFactory.CreateLogger<JsonHalMediaTypeInputFormatter>();
-            options.InputFormatters.Add(new JsonHalMediaTypeInputFormatter(
-                jsonInputPatchLogger,
-                _jsonSerializerSettings,
-                _charPool,
-                _objectPoolProvider));
+
+            //TODO Including this formatter causes all returns to be empty
+            //var jsonInputPatchLogger = _loggerFactory.CreateLogger<JsonHalMediaTypeInputFormatter>();
+            //options.InputFormatters.Add(new JsonHalMediaTypeInputFormatter(
+            //                                jsonInputPatchLogger,
+            //                                _jsonSerializerSettings,
+            //                                _charPool,
+            //                                _objectPoolProvider));
         }
     }
 }

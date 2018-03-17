@@ -6,7 +6,7 @@ namespace WebApi.Hal.Web.Data
     public interface IBeerDbContext
     {
         DbSet<Beer> Beers { get; }
-        DbSet<BeerStyle> Styles { get; }
+        DbSet<BeerStyle> BeerStyles { get; }
         DbSet<Brewery> Breweries { get; set; }
         DbSet<Review> Reviews { get; set; }
         int SaveChanges();
