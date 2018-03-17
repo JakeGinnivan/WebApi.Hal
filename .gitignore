@@ -108,3 +108,7 @@ artifacts
 
 WebApi.Hal*.nupkg
 *.received.txt
+
+.vscode/
+
+*~

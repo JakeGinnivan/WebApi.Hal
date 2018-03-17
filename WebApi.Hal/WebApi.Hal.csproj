@@ -4,8 +4,11 @@
   
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <Version>3.0.0-pre-1</Version>
-    <Copyright>Copyright © Jake Ginnvan 2017</Copyright>
+    <Version>3.0.0</Version>
+    <PackageVersion>3.0.0</PackageVersion>
+    <Copyright>Copyright © Jake Ginnvan 2018</Copyright>
+    <Description>Adds support for the Hal Media Type (and Hypermedia) to Asp.net</Description>
+    <ProjectUrl>https://github.com/JakeGinnivan/WebApi.Hal</ProjectUrl>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
