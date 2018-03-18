@@ -56,9 +56,9 @@ namespace WebApi.Hal.Web.Api
 
         [HttpPost]
         // POST beers
-        public IActionResult Post(BeerRepresentation value)
+        public IActionResult Post([FromBody] BeerRepresentation value)
         {
-            var newBeer = new Beer(value.Name);
+            var newBeer = new Beer(value.Name) { Style_Id = value.StyleId.Value, Brewery_Id = value.BreweryId.Value };
             repository.Add(newBeer);
 
             return Created(LinkTemplates.Beers.Beer.CreateUri(new {id = newBeer.Id}), newBeer);
