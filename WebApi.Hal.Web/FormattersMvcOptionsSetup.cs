@@ -56,7 +56,6 @@ namespace WebApi.Hal.Web
             // JsonInputFormatter would consume "application/json-patch+json" requests
             // before JsonPatchInputFormatter gets to see them.
 
-            //TODO Including this formatter causes all returns to be empty
             var jsonInputPatchLogger = _loggerFactory.CreateLogger<JsonHalMediaTypeInputFormatter>();
             options.InputFormatters.Add(new JsonHalMediaTypeInputFormatter(
                                             jsonInputPatchLogger,
