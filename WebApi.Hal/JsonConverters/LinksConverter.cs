@@ -59,6 +59,17 @@ namespace WebApi.Hal.JsonConverters
                             writer.WriteValue(true);
                         }
                         break;
+                    case "extendedattributes":
+                        if (info.PropertyType == typeof (IDictionary<string, string>))
+                        {
+                            var dictionary = (IDictionary<string, string>)info.GetValue(link);
+                            foreach (var pair in dictionary)
+                            {
+                                writer.WritePropertyName(pair.Key);
+                                writer.WriteValue(pair.Value);
+                            }
+                        }
+                        break;
                     default:
                         if ((info.PropertyType == typeof (string)))
                         {

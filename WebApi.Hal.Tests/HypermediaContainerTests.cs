@@ -22,8 +22,13 @@ namespace WebApi.Hal.Tests
             var selfLink = new Link<ProductRepresentation>("product", "http://www.product.com?id=1");
             var link2 = new Link("related", "http://www.related.com");
             var link3 = curie.CreateLink<CategoryRepresentation>("category", "http://www.category.com");
+            var linkWithExtendedAttributes = new Link("enclosure","http://adownload.com/?id=1")
+            {
+                Type="text/xml",
+            };
+            linkWithExtendedAttributes.ExtendedAttributes.Add("length", 1337.ToString());
             
-            builder.Register(selfLink, link2, link3);
+            builder.Register(selfLink, link2, link3, linkWithExtendedAttributes);
             
             var config = builder.Build();
 

@@ -17,6 +17,11 @@
     },
     "aap:category": {
       "href": "http://www.category.com"
+    },
+    "enclosure": {
+      "href": "http://adownload.com/?id=1",
+      "type": "text/xml",
+      "length": "1337"
     }
   }
 }
