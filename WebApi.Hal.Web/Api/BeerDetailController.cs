@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ using WebApi.Hal.Web.Data;
 namespace WebApi.Hal.Web.Api
 {
     [Route("[controller]")]
+    [ApiController]
+    [Produces("application/hal+json")]
     public class BeerDetailController : Controller
     {
         readonly IBeerDbContext beerDbContext;
@@ -19,13 +22,14 @@ namespace WebApi.Hal.Web.Api
             this.beerDbContext = beerDbContext;
         }
 
-        [HttpGet("{id}")]
         // GET beerdetail/5
-        public BeerDetailRepresentation Get(int id)
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(BeerDetailRepresentation), (int)HttpStatusCode.OK)]
+        public ActionResult<BeerDetailRepresentation> Get(int id)
         {
             var beer = beerDbContext.Beers
-                                    .Include("Brewery") // lazy loading isn't on for this query; force loading
-                                    .Include("BeerStyle")
+                                    .Include(b => b.Brewery) // lazy loading isn't on for this query; force loading
+                                    .Include(b => b.Style)
                                     .Single(br => br.Id == id);
 
             var reviews = beerDbContext.Reviews
@@ -58,8 +62,9 @@ namespace WebApi.Hal.Web.Api
             return detail;
         }
 
-        [HttpPut("{id}")]
         // PUT beerdetail/5
+        [HttpPut("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         public void Put(int id, BeerDetailRepresentation beer)
         {
             // this is here just to see how the deserializer is working
@@ -68,7 +73,8 @@ namespace WebApi.Hal.Web.Api
         }
 
         [HttpGet("largeset")]
-        public async Task<BeerDetailListRepresentation> GetLargeSet(int setSize = 500)
+        [ProducesResponseType(typeof(BeerDetailListRepresentation), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<BeerDetailListRepresentation>> GetLargeSet(int setSize = 500)
         {
             var random = new Random();
             var largeSet = new BeerDetailRepresentation[setSize];

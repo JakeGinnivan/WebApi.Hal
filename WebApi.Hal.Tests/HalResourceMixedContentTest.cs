@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Assent;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
@@ -80,7 +81,8 @@ namespace WebApi.Hal.Tests
                 NullLogger.Instance,
                 new JsonSerializerSettings { Formatting = Formatting.Indented },
                 ArrayPool<char>.Shared,
-                new DefaultObjectPoolProvider());
+                new DefaultObjectPoolProvider(),
+                new MvcOptions(), new MvcJsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -122,7 +124,9 @@ namespace WebApi.Hal.Tests
                 NullLogger.Instance,
                 new JsonSerializerSettings { Formatting = Formatting.Indented },
                 ArrayPool<char>.Shared,
-                new DefaultObjectPoolProvider());
+                new DefaultObjectPoolProvider(),
+                new MvcOptions(), 
+                new MvcJsonOptions());
 
             var type = typeof(OrganisationWithPeopleRepresentation);
             const string json = @"
@@ -182,7 +186,9 @@ namespace WebApi.Hal.Tests
                 NullLogger.Instance,
                 new JsonSerializerSettings { Formatting = Formatting.Indented },
                 ArrayPool<char>.Shared,
-                new DefaultObjectPoolProvider());
+                new DefaultObjectPoolProvider(),
+                new MvcOptions(), 
+                new MvcJsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -231,7 +237,9 @@ namespace WebApi.Hal.Tests
                 NullLogger.Instance,
                 new JsonSerializerSettings { Formatting = Formatting.Indented },
                 ArrayPool<char>.Shared,
-                new DefaultObjectPoolProvider());
+                new DefaultObjectPoolProvider(),
+                new MvcOptions(), 
+                new MvcJsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -284,7 +292,9 @@ namespace WebApi.Hal.Tests
                 NullLogger.Instance,
                 new JsonSerializerSettings { Formatting = Formatting.Indented },
                 ArrayPool<char>.Shared,
-                new DefaultObjectPoolProvider());
+                new DefaultObjectPoolProvider(),
+                new MvcOptions(), 
+                new MvcJsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -335,7 +345,9 @@ namespace WebApi.Hal.Tests
                 NullLogger.Instance,
                 new JsonSerializerSettings { Formatting = Formatting.Indented },
                 ArrayPool<char>.Shared,
-                new DefaultObjectPoolProvider());
+                new DefaultObjectPoolProvider(),
+                new MvcOptions(), 
+                new MvcJsonOptions());
 
             var type = typeof(MySimpleList);
             const string json = @"

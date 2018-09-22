@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
@@ -14,8 +15,8 @@ namespace WebApi.Hal
         private readonly ResourceConverter _resourceConverter;
         private readonly EmbeddedResourceConverter _embeddedResourceConverter = new EmbeddedResourceConverter();
 
-        public JsonHalMediaTypeInputFormatter(
-            ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, IHypermediaResolver hypermediaResolver) : base(logger, serializerSettings, charPool, objectPoolProvider)
+        public JsonHalMediaTypeInputFormatter(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, IHypermediaResolver hypermediaResolver, MvcOptions mvcOptions, MvcJsonOptions mvcJsonOptions) 
+            : base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
         {
             if (hypermediaResolver == null)
             {
@@ -26,8 +27,8 @@ namespace WebApi.Hal
             Initialize();
         }
 
-        public JsonHalMediaTypeInputFormatter(
-            ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider) : base(logger, serializerSettings, charPool, objectPoolProvider)
+        public JsonHalMediaTypeInputFormatter(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, MvcOptions mvcOptions, MvcJsonOptions mvcJsonOptions) 
+            : base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
         {
             _resourceConverter = new ResourceConverter();
             Initialize();

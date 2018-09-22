@@ -14,6 +14,7 @@ namespace WebApi.Hal.Web
         private readonly JsonSerializerSettings _jsonSerializerSettings;
         private readonly ArrayPool<char> _charPool;
         private readonly ObjectPoolProvider _objectPoolProvider;
+        private readonly MvcJsonOptions _mvcJsonOptions;
 
         public FormattersMvcOptionsSetup(
             ILoggerFactory loggerFactory,
@@ -21,30 +22,16 @@ namespace WebApi.Hal.Web
             ArrayPool<char> charPool,
             ObjectPoolProvider objectPoolProvider)
         {
-            if (loggerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(loggerFactory));
-            }
-
             if (jsonOptions == null)
             {
                 throw new ArgumentNullException(nameof(jsonOptions));
             }
 
-            if (charPool == null)
-            {
-                throw new ArgumentNullException(nameof(charPool));
-            }
-
-            if (objectPoolProvider == null)
-            {
-                throw new ArgumentNullException(nameof(objectPoolProvider));
-            }
-
-            _loggerFactory = loggerFactory;
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _jsonSerializerSettings = jsonOptions.Value.SerializerSettings;
-            _charPool = charPool;
-            _objectPoolProvider = objectPoolProvider;
+            _charPool = charPool ?? throw new ArgumentNullException(nameof(charPool));
+            _objectPoolProvider = objectPoolProvider ?? throw new ArgumentNullException(nameof(objectPoolProvider));
+            _mvcJsonOptions = jsonOptions.Value;
         }
 
         public void Configure(MvcOptions options)
@@ -61,7 +48,9 @@ namespace WebApi.Hal.Web
                                             jsonInputPatchLogger,
                                             new JsonSerializerSettings(),
                                             _charPool,
-                                            _objectPoolProvider));
+                                            _objectPoolProvider,
+                                            options, 
+                                            _mvcJsonOptions));
         }
     }
 }
