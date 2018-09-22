@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Hal.Web.Api.Resources;
@@ -63,6 +65,46 @@ namespace WebApi.Hal.Web.Api
             // this is here just to see how the deserializer is working
             // we should get the links and all the embedded objects deserialized
             // we'd be better off creating a client to test the full deserializing, but this way is cheap for now
+        }
+
+        [HttpGet("largeset")]
+        public async Task<BeerDetailListRepresentation> GetLargeSet(int setSize = 500)
+        {
+            var random = new Random();
+            var largeSet = new BeerDetailRepresentation[setSize];
+            Parallel.For(0, setSize, index =>
+            {
+                largeSet[index] = new BeerDetailRepresentation
+                {
+                    Id = index + 1,
+                    Name = $"Test beer name {Guid.NewGuid()}",
+                    Reviews = new List<ReviewRepresentation>(),
+                    Style = new BeerStyleRepresentation
+                    {
+                        Id = random.Next(1, 50),
+                        Name = $"Test beer style name {Guid.NewGuid()}"
+                    },
+                    Brewery = new BreweryRepresentation
+                    {
+                        Id = random.Next(1, 10),
+                        Name = $"Test brewery name {Guid.NewGuid()}"
+                    }
+                };
+                var numberOfReviews = random.Next(2, 20);
+                for (var reviewIndex = 0; reviewIndex < numberOfReviews; reviewIndex++)
+                {
+                    largeSet[index].Reviews.Add(new ReviewRepresentation
+                    {
+                        Id = random.Next(setSize * 10, setSize * 100) + largeSet[index].Id,
+                        Content = $"Test beer review content {Guid.NewGuid()}",
+                        Title = $"Test beer review title {Guid.NewGuid()}",
+                        Beer_Id = largeSet[index].Id
+                    });
+                }
+            });
+
+            await Task.CompletedTask;
+            return new BeerDetailListRepresentation(largeSet, largeSet.Length, 1, 1, LinkTemplates.BeerDetails.GetBeerDetail);
         }
     }
 }

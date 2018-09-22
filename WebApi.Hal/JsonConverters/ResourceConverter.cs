@@ -17,12 +17,8 @@ namespace WebApi.Hal.JsonConverters
 
         public ResourceConverter(IHypermediaResolver hypermediaConfiguration)
         {
-            if (hypermediaConfiguration == null)
-            {
-                throw new ArgumentNullException(nameof(hypermediaConfiguration));
-            }
-
-            HypermediaResolver = hypermediaConfiguration;
+            HypermediaResolver = hypermediaConfiguration ??
+                                 throw new ArgumentNullException(nameof(hypermediaConfiguration));
         }
 
         public IHypermediaResolver HypermediaResolver { get; }
@@ -44,12 +40,42 @@ namespace WebApi.Hal.JsonConverters
             if (linksBackup.Count == 0)
                 resource.Links = null; // avoid serialization
 
-            var saveContext = serializer.Context;
+            var localJsonSerializer = JsonSerializer.Create();
+            localJsonSerializer.CheckAdditionalContent = serializer.CheckAdditionalContent;
+            localJsonSerializer.Context = serializer.Context;
+            localJsonSerializer.ContractResolver = serializer.ContractResolver;
+            localJsonSerializer.ConstructorHandling = serializer.ConstructorHandling;
+            foreach (var converter in serializer.Converters.Where(converter => converter != this))
+            {
+                localJsonSerializer.Converters.Add(converter);
+            }
+
+            localJsonSerializer.Culture = serializer.Culture;
+            localJsonSerializer.DateFormatHandling = serializer.DateFormatHandling;
+            localJsonSerializer.DateFormatString = serializer.DateFormatString;
+            localJsonSerializer.DateParseHandling = serializer.DateParseHandling;
+            localJsonSerializer.DateTimeZoneHandling = serializer.DateTimeZoneHandling;
+            localJsonSerializer.DefaultValueHandling = serializer.DefaultValueHandling;
+            localJsonSerializer.EqualityComparer = serializer.EqualityComparer;
+            localJsonSerializer.FloatFormatHandling = serializer.FloatFormatHandling;
+            localJsonSerializer.FloatParseHandling = serializer.FloatParseHandling;
+            localJsonSerializer.Formatting = serializer.Formatting;
+            localJsonSerializer.MaxDepth = serializer.MaxDepth;
+            localJsonSerializer.MetadataPropertyHandling = serializer.MetadataPropertyHandling;
+            localJsonSerializer.MissingMemberHandling = serializer.MissingMemberHandling;
+            localJsonSerializer.NullValueHandling = serializer.NullValueHandling;
+            localJsonSerializer.ObjectCreationHandling = serializer.ObjectCreationHandling;
+            localJsonSerializer.PreserveReferencesHandling = serializer.PreserveReferencesHandling;
+            localJsonSerializer.ReferenceLoopHandling = serializer.ReferenceLoopHandling;
+            localJsonSerializer.ReferenceResolver = serializer.ReferenceResolver;
+            localJsonSerializer.SerializationBinder = serializer.SerializationBinder;
+            localJsonSerializer.StringEscapeHandling = serializer.StringEscapeHandling;
+            localJsonSerializer.TraceWriter = serializer.TraceWriter;
+            localJsonSerializer.TypeNameAssemblyFormatHandling = serializer.TypeNameAssemblyFormatHandling;
+            localJsonSerializer.TypeNameHandling = serializer.TypeNameHandling;
+
             resource.ConverterContext = GetResourceConverterContext();
-            serializer.Converters.Remove(this);
-            serializer.Serialize(writer, resource);
-            serializer.Converters.Add(this);
-            serializer.Context = saveContext;
+            localJsonSerializer.Serialize(writer, resource);
 
             if (linksBackup.Count == 0)
 				resource.Links = linksBackup;
