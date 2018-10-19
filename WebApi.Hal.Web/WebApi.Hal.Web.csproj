@@ -5,6 +5,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>WebApi.Hal.Web</AssemblyName>
+    <Version>2.0.0</Version>
+    <AssemblyVersion>3.1.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
