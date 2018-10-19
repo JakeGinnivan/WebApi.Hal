@@ -11,14 +11,21 @@ namespace WebApi.Hal.JsonConverters
 {
     public class ResourceConverter : JsonConverter
     {
-        public ResourceConverter()
+        private readonly JsonSerializerSettings _jsonSerializerSettings;
+
+        public ResourceConverter(JsonSerializerSettings jsonSerializerSettings)
         {
+            _jsonSerializerSettings = jsonSerializerSettings;
         }
 
-        public ResourceConverter(IHypermediaResolver hypermediaConfiguration)
+        public ResourceConverter(IHypermediaResolver hypermediaConfiguration, JsonSerializerSettings jsonSerializerSettings) : this(jsonSerializerSettings)
         {
-            HypermediaResolver = hypermediaConfiguration ??
-                                 throw new ArgumentNullException(nameof(hypermediaConfiguration));
+            if (hypermediaConfiguration == null)
+            {
+                throw new ArgumentNullException(nameof(hypermediaConfiguration));
+            }
+
+            HypermediaResolver = hypermediaConfiguration;
         }
 
         public IHypermediaResolver HypermediaResolver { get; }
@@ -40,45 +47,44 @@ namespace WebApi.Hal.JsonConverters
             if (linksBackup.Count == 0)
                 resource.Links = null; // avoid serialization
 
-            var localJsonSerializer = JsonSerializer.Create();
-            localJsonSerializer.CheckAdditionalContent = serializer.CheckAdditionalContent;
-            localJsonSerializer.Context = serializer.Context;
-            localJsonSerializer.ContractResolver = serializer.ContractResolver;
-            localJsonSerializer.ConstructorHandling = serializer.ConstructorHandling;
-            foreach (var converter in serializer.Converters.Where(converter => converter != this))
-            {
-                localJsonSerializer.Converters.Add(converter);
-            }
-
-            localJsonSerializer.Culture = serializer.Culture;
-            localJsonSerializer.DateFormatHandling = serializer.DateFormatHandling;
-            localJsonSerializer.DateFormatString = serializer.DateFormatString;
-            localJsonSerializer.DateParseHandling = serializer.DateParseHandling;
-            localJsonSerializer.DateTimeZoneHandling = serializer.DateTimeZoneHandling;
-            localJsonSerializer.DefaultValueHandling = serializer.DefaultValueHandling;
-            localJsonSerializer.EqualityComparer = serializer.EqualityComparer;
-            localJsonSerializer.FloatFormatHandling = serializer.FloatFormatHandling;
-            localJsonSerializer.FloatParseHandling = serializer.FloatParseHandling;
-            localJsonSerializer.Formatting = serializer.Formatting;
-            localJsonSerializer.MaxDepth = serializer.MaxDepth;
-            localJsonSerializer.MetadataPropertyHandling = serializer.MetadataPropertyHandling;
-            localJsonSerializer.MissingMemberHandling = serializer.MissingMemberHandling;
-            localJsonSerializer.NullValueHandling = serializer.NullValueHandling;
-            localJsonSerializer.ObjectCreationHandling = serializer.ObjectCreationHandling;
-            localJsonSerializer.PreserveReferencesHandling = serializer.PreserveReferencesHandling;
-            localJsonSerializer.ReferenceLoopHandling = serializer.ReferenceLoopHandling;
-            localJsonSerializer.ReferenceResolver = serializer.ReferenceResolver;
-            localJsonSerializer.SerializationBinder = serializer.SerializationBinder;
-            localJsonSerializer.StringEscapeHandling = serializer.StringEscapeHandling;
-            localJsonSerializer.TraceWriter = serializer.TraceWriter;
-            localJsonSerializer.TypeNameAssemblyFormatHandling = serializer.TypeNameAssemblyFormatHandling;
-            localJsonSerializer.TypeNameHandling = serializer.TypeNameHandling;
-
             resource.ConverterContext = GetResourceConverterContext();
+
+            var localJsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                CheckAdditionalContent = _jsonSerializerSettings.CheckAdditionalContent,
+                ConstructorHandling = _jsonSerializerSettings.ConstructorHandling,
+                Context = serializer.Context,
+                ContractResolver = _jsonSerializerSettings.ContractResolver,
+                Converters = _jsonSerializerSettings.Converters.Where(converter => converter != this).ToList(),
+                Culture = _jsonSerializerSettings.Culture,
+                DateFormatHandling = _jsonSerializerSettings.DateFormatHandling,
+                DateFormatString = _jsonSerializerSettings.DateFormatString,
+                DateParseHandling = _jsonSerializerSettings.DateParseHandling,
+                DateTimeZoneHandling = _jsonSerializerSettings.DateTimeZoneHandling,
+                DefaultValueHandling = _jsonSerializerSettings.DefaultValueHandling,
+                EqualityComparer = _jsonSerializerSettings.EqualityComparer,
+                Error = _jsonSerializerSettings.Error,
+                FloatFormatHandling = _jsonSerializerSettings.FloatFormatHandling,
+                FloatParseHandling = _jsonSerializerSettings.FloatParseHandling,
+                Formatting = _jsonSerializerSettings.Formatting,
+                MaxDepth = _jsonSerializerSettings.MaxDepth,
+                MetadataPropertyHandling = _jsonSerializerSettings.MetadataPropertyHandling,
+                MissingMemberHandling = _jsonSerializerSettings.MissingMemberHandling,
+                NullValueHandling = _jsonSerializerSettings.NullValueHandling,
+                ObjectCreationHandling = _jsonSerializerSettings.ObjectCreationHandling,
+                PreserveReferencesHandling = _jsonSerializerSettings.PreserveReferencesHandling,
+                ReferenceLoopHandling = _jsonSerializerSettings.ReferenceLoopHandling,
+                ReferenceResolverProvider = _jsonSerializerSettings.ReferenceResolverProvider,
+                SerializationBinder = _jsonSerializerSettings.SerializationBinder,
+                StringEscapeHandling = _jsonSerializerSettings.StringEscapeHandling,
+                TraceWriter = _jsonSerializerSettings.TraceWriter,
+                TypeNameAssemblyFormatHandling = _jsonSerializerSettings.TypeNameAssemblyFormatHandling,
+                TypeNameHandling = _jsonSerializerSettings.TypeNameHandling
+            });
             localJsonSerializer.Serialize(writer, resource);
 
             if (linksBackup.Count == 0)
-				resource.Links = linksBackup;
+                resource.Links = linksBackup;
 		}
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,

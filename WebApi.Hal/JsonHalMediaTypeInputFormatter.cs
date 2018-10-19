@@ -23,14 +23,14 @@ namespace WebApi.Hal
                 throw new ArgumentNullException(nameof(hypermediaResolver));
             }
 
-            _resourceConverter = new ResourceConverter(hypermediaResolver);
+            _resourceConverter = new ResourceConverter(hypermediaResolver, SerializerSettings);
             Initialize();
         }
 
         public JsonHalMediaTypeInputFormatter(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, MvcOptions mvcOptions, MvcJsonOptions mvcJsonOptions) 
             : base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
         {
-            _resourceConverter = new ResourceConverter();
+            _resourceConverter = new ResourceConverter(SerializerSettings);
             Initialize();
         }
 
