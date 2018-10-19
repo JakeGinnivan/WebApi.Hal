@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
@@ -8,7 +9,9 @@ using WebApi.Hal.Web.Models;
 namespace WebApi.Hal.Web.Api
 {
     [Route("[controller]")]
-    public class BeersController : Controller
+    [ApiController]
+    [Produces("application/hal+json")]
+    public class BeersController : ControllerBase
     {
         public const int PageSize = 5;
 
@@ -19,9 +22,10 @@ namespace WebApi.Hal.Web.Api
             this.repository = repository;
         }
 
-        [HttpGet]
         // GET beers
-        public BeerListRepresentation Get(int page = 1)
+        [HttpGet]
+        [ProducesResponseType(typeof(BeerListRepresentation), (int)HttpStatusCode.OK)]
+        public ActionResult<BeerListRepresentation> Get(int page = 1)
         {
             var beers = repository.Find(new GetBeersQuery(), page, PageSize);
 
@@ -30,9 +34,10 @@ namespace WebApi.Hal.Web.Api
             return resourceList;
         }
 
-        [HttpGet("Search")]
         // GET beers/Search?searchTerm=Roger
-        public BeerListRepresentation Search(string searchTerm, int page = 1)
+        [HttpGet("Search")]
+        [ProducesResponseType(typeof(BeerListRepresentation), (int)HttpStatusCode.OK)]
+        public ActionResult<BeerListRepresentation> Search(string searchTerm, int page = 1)
         {
             var beers = repository.Find(new GetBeersQuery(b => b.Name.Contains(searchTerm)), page, PageSize);
 
@@ -54,11 +59,13 @@ namespace WebApi.Hal.Web.Api
             return beersResource;
         }
 
-        [HttpPost]
         // POST beers
+        [HttpPost]
+        [ProducesResponseType(typeof(Beer), (int)HttpStatusCode.Created)]
         public IActionResult Post([FromBody] BeerRepresentation value)
         {
-            var newBeer = new Beer(value.Name) { Style_Id = value.StyleId.Value, Brewery_Id = value.BreweryId.Value };
+            var newBeer = new Beer
+                {Name = value.Name, Style_Id = value.StyleId.Value, Brewery_Id = value.BreweryId.Value};
             repository.Add(newBeer);
 
             return Created(LinkTemplates.Beers.Beer.CreateUri(new {id = newBeer.Id}), newBeer);

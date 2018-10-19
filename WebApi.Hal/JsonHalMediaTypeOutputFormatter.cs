@@ -28,7 +28,7 @@ namespace WebApi.Hal
                 throw new ArgumentNullException(nameof(hypermediaResolver));
             }
 
-            _resourceConverter = new ResourceConverter(hypermediaResolver);
+            _resourceConverter = new ResourceConverter(hypermediaResolver, SerializerSettings);
             Initialize();
         }
 
@@ -37,7 +37,7 @@ namespace WebApi.Hal
             ArrayPool<char> charPool) :
             base(serializerSettings, charPool)
         {
-            _resourceConverter = new ResourceConverter();
+            _resourceConverter = new ResourceConverter(SerializerSettings);
             Initialize();
         }
 

@@ -1,12 +1,19 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace WebApi.Hal.Web.Models
 {
+    [Table("BeerStyles")]
     public class BeerStyle
     {
-        protected BeerStyle()
-        {
-        }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
-        public int Id { get; protected set; }
+        [Required]
+        [StringLength(100)]
         public string Name { get; set; }
+
+        public string Description { get; set; }
     }
 }

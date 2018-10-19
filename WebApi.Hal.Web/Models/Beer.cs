@@ -1,20 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApi.Hal.Web.Models
 {
+    [Table("Beers")]
     public class Beer
     {
-        protected Beer()
-        {
-        }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
-        public Beer(string name)
-        {
-            Name = name;
-        }
-
-        public int Id { get; protected set; }
-
+        [Required]
+        [StringLength(100)]
         public string Name { get; set; }
 
         [ForeignKey("Style")]
@@ -26,5 +23,8 @@ namespace WebApi.Hal.Web.Models
         public int Brewery_Id { get; set; }
 
         public Brewery Brewery { get; set; }
+
+        [Column(TypeName = "decimal(3,2)")]
+        public decimal? Abv { get; set; }
     }
 }

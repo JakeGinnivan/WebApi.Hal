@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
@@ -6,7 +7,9 @@ using WebApi.Hal.Web.Data;
 namespace WebApi.Hal.Web.Api
 {
     [Route("[controller]")]
-    public class StylesController : Controller
+    [ApiController]
+    [Produces("application/hal+json")]
+    public class StylesController : ControllerBase
     {
         readonly IBeerDbContext beerDbContext;
 
@@ -15,9 +18,10 @@ namespace WebApi.Hal.Web.Api
             this.beerDbContext = beerDbContext;
         }
 
-        [HttpGet]
         // GET styles
-        public BeerStyleListRepresentation Get()
+        [HttpGet]
+        [ProducesResponseType(typeof(BeerStyleListRepresentation), (int)HttpStatusCode.OK)]
+        public ActionResult<BeerStyleListRepresentation> Get()
         {
             var beerStyles = beerDbContext.BeerStyles
                                           .ToList()
@@ -31,9 +35,10 @@ namespace WebApi.Hal.Web.Api
             return new BeerStyleListRepresentation(beerStyles);
         }
 
-        [HttpGet("{id}")]
         // GET styles/5
-        public IActionResult Get(int id)
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(BeerStyleRepresentation), (int)HttpStatusCode.OK)]
+        public ActionResult<BeerStyleRepresentation> Get(int id)
         {
             var beerStyle = beerDbContext.BeerStyles.SingleOrDefault(s => s.Id == id);
             if (beerStyle == null)
@@ -45,7 +50,7 @@ namespace WebApi.Hal.Web.Api
                                         Name = beerStyle.Name
                                     };
 
-            return Ok(beerStyleResource);
+            return beerStyleResource;
         }
     }
 }

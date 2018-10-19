@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Hal.Web.Api.Resources;
 using WebApi.Hal.Web.Data;
@@ -6,7 +7,9 @@ using WebApi.Hal.Web.Data;
 namespace WebApi.Hal.Web.Api
 {
     [Route("[controller]")]
-    public class BreweriesController : Controller
+    [ApiController]
+    [Produces("application/hal+json")]
+    public class BreweriesController : ControllerBase
     {
         readonly IBeerDbContext beerDbContext;
 
@@ -15,9 +18,10 @@ namespace WebApi.Hal.Web.Api
             this.beerDbContext = beerDbContext;
         }
 
-        [HttpGet]
         // GET breweries
-        public BreweryListRepresentation Get()
+        [HttpGet]
+        [ProducesResponseType(typeof(BreweryListRepresentation), (int)HttpStatusCode.OK)]
+        public ActionResult<BreweryListRepresentation> Get()
         {
             var breweries = beerDbContext.BeerStyles
                                          .ToList()
@@ -31,9 +35,10 @@ namespace WebApi.Hal.Web.Api
             return new BreweryListRepresentation(breweries);
         }
 
-        [HttpGet("{id}")]
         // GET breweries/5
-        public BreweryRepresentation Get(int id)
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(BreweryRepresentation), (int)HttpStatusCode.OK)]
+        public ActionResult<BreweryRepresentation> Get(int id)
         {
             var brewery = beerDbContext.Breweries.Find(id);
 

@@ -1,5 +1,10 @@
 Release Notes
 
+Version 2.3.1
+ - Fixed the concurrency bug occurring when simultaneous http requests need to serialize large sets of data
+ - Upgraded demo web app to ASP.NET Core 2.1 and Entity Framework Core 2.1
+    - Demo app can't run with a database created by the previous demo app. An existing database needs to be removed first.
+
 Version 2.3.0.1
  - Fix bug introduced in 2.3.0 of non-array embedded Representation getting serialized improperly as array
  - Serialize link Title

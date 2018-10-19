@@ -13,13 +13,13 @@ namespace WebApi.Hal.Web.Api.Resources
 
         public override string Rel
         {
-            get { return LinkTemplates.BeerDetails.GetBeerDetail.Rel; }
+            get => LinkTemplates.BeerDetails.GetBeerDetail.Rel;
             set { }
         }
 
         public override string Href
         {
-            get { return LinkTemplates.BeerDetails.GetBeerDetail.CreateLink(new { id = Id }).Href; }
+            get => LinkTemplates.BeerDetails.GetBeerDetail.CreateLink(new { id = Id }).Href;
             set { }
         }
 
