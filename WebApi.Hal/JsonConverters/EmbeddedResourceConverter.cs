@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
 using Newtonsoft.Json;
-using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal.JsonConverters
 {
@@ -11,13 +10,12 @@ namespace WebApi.Hal.JsonConverters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var resourceList = (IList<EmbeddedResource>)value;
-            if (resourceList.Count == 0) return;
-
+           
             writer.WriteStartObject();
 
             foreach (var rel in resourceList)
             {
-                writer.WritePropertyName(NormalizeRel(rel.Resources[0]));
+                writer.WritePropertyName(NormalizeRel(rel));
                 if (rel.IsSourceAnArray)
                     writer.WriteStartArray();
                 foreach (var res in rel.Resources)
@@ -28,11 +26,10 @@ namespace WebApi.Hal.JsonConverters
             writer.WriteEndObject();
         }
 
-        private static string NormalizeRel(IResource res)
-        {
-            if (!string.IsNullOrEmpty(res.Rel)) return res.Rel;
-            return "unknownRel-" + res.GetType().Name;
-        }
+        private static string NormalizeRel(EmbeddedResource relation) =>
+            !string.IsNullOrEmpty(relation.RelationName)
+                ? relation.RelationName
+                : $"unknownRel-{relation.Resources.FirstOrDefault()?.GetType().Name ?? string.Empty}";
 
         public override bool CanRead => false;
 

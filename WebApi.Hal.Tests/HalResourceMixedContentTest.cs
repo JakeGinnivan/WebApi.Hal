@@ -26,13 +26,13 @@ namespace WebApi.Hal.Tests
         {
             resource = new OrganisationWithPeopleDetailRepresentation(1, "Org Name")
             {
-                Boss = new Boss(2, "Eunice PHB", 1, true)
-            };
-            resource.People = new List<Person>
-            {
-                new Person(3, "Dilbert", 1),
-                new Person(4, "Wally", 1),
-                new Person(5, "Alice", 1)
+                Boss = new Boss(2, "Eunice PHB", 1, true),
+                People = new List<Person>
+                {
+                    new Person(3, "Dilbert", 1),
+                    new Person(4, "Wally", 1),
+                    new Person(5, "Alice", 1)
+                }
             };
         }
 
@@ -52,6 +52,61 @@ namespace WebApi.Hal.Tests
 
                 // assert
                 this.Assent(serialisedResult);
+            }
+        }
+
+        [Fact]
+        public void peopledetail_non_empty_resource_list_get_json_test()
+        {
+            // arrange
+            var resourceWithResourceList = new OrganisationWithPeopleDetailRepresentation(1, "Org Name")
+            {
+                Boss = new Boss(2, "Eunice PHB", 1, true),
+                People = new ResourceList<Person>("person")
+                {
+                    new Person(3, "Dilbert", 1),
+                    new Person(4, "Wally", 1),
+                    new Person(5, "Alice", 1)
+                }
+            };
+
+            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
+
+            // act
+            using (var stream = new StringWriter())
+            {
+                mediaFormatter.WriteObject(stream, resourceWithResourceList);
+
+                var serializedResult = stream.ToString();
+
+                // assert
+                this.Assent(serializedResult);
+            }
+        }
+
+        [Fact]
+        public void peopledetail_empty_resource_list_get_json_test()
+        {
+            // arrange
+            var emptyResource = new OrganisationWithPeopleDetailRepresentation(1, "Org Name")
+            {
+                Boss = new Boss(2, "Eunice PHB", 1, true),
+                People = new ResourceList<Person>("person")
+            };
+
+            var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
+
+            // act
+            using (var stream = new StringWriter())
+            {
+                mediaFormatter.WriteObject(stream, emptyResource);
+
+                var serializedResult = stream.ToString();
+
+                // assert
+                this.Assent(serializedResult);
             }
         }
 
@@ -102,7 +157,7 @@ namespace WebApi.Hal.Tests
                 var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
                     context,
                     type.ToString(),
-                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    new ModelStateDictionary(),
                     CreateDefaultProvider().GetMetadataForType(type),
                     (s, encoding) => new StreamReader(s, encoding)
                     ));
@@ -154,7 +209,7 @@ namespace WebApi.Hal.Tests
                 var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
                     context,
                     type.ToString(),
-                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    new ModelStateDictionary(),
                     CreateDefaultProvider().GetMetadataForType(type),
                     (s, encoding) => new StreamReader(s, encoding)
                     ));
@@ -214,7 +269,7 @@ namespace WebApi.Hal.Tests
                 var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
                     context,
                     type.ToString(),
-                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    new ModelStateDictionary(),
                     CreateDefaultProvider().GetMetadataForType(type),
                     (s, encoding) => new StreamReader(s, encoding)
                     ));
@@ -224,7 +279,7 @@ namespace WebApi.Hal.Tests
                 var org = obj.Model as OrganisationWithPeopleDetailRepresentation;
                 Assert.NotNull(org);
                 Assert.NotNull(org.Boss);
-                Assert.Equal(1, org.People.Count);
+                Assert.Single(org.People);
                 Assert.Equal(1, org.Boss.Links.Count);
             }
         }
@@ -269,7 +324,7 @@ namespace WebApi.Hal.Tests
                 var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
                     context,
                     type.ToString(),
-                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    new ModelStateDictionary(),
                     CreateDefaultProvider().GetMetadataForType(type),
                     (s, encoding) => new StreamReader(s, encoding)
                     ));
@@ -314,7 +369,7 @@ namespace WebApi.Hal.Tests
                 var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
                     context,
                     type.ToString(),
-                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    new ModelStateDictionary(),
                     CreateDefaultProvider().GetMetadataForType(type),
                     (s, encoding) => new StreamReader(s, encoding)
                     ));
@@ -373,7 +428,7 @@ namespace WebApi.Hal.Tests
                 var obj = await mediaFormatter.ReadAsync(new Microsoft.AspNetCore.Mvc.Formatters.InputFormatterContext(
                     context,
                     type.ToString(),
-                    new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary(),
+                    new ModelStateDictionary(),
                     CreateDefaultProvider().GetMetadataForType(type),
                     (s, encoding) => new StreamReader(s, encoding)
                     ));

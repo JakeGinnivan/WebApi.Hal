@@ -17,7 +17,7 @@ namespace WebApi.Hal
         private IList<EmbeddedResource> Embedded { get; set; }
 
         [JsonIgnore]
-        readonly IDictionary<PropertyInfo, object> embeddedResourceProperties = new Dictionary<PropertyInfo, object>();
+        private readonly IDictionary<PropertyInfo, object> embeddedResourceProperties = new Dictionary<PropertyInfo, object>();
 
         [JsonIgnore]
         public HalJsonConverterContext ConverterContext { get; set; }
@@ -32,19 +32,19 @@ namespace WebApi.Hal
                 return;
 
             var ctx = ConverterContext;
-            if (!ctx.IsRoot) 
+            if (!ctx.IsRoot)
                 return;
-            
+
             var curies = new List<CuriesLink>();
-            
+
             RepopulateRecursively(ctx.HypermediaResolver, curies);
 
-	        if (Links != null)
-		        Links = curies
-			        .Distinct(CuriesLink.EqualityComparer)
-			        .Select(x => x.ToLink())
-			        .Union(Links)
-			        .ToList();
+            if (Links != null)
+                Links = curies
+                    .Distinct(CuriesLink.EqualityComparer)
+                    .Select(x => x.ToLink())
+                    .Union(Links)
+                    .ToList();
 
             ctx.IsRoot = false;
         }
@@ -60,7 +60,7 @@ namespace WebApi.Hal
             }
         }
 
-        Link ToLink(IHypermediaResolver resolver)
+        private Link ToLink(IHypermediaResolver resolver)
         {
             Link link = null;
 
@@ -104,8 +104,8 @@ namespace WebApi.Hal
             foreach (var property in type.GetProperties().Where(p => IsEmbeddedResourceType(p.PropertyType)))
             {
                 var value = property.GetValue(this, null);
-                
-                if (value == null) 
+
+                if (value == null)
                     continue; // nothing to serialize for this property ...
 
                 // remember embedded resource property for restoring after serialization
@@ -120,61 +120,56 @@ namespace WebApi.Hal
                 property.SetValue(this, null, null);
             }
 
-			if (Links != null)
-				curies.AddRange(Links.Where(l => l.Curie != null).Select(l => l.Curie));
+            if (Links != null)
+                curies.AddRange(Links.Where(l => l.Curie != null).Select(l => l.Curie));
 
             if (Embedded.Count == 0)
                 Embedded = null; // avoid the property from being serialized ...
         }
 
-        void ProcessPropertyValue(IHypermediaResolver resolver, List<CuriesLink> curies, IEnumerable<IResource> resources)
+        private void ProcessPropertyValue(IHypermediaResolver resolver, List<CuriesLink> curies, IEnumerable<IResource> resources)
         {
             var resourceList = resources.ToList();
 
-            if (!resourceList.Any()) 
-                return;
+            var relationName = resources is IResourceList list ? list.RelationName : resourceList.FirstOrDefault()?.Rel ?? string.Empty;
 
-            var embeddedResource = new EmbeddedResource {IsSourceAnArray = true};
+            var embeddedResource = new EmbeddedResource {IsSourceAnArray = true, RelationName = relationName};
 
-	        foreach (var resourceItem in resourceList)
-	        {
-		        embeddedResource.Resources.Add(resourceItem);
+            foreach (var resourceItem in resourceList)
+            {
+                embeddedResource.Resources.Add(resourceItem);
 
-		        var representation = resourceItem as Representation;
+                if (!(resourceItem is Representation representation))
+                    continue;
 
-		        if (representation == null)
-			        continue;
+                representation.RepopulateRecursively(resolver, curies); // traverse ...
+                var link = representation.ToLink(resolver);
 
-		        representation.RepopulateRecursively(resolver, curies); // traverse ...
-		        var link = representation.ToLink(resolver);
+                if (link != null)
+                    Links.Add(link); // add a link to embedded to the container ...
+            }
 
-		        if (link != null)
-			        Links.Add(link); // add a link to embedded to the container ...
-	        }
-
-	        Embedded.Add(embeddedResource);
+            Embedded.Add(embeddedResource);
         }
 
-	    void ProcessPropertyValue(IHypermediaResolver resolver, List<CuriesLink> curies, IResource resource)
-	    {
-		    var embeddedResource = new EmbeddedResource {IsSourceAnArray = false};
-		    embeddedResource.Resources.Add(resource);
+        private void ProcessPropertyValue(IHypermediaResolver resolver, List<CuriesLink> curies, IResource resource)
+        {
+            var embeddedResource = new EmbeddedResource {IsSourceAnArray = false, RelationName = resource.Rel};
+            embeddedResource.Resources.Add(resource);
 
-		    Embedded.Add(embeddedResource);
+            Embedded.Add(embeddedResource);
 
-		    var representation = resource as Representation;
+            if (!(resource is Representation representation))
+                return;
 
-		    if (representation == null)
-			    return;
+            representation.RepopulateRecursively(resolver, curies); // traverse ...
+            var link = representation.ToLink(resolver);
 
-		    representation.RepopulateRecursively(resolver, curies); // traverse ...
-		    var link = representation.ToLink(resolver);
+            if (link != null)
+                Links.Add(link); // add a link to embedded to the container ...
+        }
 
-		    if (link != null)
-			    Links.Add(link); // add a link to embedded to the container ...
-	    }
-
-	    void ResolveAndAppend(IHypermediaResolver resolver, Type type)
+        private void ResolveAndAppend(IHypermediaResolver resolver, Type type)
         {
             // We need reflection here, because appenders are of type IHypermediaAppender<T> whilst we define this logic in the base class of T
 
@@ -184,36 +179,36 @@ namespace WebApi.Hal
             genericMethod.Invoke(this, new object[] {this, resolver});
         }
 
-	    protected static void Append<T>(IResource resource, IHypermediaResolver resolver) where T : class, IResource
-		    // called using reflection ...
-	    {
-		    var typed = resource as T;
+        protected static void Append<T>(IResource resource, IHypermediaResolver resolver) where T : class, IResource
+            // called using reflection ...
+        {
+            var typed = resource as T;
 
-	        if (typed == null)
-	        {
-	            throw new ArgumentOutOfRangeException(nameof(resource), "resource must be of type " + typeof(T));
-	        }
+            if (typed == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(resource), "resource must be of type " + typeof(T));
+            }
 
-		    IHypermediaAppender<T> appender = resolver.ResolveAppender(typed);
-		    List<Link> configured = resolver.ResolveLinks(typed).ToList();
-		    Link link = resolver.ResolveSelf(typed);
+            IHypermediaAppender<T> appender = resolver.ResolveAppender(typed);
+            List<Link> configured = resolver.ResolveLinks(typed).ToList();
+            Link link = resolver.ResolveSelf(typed);
 
-		    if (link != null)
-			    configured.Insert(0, link);
+            if (link != null)
+                configured.Insert(0, link);
 
-		    if (configured.Count > 0 && (appender != null))
-		    {
-			    if (typed.Links == null)
-				    typed.Links = new List<Link>(); // make sure resource.Links.Add() can safely be called inside the appender
+            if (configured.Count > 0 && (appender != null))
+            {
+                if (typed.Links == null)
+                    typed.Links = new List<Link>(); // make sure resource.Links.Add() can safely be called inside the appender
 
-			    appender.Append(typed, configured);
+                appender.Append(typed, configured);
 
-			    if ((typed.Links != null) && !typed.Links.Any())
-				    typed.Links = null; // prevent _links property serialisation
-			}
-	    }
+                if ((typed.Links != null) && !typed.Links.Any())
+                    typed.Links = null; // prevent _links property serialization
+            }
+        }
 
-	    internal static bool IsEmbeddedResourceType(Type type)
+        internal static bool IsEmbeddedResourceType(Type type)
         {
             return typeof (IResource).IsAssignableFrom(type) ||
                    typeof (IEnumerable<IResource>).IsAssignableFrom(type);
@@ -221,17 +216,17 @@ namespace WebApi.Hal
 
         public void RepopulateHyperMedia()
         {
-			if (Links == null)
-				Links = new List<Link>(); // make sure resource.Links.Add() can safely be called inside the overload
+            if (Links == null)
+                Links = new List<Link>(); // make sure resource.Links.Add() can safely be called inside the overload
 
-			CreateHypermedia();
-			
-			if (!string.IsNullOrEmpty(Href) && Links.Count(l=>l.Rel == "self") == 0)
+            CreateHypermedia();
+
+            if (!string.IsNullOrEmpty(Href) && Links.Count(l=>l.Rel == "self") == 0)
                 Links.Insert(0, new Link { Rel = "self", Href = Href });
-			
-			if ((Links != null) && !Links.Any())
-				Links = null; // prevent _links property serialisation
-		}
+
+            if ((Links != null) && !Links.Any())
+                Links = null; // prevent _links property serialization
+        }
 
         [JsonIgnore]
         public virtual string Rel { get; set; }

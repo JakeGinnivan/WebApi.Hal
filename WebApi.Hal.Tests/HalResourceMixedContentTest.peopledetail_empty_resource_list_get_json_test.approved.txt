@@ -1,0 +1,29 @@
+﻿{
+  "Id": 1,
+  "Name": "Org Name",
+  "_links": {
+    "self": {
+      "href": "/api/organisations/1"
+    },
+    "people": {
+      "href": "/api/organisations/1/people"
+    },
+    "boss": {
+      "href": "/api/organisations/1/boss"
+    }
+  },
+  "_embedded": {
+    "person": [],
+    "boss": {
+      "HasPointyHair": true,
+      "Id": 2,
+      "Name": "Eunice PHB",
+      "OrganisationId": 1,
+      "_links": {
+        "self": {
+          "href": "/api/organisations/1/boss"
+        }
+      }
+    }
+  }
+}

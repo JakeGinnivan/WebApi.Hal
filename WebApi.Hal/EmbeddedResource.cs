@@ -7,5 +7,6 @@ namespace WebApi.Hal
     {
         public bool IsSourceAnArray { get; set; }
         public IList<IResource> Resources { get; private set; } = new List<IResource>();
+        public string RelationName { get; set; }
     }
 }
