@@ -113,5 +113,5 @@ WebApi.Hal*.nupkg
 *.received.txt
 
 .vscode/
-
+.DS_Store
 *~
