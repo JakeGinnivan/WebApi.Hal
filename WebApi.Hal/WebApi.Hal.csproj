@@ -4,13 +4,13 @@
   
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <Version>3.1.0</Version>
-    <PackageVersion>3.1.0</PackageVersion>
+    <Version>3.2.0</Version>
+    <PackageVersion>3.2.0</PackageVersion>
     <Copyright>Copyright © Jake Ginnivan 2018</Copyright>
     <Description>Adds support for the Hal Media Type (and Hypermedia) to Asp.net</Description>
     <ProjectUrl>https://github.com/JakeGinnivan/WebApi.Hal</ProjectUrl>
     <IsPackable>true</IsPackable>
-    <PackageReleaseNotes>3.10 updates to support multithreaded usage</PackageReleaseNotes>
+    <PackageReleaseNotes>3.2.0 ability to mark a link-rel as multi-link to ensure that it always serialzies to an array, even if there's only one link at runtime</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

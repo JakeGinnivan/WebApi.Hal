@@ -1,0 +1,35 @@
+{
+  "Id": 1,
+  "Name": "Org Name",
+  "_links": {
+    "self": {
+      "href": "/api/organisations/1"
+    },
+    "multi-resource": [
+      {
+        "href": "/multi"
+      }
+    ],
+    "single-resource": {
+      "href": "/single"
+    }
+  },
+  "_embedded": {
+    "multi-resource": [
+      {
+        "_links": {
+          "self": {
+            "href": "/multi"
+          }
+        }
+      }
+    ],
+    "single-resource": {
+      "_links": {
+        "self": {
+          "href": "/single"
+        }
+      }
+    }
+  }
+}

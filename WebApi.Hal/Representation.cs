@@ -146,7 +146,10 @@ namespace WebApi.Hal
                 var link = representation.ToLink(resolver);
 
                 if (link != null)
+                {
+                    link.IsMultiLink = true;
                     Links.Add(link); // add a link to embedded to the container ...
+                }
             }
 
             Embedded.Add(embeddedResource);

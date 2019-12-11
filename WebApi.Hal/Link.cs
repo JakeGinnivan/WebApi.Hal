@@ -76,6 +76,7 @@ namespace WebApi.Hal
         public string Name { get; set; }
         public string Profile { get; set; }
         public string HrefLang { get; set; }
+        public bool IsMultiLink { get; set; }
         
         public bool IsTemplated => !string.IsNullOrEmpty(Href) && isTemplatedRegex.IsMatch(Href);
 

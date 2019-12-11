@@ -161,6 +161,7 @@ namespace WebApi.Hal.JsonConverters
                     foreach (var link in arr.Select(item => item.ToObject<Link>()))
                     {
                         link.Rel = rel.Name;
+                        link.IsMultiLink = true;
                         resource.Links.Add(link);
                     }
             }
