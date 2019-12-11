@@ -5,14 +5,12 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Version>3.1.0</Version>
-+    <PackageVersion>3.1.0</PackageVersion>
+    <PackageVersion>3.1.0</PackageVersion>
     <Copyright>Copyright © Jake Ginnivan 2018</Copyright>
     <Description>Adds support for the Hal Media Type (and Hypermedia) to Asp.net</Description>
     <ProjectUrl>https://github.com/JakeGinnivan/WebApi.Hal</ProjectUrl>
     <IsPackable>true</IsPackable>
-    <PackageReleaseNotes>3.10 updates to support multithreaded usage
-+    3.0.0 first .net standard release
-+    </PackageReleaseNotes>
+    <PackageReleaseNotes>3.10 updates to support multithreaded usage</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
