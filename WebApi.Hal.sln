@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Licence.md = Licence.md
 		README.md = README.md
 		Readme.txt = Readme.txt
+		WebApi.Hal.Build\WebApi.Hal.Commons.props = WebApi.Hal.Build\WebApi.Hal.Commons.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.Hal.Web", "WebApi.Hal.Web\WebApi.Hal.Web.csproj", "{29ADB701-A036-4195-8478-2FE393CC7A74}"
