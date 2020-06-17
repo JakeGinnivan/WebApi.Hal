@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using System.IO;
 using Assent;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
@@ -21,7 +22,7 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, new MvcOptions());
 
             // act
             using (var stream = new StringWriter())

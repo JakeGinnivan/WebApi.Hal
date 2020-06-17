@@ -14,11 +14,11 @@ namespace WebApi.Hal.Web
         private readonly JsonSerializerSettings _jsonSerializerSettings;
         private readonly ArrayPool<char> _charPool;
         private readonly ObjectPoolProvider _objectPoolProvider;
-        private readonly MvcJsonOptions _mvcJsonOptions;
+        private readonly MvcNewtonsoftJsonOptions _mvcJsonOptions;
 
         public FormattersMvcOptionsSetup(
             ILoggerFactory loggerFactory,
-            IOptions<MvcJsonOptions> jsonOptions,
+            IOptions<MvcNewtonsoftJsonOptions> jsonOptions,
             ArrayPool<char> charPool,
             ObjectPoolProvider objectPoolProvider)
         {
@@ -37,7 +37,7 @@ namespace WebApi.Hal.Web
         public void Configure(MvcOptions options)
         {
             options.OutputFormatters.Add(new XmlHalMediaTypeOutputFormatter());
-            options.OutputFormatters.Add(new JsonHalMediaTypeOutputFormatter(_jsonSerializerSettings, _charPool));
+            options.OutputFormatters.Add(new JsonHalMediaTypeOutputFormatter(_jsonSerializerSettings, _charPool, options));
 
             // Register JsonPatchInputFormatter before JsonInputFormatter, otherwise
             // JsonInputFormatter would consume "application/json-patch+json" requests

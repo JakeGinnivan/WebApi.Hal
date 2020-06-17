@@ -9,13 +9,13 @@ using WebApi.Hal.JsonConverters;
 
 namespace WebApi.Hal
 {
-    public class JsonHalMediaTypeInputFormatter : JsonInputFormatter
+    public class JsonHalMediaTypeInputFormatter : NewtonsoftJsonInputFormatter
     {
         private readonly LinksConverter _linksConverter = new LinksConverter();
         private readonly ResourceConverter _resourceConverter;
         private readonly EmbeddedResourceConverter _embeddedResourceConverter = new EmbeddedResourceConverter();
 
-        public JsonHalMediaTypeInputFormatter(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, IHypermediaResolver hypermediaResolver, MvcOptions mvcOptions, MvcJsonOptions mvcJsonOptions) 
+        public JsonHalMediaTypeInputFormatter(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, IHypermediaResolver hypermediaResolver, MvcOptions mvcOptions, MvcNewtonsoftJsonOptions mvcJsonOptions) 
             : base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
         {
             if (hypermediaResolver == null)
@@ -27,7 +27,7 @@ namespace WebApi.Hal
             Initialize();
         }
 
-        public JsonHalMediaTypeInputFormatter(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, MvcOptions mvcOptions, MvcJsonOptions mvcJsonOptions) 
+        public JsonHalMediaTypeInputFormatter(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, MvcOptions mvcOptions, MvcNewtonsoftJsonOptions mvcJsonOptions) 
             : base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
         {
             _resourceConverter = new ResourceConverter(SerializerSettings);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
-using System.Reflection;
+using System.IO;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -8,7 +9,7 @@ using WebApi.Hal.JsonConverters;
 
 namespace WebApi.Hal
 {
-    public class JsonHalMediaTypeOutputFormatter : JsonOutputFormatter
+    public class JsonHalMediaTypeOutputFormatter : NewtonsoftJsonOutputFormatter
     {
         private const string _mediaTypeHeaderValueName = "application/hal+json";
 
@@ -19,9 +20,10 @@ namespace WebApi.Hal
 
         public JsonHalMediaTypeOutputFormatter(
             JsonSerializerSettings serializerSettings, 
-            ArrayPool<char> charPool, 
+            ArrayPool<char> charPool,
+            MvcOptions mvcOptions,
             IHypermediaResolver hypermediaResolver) : 
-            base(serializerSettings, charPool)
+            base(serializerSettings, charPool, mvcOptions)
         {
             if (hypermediaResolver == null)
             {
@@ -34,11 +36,17 @@ namespace WebApi.Hal
 
         public JsonHalMediaTypeOutputFormatter(
             JsonSerializerSettings serializerSettings, 
-            ArrayPool<char> charPool) :
-            base(serializerSettings, charPool)
+            ArrayPool<char> charPool,
+            MvcOptions mvcOptions) :
+            base(serializerSettings, charPool, mvcOptions)
         {
             _resourceConverter = new ResourceConverter(SerializerSettings);
             Initialize();
+        }
+
+        public void WriteObject(TextWriter stream, object value)
+        {
+            CreateJsonSerializer().Serialize(stream, value);
         }
 
         private void Initialize()

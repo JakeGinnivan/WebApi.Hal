@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 using Assent;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.ObjectPool;
 using Newtonsoft.Json;
@@ -41,7 +39,7 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, new MvcOptions());
 
             // act
             using (var stream = new StringWriter())
@@ -71,7 +69,7 @@ namespace WebApi.Hal.Tests
             };
 
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, new MvcOptions());
 
             // act
             using (var stream = new StringWriter())
@@ -96,7 +94,7 @@ namespace WebApi.Hal.Tests
             };
 
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, new MvcOptions());
 
             // act
             using (var stream = new StringWriter())
@@ -137,7 +135,7 @@ namespace WebApi.Hal.Tests
                 new JsonSerializerSettings { Formatting = Formatting.Indented },
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
-                new MvcOptions(), new MvcJsonOptions());
+                new MvcOptions(), new MvcNewtonsoftJsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -181,7 +179,7 @@ namespace WebApi.Hal.Tests
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcJsonOptions());
+                new MvcNewtonsoftJsonOptions());
 
             var type = typeof(OrganisationWithPeopleRepresentation);
             const string json = @"
@@ -243,7 +241,7 @@ namespace WebApi.Hal.Tests
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcJsonOptions());
+                new MvcNewtonsoftJsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -294,7 +292,7 @@ namespace WebApi.Hal.Tests
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcJsonOptions());
+                new MvcNewtonsoftJsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -349,7 +347,7 @@ namespace WebApi.Hal.Tests
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcJsonOptions());
+                new MvcNewtonsoftJsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -402,7 +400,7 @@ namespace WebApi.Hal.Tests
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcJsonOptions());
+                new MvcNewtonsoftJsonOptions());
 
             var type = typeof(MySimpleList);
             const string json = @"
@@ -448,16 +446,9 @@ namespace WebApi.Hal.Tests
             }
         }
 
-        public static IModelMetadataProvider CreateDefaultProvider()
+        public static ModelMetadataProvider CreateDefaultProvider()
         {
-            var detailsProviders = new IMetadataDetailsProvider[]
-            {
-                new DefaultBindingMetadataProvider(),
-                new DefaultValidationMetadataProvider()
-            };
-
-            var compositeDetailsProvider = new DefaultCompositeMetadataDetailsProvider(detailsProviders);
-            return new DefaultModelMetadataProvider(compositeDetailsProvider);
+            return new EmptyModelMetadataProvider();
         }
     }
 }
