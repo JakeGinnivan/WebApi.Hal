@@ -58,7 +58,7 @@ namespace WebApi.Hal
             var settings = new XmlWriterSettings
             {
                 Indent = true,
-                Encoding = Encoding.UTF8
+                Encoding = writer.Encoding
             };
             using (var xmlWriter = XmlWriter.Create(writer, settings))
             {
@@ -70,7 +70,8 @@ namespace WebApi.Hal
         private void Initialize()
         {
             SupportedMediaTypes.Add(new MediaTypeHeaderValue(_mediaTypeHeaderValueName));
-        }
+            SupportedEncodings.Add(Encoding.UTF8);
+    }
         
         /// <summary>
         /// ReadHalResource will
