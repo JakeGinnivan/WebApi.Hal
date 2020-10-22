@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using System.IO;
 using Assent;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using WebApi.Hal.Tests.HypermediaAppenders;
 using WebApi.Hal.Tests.Representations;
@@ -51,7 +52,7 @@ namespace WebApi.Hal.Tests
 
             var config = builder.Build();
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, config);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, new MvcOptions(), config);
 
             // act
             using (var stream = new StringWriter())
@@ -72,7 +73,7 @@ namespace WebApi.Hal.Tests
 			var builder = Hypermedia.CreateBuilder();
 			var config = builder.Build();
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, config);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, new MvcOptions(), config);
 
             // act
             using (var stream = new StringWriter())
