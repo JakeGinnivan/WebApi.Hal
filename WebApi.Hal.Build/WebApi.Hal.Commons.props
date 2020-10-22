@@ -6,9 +6,9 @@
 
     <Company>Jake Ginnivan</Company>
     <Description>Enabled Hypermedia support in Asp.net Web API using the HAL mediatype</Description>
-    <Copyright>Copyright © Jake Ginnvan 2012</Copyright>
+    <Copyright>Copyright © Jake Ginnvan 2020</Copyright>
     <PackageProjectUrl>https://github.com/JakeGinnivan/WebApi.Hal</PackageProjectUrl>
-    <PackageLicenseUrl>$(PackageProjectUrl)/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageLicense>$(PackageProjectUrl)/blob/master/LICENSE.md</PackageLicense>
     <PackageReleaseNotes>$(PackageProjectUrl)/releases</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 

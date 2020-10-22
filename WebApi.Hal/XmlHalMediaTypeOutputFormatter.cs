@@ -14,7 +14,7 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    public class XmlHalMediaTypeOutputFormatter : OutputFormatter
+    public class XmlHalMediaTypeOutputFormatter : TextOutputFormatter
     {
         private const string _mediaTypeHeaderValueName = "application/hal+xml";
         
@@ -23,7 +23,7 @@ namespace WebApi.Hal
             Initialize();
         }
         
-        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             if (context == null)
             {
@@ -32,9 +32,8 @@ namespace WebApi.Hal
             
             var response = context.HttpContext.Response;
             var contentType = context.ContentType;
-            var encoding = (contentType.HasValue ? (Encoding)Enum.Parse(typeof(Encoding), contentType.Value) : null) ?? Encoding.UTF8;
             var memoryStream = new MemoryStream();
-            using (var textWriter = context.WriterFactory(memoryStream, encoding))
+            using (var textWriter = context.WriterFactory(memoryStream, selectedEncoding))
             {
                 WriteObject(textWriter, context.Object);
                 await textWriter.FlushAsync();
@@ -59,7 +58,7 @@ namespace WebApi.Hal
             var settings = new XmlWriterSettings
             {
                 Indent = true,
-                Encoding = Encoding.UTF8
+                Encoding = writer.Encoding
             };
             using (var xmlWriter = XmlWriter.Create(writer, settings))
             {
@@ -71,7 +70,8 @@ namespace WebApi.Hal
         private void Initialize()
         {
             SupportedMediaTypes.Add(new MediaTypeHeaderValue(_mediaTypeHeaderValueName));
-        }
+            SupportedEncodings.Add(Encoding.UTF8);
+    }
         
         /// <summary>
         /// ReadHalResource will

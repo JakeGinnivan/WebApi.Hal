@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using WebApi.Hal.Web.Data;
 
@@ -14,7 +16,7 @@ namespace WebApi.Hal.Web
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment hostingEnvironment)
+        public Startup(IWebHostEnvironment hostingEnvironment)
         {
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(hostingEnvironment.ContentRootPath)
@@ -30,14 +32,15 @@ namespace WebApi.Hal.Web
         {
             services
                 .AddMvcCore()
-                .AddJsonFormatters(
+                .AddNewtonsoftJson(
                     options =>
                     {
-                        options.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-                        options.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                     })
                 .AddApiExplorer()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddControllers();
 
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, FormattersMvcOptionsSetup>());
@@ -46,20 +49,22 @@ namespace WebApi.Hal.Web
             services.AddScoped<IBeerDbContext, BeerDbContext>();
             services.AddScoped<IRepository, BeerRepository>();
 
+            services.AddLogging(options =>
+            {
+                options.AddConsole();
+            });
+
             services.AddSwaggerGen(
                 options =>
                 {
-                    options.DescribeAllEnumsAsStrings();
-                    options.SwaggerDoc("v1", new Info {Title = "WebApi.Hal Demo API", Version = "v1"});
+                    options.SwaggerDoc("v1", new OpenApiInfo {Title = "WebApi.Hal Demo API", Version = "v1"});
                     options.CustomSchemaIds(type => type.FullName);
                 });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, BeerDbContext beerDbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, BeerDbContext beerDbContext)
         {
-            loggerFactory.AddConsole();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -70,7 +75,12 @@ namespace WebApi.Hal.Web
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi.Hal Demo API V1"); });
 
-            app.UseMvc();
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }
