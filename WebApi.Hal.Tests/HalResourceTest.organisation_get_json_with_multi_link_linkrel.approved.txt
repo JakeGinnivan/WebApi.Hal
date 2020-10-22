@@ -1,0 +1,31 @@
+{
+  "Id": 1,
+  "Name": "Org Name",
+  "_links": {
+    "multi-rel-with-single-link": [
+      {
+        "href": "/api/organisations/test"
+      }
+    ],
+    "multi-rel-with-multiple-links": [
+      {
+        "href": "/api/organisations/test1"
+      },
+      {
+        "href": "/api/organisations/test2"
+      }
+    ],
+    "multi-rel-with-multiple-links-with-is-multilink-false": [
+      {
+        "href": "/api/organisations/test-f1"
+      },
+      {
+        "href": "/api/organisations/test-f2"
+      }
+    ],
+    "somerel": {
+      "href": "someHref",
+      "title": "someTitle"
+    }
+  }
+}

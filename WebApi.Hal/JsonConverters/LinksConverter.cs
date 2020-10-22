@@ -24,13 +24,15 @@ namespace WebApi.Hal.JsonConverters
 
                 writer.WritePropertyName(rel.Key);
                 
-                if ((count > 1) || (rel.Key == Link.RelForCuries))
+                bool serializeAsArray = (count > 1) || (rel.Any(l => l.IsMultiLink)) || (rel.Key == Link.RelForCuries);
+
+                if (serializeAsArray)
                     writer.WriteStartArray();
 
                 foreach (var link in rel)
                     WriteLink(writer, link);
 
-                if ((count > 1) || (rel.Key == Link.RelForCuries))
+                if ((count > 1) || (rel.Any(l => l.IsMultiLink)) || (rel.Key == Link.RelForCuries))
                     writer.WriteEndArray();
             }
 

@@ -3,9 +3,11 @@
     "self": {
       "href": "/api/organisations"
     },
-    "organisation": {
-      "href": "/api/organisations/1"
-    }
+    "organisation": [
+      {
+        "href": "/api/organisations/1"
+      }
+    ]
   },
   "_embedded": {
     "organisation": [
