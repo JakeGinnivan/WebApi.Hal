@@ -115,3 +115,7 @@ WebApi.Hal*.nupkg
 .vscode/
 .DS_Store
 *~
+*.bak
+
+beer.db
+
