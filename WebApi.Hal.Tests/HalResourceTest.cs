@@ -125,7 +125,8 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared,
+                new MvcOptions());
             var resourceWithAppPath = new OrganisationWithLinkTitleRepresentation(1, "Org Name");
             resourceWithAppPath.Links.Add(new Link("multi-rel-with-single-link", "~/api/organisations/test")
             {
@@ -174,7 +175,8 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared,
+                new MvcOptions());
             var org = new OrganisationRepresentationWithEmbeddedResources(1, "Org Name");
 
             org.EmbeddedSingleResource = new TestRepresentation
@@ -202,7 +204,7 @@ namespace WebApi.Hal.Tests
 
         private class JsonHalMediaTypeInputFormatterWithCreateSerializer : JsonHalMediaTypeInputFormatter
         {
-            public JsonHalMediaTypeInputFormatterWithCreateSerializer(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, MvcOptions mvcOptions, MvcJsonOptions mvcJsonOptions) 
+            public JsonHalMediaTypeInputFormatterWithCreateSerializer(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, MvcOptions mvcOptions, MvcNewtonsoftJsonOptions mvcJsonOptions) 
                 : base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
             {
             }
@@ -218,7 +220,8 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared);
+                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared,
+                new MvcOptions());
             var resourceWithAppPath = new OrganisationWithLinkTitleRepresentation(1, "Org Name");
             resourceWithAppPath.Links.Add(new Link("multi-rel-with-single-link", "~/api/organisations/test")
             {
@@ -248,7 +251,7 @@ namespace WebApi.Hal.Tests
             var inputFormatter = new JsonHalMediaTypeInputFormatterWithCreateSerializer(
                 NullLogger.Instance,
                 new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared,
-                new DefaultObjectPoolProvider(), new MvcOptions(), new MvcJsonOptions());
+                new DefaultObjectPoolProvider(), new MvcOptions(), new MvcNewtonsoftJsonOptions());
             var inputSerializer = inputFormatter.CreateJsonSerializer();
             using (var stream = new StringReader(serialisedResource))
             {
