@@ -20,7 +20,7 @@
     <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup>
-      <Major>3</Major>
+      <Major>6</Major>
       <Minor>0</Minor>
       <Revision>0</Revision>
 

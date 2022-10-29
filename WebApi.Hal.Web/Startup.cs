@@ -38,8 +38,7 @@ namespace WebApi.Hal.Web
                         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                     })
-                .AddApiExplorer()
-                .SetCompatibilityVersion(CompatibilityVersion.Latest);
+                .AddApiExplorer();
             services.AddControllers();
 
             services.TryAddEnumerable(
