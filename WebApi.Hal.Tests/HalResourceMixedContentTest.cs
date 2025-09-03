@@ -278,7 +278,7 @@ namespace WebApi.Hal.Tests
                 Assert.NotNull(org);
                 Assert.NotNull(org.Boss);
                 Assert.Single(org.People);
-                Assert.Equal(1, org.Boss.Links.Count);
+                Assert.Single(org.Boss.Links);
             }
         }
 
@@ -333,7 +333,7 @@ namespace WebApi.Hal.Tests
                 Assert.NotNull(org);
                 Assert.NotNull(org.Boss);
                 Assert.Equal(2, org.People.Count);
-                Assert.Equal(1, org.Boss.Links.Count);
+                Assert.Single(org.Boss.Links);
             }
         }
 
