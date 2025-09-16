@@ -23,7 +23,7 @@ namespace WebApi.Hal
             ArrayPool<char> charPool,
             MvcOptions mvcOptions,
             IHypermediaResolver hypermediaResolver) : 
-            base(serializerSettings, charPool, mvcOptions)
+            base(serializerSettings, charPool, mvcOptions, null)
         {
             if (hypermediaResolver == null)
             {
@@ -38,7 +38,7 @@ namespace WebApi.Hal
             JsonSerializerSettings serializerSettings, 
             ArrayPool<char> charPool,
             MvcOptions mvcOptions) :
-            base(serializerSettings, charPool, mvcOptions)
+            base(serializerSettings, charPool, mvcOptions, null)
         {
             _resourceConverter = new ResourceConverter(SerializerSettings);
             Initialize();
