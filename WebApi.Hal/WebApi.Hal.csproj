@@ -3,7 +3,7 @@
   <Import Project=".\..\WebApi.Hal.Build\WebApi.Hal.Commons.props" />
   
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Version>4.0.1</Version>
     <PackageVersion>4.0.1</PackageVersion>
     <Copyright>Copyright © Jake Ginnivan 2020</Copyright>
