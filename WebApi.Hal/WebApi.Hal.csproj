@@ -5,7 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Version>8.0.0</Version>
-    <PackageVersion>8.0.0-prerelease</PackageVersion>
+    <PackageVersion>8.0.0</PackageVersion>
     <Copyright>Copyright © Jake Ginnivan 2020</Copyright>
     <Description>Adds support for the Hal Media Type (and Hypermedia) to Asp.net</Description>
     <ProjectUrl>https://github.com/JakeGinnivan/WebApi.Hal</ProjectUrl>

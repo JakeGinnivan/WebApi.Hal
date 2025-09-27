@@ -29,7 +29,7 @@
       <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
 
       <!-- Remove for release -->
-      <PrereleaseLabel>-pre</PrereleaseLabel>
+      <PrereleaseLabel></PrereleaseLabel>
 
       <BuildSuffix Condition=" '$(PrereleaseLabel)' != '' ">$(PrereleaseLabel)-$(BuildNumber)</BuildSuffix>
       <BuildSuffix Condition=" '$(BuildSuffix)' == '' "></BuildSuffix>
