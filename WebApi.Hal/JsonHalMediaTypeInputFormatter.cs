@@ -1,45 +1,45 @@
 using System;
 using System.Buffers;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
-using Newtonsoft.Json;
 using WebApi.Hal.JsonConverters;
 
 namespace WebApi.Hal
 {
-    public class JsonHalMediaTypeInputFormatter : NewtonsoftJsonInputFormatter
+    public class JsonHalMediaTypeInputFormatter : SystemTextJsonInputFormatter
     {
         private readonly LinksConverter _linksConverter = new LinksConverter();
         private readonly ResourceConverter _resourceConverter;
         private readonly EmbeddedResourceConverter _embeddedResourceConverter = new EmbeddedResourceConverter();
 
-        public JsonHalMediaTypeInputFormatter(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, IHypermediaResolver hypermediaResolver, MvcOptions mvcOptions, MvcNewtonsoftJsonOptions mvcJsonOptions) 
-            : base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
+        public JsonHalMediaTypeInputFormatter(ILogger<JsonHalMediaTypeInputFormatter> logger, JsonSerializerOptions serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, IHypermediaResolver hypermediaResolver, MvcOptions mvcOptions, JsonOptions mvcJsonOptions) 
+            : base(mvcJsonOptions, logger) //, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
         {
             if (hypermediaResolver == null)
             {
                 throw new ArgumentNullException(nameof(hypermediaResolver));
             }
 
-            _resourceConverter = new ResourceConverter(hypermediaResolver, SerializerSettings);
+            _resourceConverter = new ResourceConverter(hypermediaResolver, SerializerOptions);
             Initialize();
         }
 
-        public JsonHalMediaTypeInputFormatter(ILogger logger, JsonSerializerSettings serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, MvcOptions mvcOptions, MvcNewtonsoftJsonOptions mvcJsonOptions) 
-            : base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
+        public JsonHalMediaTypeInputFormatter(ILogger<JsonHalMediaTypeInputFormatter> logger, JsonSerializerOptions serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, MvcOptions mvcOptions, JsonOptions mvcJsonOptions)
+            : base(mvcJsonOptions, logger) //: base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
         {
-            _resourceConverter = new ResourceConverter(SerializerSettings);
+            _resourceConverter = new ResourceConverter(SerializerOptions);
             Initialize();
         }
 
         private void Initialize()
         {
-            SerializerSettings.Converters.Add(_linksConverter);
-            SerializerSettings.Converters.Add(_resourceConverter);
-            SerializerSettings.Converters.Add(_embeddedResourceConverter);
-            SerializerSettings.NullValueHandling = NullValueHandling.Include;
+            SerializerOptions.Converters.Add(_linksConverter);
+            SerializerOptions.Converters.Add(_resourceConverter);
+            SerializerOptions.Converters.Add(_embeddedResourceConverter);
+            //SerializerOptions.NullValueHandling = NullValueHandling.Include;
         }
     }
 }

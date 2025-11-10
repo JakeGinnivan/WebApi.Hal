@@ -1,16 +1,17 @@
-﻿using System.Buffers;
+﻿using Assent;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.ObjectPool;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Assent;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.ObjectPool;
-using Newtonsoft.Json;
 using WebApi.Hal.Tests.Representations;
 using Xunit;
 
@@ -39,7 +40,7 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, new MvcOptions());
+                new JsonSerializerOptions { WriteIndented = true }, ArrayPool<char>.Shared, new MvcOptions());
 
             // act
             using (var stream = new StringWriter())
@@ -69,7 +70,7 @@ namespace WebApi.Hal.Tests
             };
 
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, new MvcOptions());
+                new JsonSerializerOptions { WriteIndented = true }, ArrayPool<char>.Shared, new MvcOptions());
 
             // act
             using (var stream = new StringWriter())
@@ -94,7 +95,7 @@ namespace WebApi.Hal.Tests
             };
 
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerSettings { Formatting = Formatting.Indented }, ArrayPool<char>.Shared, new MvcOptions());
+                new JsonSerializerOptions { WriteIndented = true }, ArrayPool<char>.Shared, new MvcOptions());
 
             // act
             using (var stream = new StringWriter())
@@ -131,11 +132,11 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeInputFormatter(
-                NullLogger.Instance,
-                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                new NullLoggerFactory().CreateLogger<JsonHalMediaTypeInputFormatter>(),
+                new JsonSerializerOptions { WriteIndented = true },
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
-                new MvcOptions(), new MvcNewtonsoftJsonOptions());
+                new MvcOptions(), new JsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -174,12 +175,12 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeInputFormatter(
-                NullLogger.Instance,
-                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                new NullLoggerFactory().CreateLogger<JsonHalMediaTypeInputFormatter>(),
+                new System.Text.Json.JsonSerializerOptions { WriteIndented = true },
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcNewtonsoftJsonOptions());
+                new JsonOptions());
 
             var type = typeof(OrganisationWithPeopleRepresentation);
             const string json = @"
@@ -236,12 +237,12 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeInputFormatter(
-                NullLogger.Instance,
-                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                new NullLoggerFactory().CreateLogger<JsonHalMediaTypeInputFormatter>(),
+                new JsonSerializerOptions { WriteIndented = true },
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcNewtonsoftJsonOptions());
+                new JsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -287,12 +288,12 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeInputFormatter(
-                NullLogger.Instance,
-                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                new NullLoggerFactory().CreateLogger<JsonHalMediaTypeInputFormatter>(),
+                new JsonSerializerOptions { WriteIndented = true },
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcNewtonsoftJsonOptions());
+                new JsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -342,12 +343,12 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeInputFormatter(
-                NullLogger.Instance,
-                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                new NullLoggerFactory().CreateLogger<JsonHalMediaTypeInputFormatter>(),
+                new JsonSerializerOptions { WriteIndented = true },
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcNewtonsoftJsonOptions());
+                new JsonOptions());
 
             var type = typeof(OrganisationWithPeopleDetailRepresentation);
             const string json = @"
@@ -395,12 +396,12 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeInputFormatter(
-                NullLogger.Instance,
-                new JsonSerializerSettings { Formatting = Formatting.Indented },
+                new NullLoggerFactory().CreateLogger<JsonHalMediaTypeInputFormatter>(),
+                new JsonSerializerOptions { WriteIndented = true },
                 ArrayPool<char>.Shared,
                 new DefaultObjectPoolProvider(),
                 new MvcOptions(), 
-                new MvcNewtonsoftJsonOptions());
+                new JsonOptions());
 
             var type = typeof(MySimpleList);
             const string json = @"

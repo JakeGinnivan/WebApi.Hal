@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using WebApi.Hal.Interfaces;
 using WebApi.Hal.JsonConverters;
 
@@ -13,7 +13,7 @@ namespace WebApi.Hal
     {
         public IList<Link> Links { get; set; } = new List<Link>();
 
-        [JsonProperty("_embedded")]
+        [JsonPropertyName("_embedded")]
         private IList<EmbeddedResource> Embedded { get; set; }
 
         [JsonIgnore]

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using WebApi.Hal.JsonConverters;
 
 namespace WebApi.Hal.Interfaces
@@ -15,7 +15,7 @@ namespace WebApi.Hal.Interfaces
         [JsonIgnore]
         string LinkName { get; set; }
 
-        [JsonProperty("_links")]
+        [JsonPropertyName("_links")]
         IList<Link> Links { get; set; }
 
         [JsonIgnore]

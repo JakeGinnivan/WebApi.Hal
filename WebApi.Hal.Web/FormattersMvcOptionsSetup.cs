@@ -1,24 +1,22 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace WebApi.Hal.Web
 {
     public class FormattersMvcOptionsSetup : IConfigureOptions<MvcOptions>
     {
         private readonly ILoggerFactory _loggerFactory;
-        private readonly JsonSerializerSettings _jsonSerializerSettings;
+        private readonly JsonSerializerOptions _jsonSerializerSettings;
         private readonly ArrayPool<char> _charPool;
         private readonly ObjectPoolProvider _objectPoolProvider;
-        private readonly MvcNewtonsoftJsonOptions _mvcJsonOptions;
+        private readonly JsonOptions _mvcJsonOptions;
 
         public FormattersMvcOptionsSetup(
             ILoggerFactory loggerFactory,
-            IOptions<MvcNewtonsoftJsonOptions> jsonOptions,
+            IOptions<JsonOptions> jsonOptions,
             ArrayPool<char> charPool,
             ObjectPoolProvider objectPoolProvider)
         {
@@ -28,7 +26,7 @@ namespace WebApi.Hal.Web
             }
 
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _jsonSerializerSettings = jsonOptions.Value.SerializerSettings;
+            _jsonSerializerSettings = jsonOptions.Value.JsonSerializerOptions;
             _charPool = charPool ?? throw new ArgumentNullException(nameof(charPool));
             _objectPoolProvider = objectPoolProvider ?? throw new ArgumentNullException(nameof(objectPoolProvider));
             _mvcJsonOptions = jsonOptions.Value;
@@ -46,7 +44,7 @@ namespace WebApi.Hal.Web
             var jsonInputPatchLogger = _loggerFactory.CreateLogger<JsonHalMediaTypeInputFormatter>();
             options.InputFormatters.Add(new JsonHalMediaTypeInputFormatter(
                                             jsonInputPatchLogger,
-                                            new JsonSerializerSettings(),
+                                            new JsonSerializerOptions(),
                                             _charPool,
                                             _objectPoolProvider,
                                             options, 

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Buffers;
 using System.IO;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
 using WebApi.Hal.JsonConverters;
+using MediaTypeHeaderValue = Microsoft.Net.Http.Headers.MediaTypeHeaderValue;
 
 namespace WebApi.Hal
 {
-    public class JsonHalMediaTypeOutputFormatter : NewtonsoftJsonOutputFormatter
+    public class JsonHalMediaTypeOutputFormatter : SystemTextJsonOutputFormatter
     {
         private const string _mediaTypeHeaderValueName = "application/hal+json";
 
@@ -19,28 +19,28 @@ namespace WebApi.Hal
         private readonly EmbeddedResourceConverter _embeddedResourceConverter = new EmbeddedResourceConverter();
 
         public JsonHalMediaTypeOutputFormatter(
-            JsonSerializerSettings serializerSettings, 
+            JsonSerializerOptions serializerSettings, 
             ArrayPool<char> charPool,
             MvcOptions mvcOptions,
             IHypermediaResolver hypermediaResolver) : 
-            base(serializerSettings, charPool, mvcOptions, null)
+            base(serializerSettings)
         {
             if (hypermediaResolver == null)
             {
                 throw new ArgumentNullException(nameof(hypermediaResolver));
             }
 
-            _resourceConverter = new ResourceConverter(hypermediaResolver, SerializerSettings);
+            _resourceConverter = new ResourceConverter(hypermediaResolver, SerializerOptions);
             Initialize();
         }
 
         public JsonHalMediaTypeOutputFormatter(
-            JsonSerializerSettings serializerSettings, 
+            JsonSerializerOptions serializerSettings, 
             ArrayPool<char> charPool,
             MvcOptions mvcOptions) :
-            base(serializerSettings, charPool, mvcOptions, null)
+            base(serializerSettings)
         {
-            _resourceConverter = new ResourceConverter(SerializerSettings);
+            _resourceConverter = new ResourceConverter(SerializerOptions);
             Initialize();
         }
 
@@ -52,10 +52,10 @@ namespace WebApi.Hal
         private void Initialize()
         {
             SupportedMediaTypes.Add(new MediaTypeHeaderValue(_mediaTypeHeaderValueName));
-            SerializerSettings.Converters.Add(_linksConverter);
-            SerializerSettings.Converters.Add(_resourceConverter);
-            SerializerSettings.Converters.Add(_embeddedResourceConverter);
-            SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            SerializerOptions.Converters.Add(_linksConverter);
+            SerializerOptions.Converters.Add(_resourceConverter);
+            SerializerOptions.Converters.Add(_embeddedResourceConverter);
+            //SerializerOptions. NullValueHandling = NullValueHandling.Ignore;
         }
         
         protected override bool CanWriteType(Type type)

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30204.135
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11201.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.Hal", "WebApi.Hal\WebApi.Hal.csproj", "{8A01C801-D7E6-4ACB-A843-7C3EFB7833F7}"
 EndProject
@@ -10,9 +10,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49D37B92-06F0-42CD-A7DC-BE364126532D}"
 	ProjectSection(SolutionItems) = preProject
 		Licence.md = Licence.md
+		WebApi.Hal.Build\Directory.Build.props = WebApi.Hal.Build\Directory.Build.props
 		README.md = README.md
 		Readme.txt = Readme.txt
-		WebApi.Hal.Build\WebApi.Hal.Commons.props = WebApi.Hal.Build\WebApi.Hal.Commons.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.Hal.Web", "WebApi.Hal.Web\WebApi.Hal.Web.csproj", "{29ADB701-A036-4195-8478-2FE393CC7A74}"

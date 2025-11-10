@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace WebApi.Hal.JsonConverters
 {
-    public class EmbeddedResourceConverter : JsonConverter
+    public class EmbeddedResourceConverter : JsonConverter<IList<EmbeddedResource>>
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override bool CanConvert(Type objectType)
         {
-            var resourceList = (IList<EmbeddedResource>)value;
-           
+            return typeof(IList<EmbeddedResource>).IsAssignableFrom(objectType);
+        }
+
+        public override IList<EmbeddedResource> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(Utf8JsonWriter writer, IList<EmbeddedResource> resourceList, JsonSerializerOptions options)
+        {
             writer.WriteStartObject();
 
             foreach (var rel in resourceList)
@@ -19,7 +28,7 @@ namespace WebApi.Hal.JsonConverters
                 if (rel.IsSourceAnArray)
                     writer.WriteStartArray();
                 foreach (var res in rel.Resources)
-                    serializer.Serialize(writer, res);
+                    writer.WriteStringValue(res.ToString()); // TODO: Implement proper serialization for IResource
                 if (rel.IsSourceAnArray)
                     writer.WriteEndArray();
             }
@@ -31,17 +40,5 @@ namespace WebApi.Hal.JsonConverters
                 ? relation.RelationName
                 : $"unknownRel-{relation.Resources.FirstOrDefault()?.GetType().Name ?? string.Empty}";
 
-        public override bool CanRead => false;
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
-                                        JsonSerializer serializer)
-        {
-            return reader.Value;
-        }
-
-        public override bool CanConvert(Type objectType)
-        {
-            return typeof(IList<EmbeddedResource>).IsAssignableFrom(objectType);
-        }
     }
 }

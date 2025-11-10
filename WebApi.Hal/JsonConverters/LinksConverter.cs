@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace WebApi.Hal.JsonConverters
 {
-    public class LinksConverter : JsonConverter
+    internal sealed class LinksConverter : JsonConverter<IList<Link>>
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, IList<Link> value, JsonSerializerOptions options)
         {
-            var links = new HashSet<Link>((IList<Link>)value, Link.EqualityComparer);
+            if (value is null)
+            {
+                writer.WriteNullValue();
+                return;
+            }
+            var links = new HashSet<Link>(value, Link.EqualityComparer);
             var lookup = links.ToLookup(l => l.Rel);
-            
-            if (lookup.Count == 0) 
+
+            if (lookup.Count == 0)
                 return;
 
             writer.WriteStartObject();
@@ -23,7 +28,7 @@ namespace WebApi.Hal.JsonConverters
                 var count = rel.Count();
 
                 writer.WritePropertyName(rel.Key);
-                
+
                 bool serializeAsArray = (count > 1) || (rel.Any(l => l.IsMultiLink)) || (rel.Key == Link.RelForCuries);
 
                 if (serializeAsArray)
@@ -39,7 +44,19 @@ namespace WebApi.Hal.JsonConverters
             writer.WriteEndObject();
         }
 
-        void WriteLink(JsonWriter writer, Link link)
+        public override IList<Link> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType is JsonTokenType.Null)
+            {
+                return null;
+            }
+
+            // TODO check this works!
+            var list = JsonSerializer.Deserialize<IList<Link>>(ref reader, options);
+            return list;
+        }
+
+        void WriteLink(Utf8JsonWriter writer, Link link)
         {
             writer.WriteStartObject();
 
@@ -49,7 +66,7 @@ namespace WebApi.Hal.JsonConverters
                 {
                     case "href":
                         writer.WritePropertyName("href");
-                        writer.WriteValue(ResolveUri(link.Href));
+                        writer.WriteStringValue(ResolveUri(link.Href));
                         break;
                     case "rel":
                         // do nothing ...
@@ -58,7 +75,7 @@ namespace WebApi.Hal.JsonConverters
                         if (link.IsTemplated)
                         {
                             writer.WritePropertyName("templated");
-                            writer.WriteValue(true);
+                            writer.WriteBooleanValue(true);
                         }
                         break;
                     default:
@@ -70,7 +87,7 @@ namespace WebApi.Hal.JsonConverters
                                 continue; // no value set, so don't write this property ...
 
                             writer.WritePropertyName(info.Name.ToLowerInvariant());
-                            writer.WriteValue(text);
+                            writer.WriteStringValue(text);
                         }
                         // else: no sensible way to serialize ...
                         break;
@@ -80,22 +97,7 @@ namespace WebApi.Hal.JsonConverters
             writer.WriteEndObject();
         }
 
-        public override bool CanRead
-        {
-            get { return false; }
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            return reader.Value;
-        }
-
-        public override bool CanConvert(Type objectType)
-        {
-            return typeof(IList<Link>).IsAssignableFrom(objectType);
-        }
-
-        public virtual string ResolveUri(string href)
+        private string ResolveUri(string href)
         {
             if (!string.IsNullOrEmpty(href) && href.StartsWith("~"))
                 return href.Replace("~/", "/");

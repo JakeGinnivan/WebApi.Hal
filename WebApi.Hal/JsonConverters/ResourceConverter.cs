@@ -3,22 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal.JsonConverters
 {
-    public class ResourceConverter : JsonConverter
+    public class ResourceConverter : JsonConverter<IResource>
     {
-        private readonly JsonSerializerSettings _jsonSerializerSettings;
+        private readonly JsonSerializerOptions _jsonSerializerSettings;
 
-        public ResourceConverter(JsonSerializerSettings jsonSerializerSettings)
+        public ResourceConverter(JsonSerializerOptions jsonSerializerSettings) : base(jsonSerializerSettings)
         {
             _jsonSerializerSettings = jsonSerializerSettings;
         }
 
-        public ResourceConverter(IHypermediaResolver hypermediaConfiguration, JsonSerializerSettings jsonSerializerSettings) : this(jsonSerializerSettings)
+        public ResourceConverter(IHypermediaResolver hypermediaConfiguration, JsonSerializerOptions jsonSerializerSettings) : this(jsonSerializerSettings)
         {
             if (hypermediaConfiguration == null)
             {
@@ -39,7 +39,14 @@ namespace WebApi.Hal.JsonConverters
             return context;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+
+
+        public override IResource Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(Utf8JsonWriter writer, IResource value, JsonSerializerOptions options)
         {
             var resource = (IResource)value;
 			var linksBackup = resource.Links;
@@ -48,7 +55,7 @@ namespace WebApi.Hal.JsonConverters
                 resource.Links = null; // avoid serialization
 
             resource.ConverterContext = GetResourceConverterContext();
-
+            /*
             var localJsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
             {
                 CheckAdditionalContent = _jsonSerializerSettings.CheckAdditionalContent,
@@ -82,17 +89,14 @@ namespace WebApi.Hal.JsonConverters
                 TypeNameHandling = _jsonSerializerSettings.TypeNameHandling
             });
             localJsonSerializer.Serialize(writer, resource);
+            */
+            
+            writer.WriteRawValue(JsonSerializer.Serialize(resource, resource.GetType(), _jsonSerializerSettings));
 
             if (linksBackup.Count == 0)
                 resource.Links = linksBackup;
 		}
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
-                                        JsonSerializer serializer)
-        {
-            // let exceptions leak out of here so ordinary exception handling in the server or client pipeline can take place
-            return CreateResource(JObject.Load(reader), objectType);
-        }
 
         private const string HalLinksName = "_links";
         private const string HalEmbeddedName = "_embedded";
