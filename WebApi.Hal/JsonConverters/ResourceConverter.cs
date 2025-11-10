@@ -9,38 +9,19 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal.JsonConverters
 {
-    public class ResourceConverter : JsonConverter<IResource>
+    public class ResourceConverter(IHypermediaResolver hypermediaConfiguration) : JsonConverter<IResource>
     {
-        private readonly JsonSerializerOptions _jsonSerializerSettings;
-
-        public ResourceConverter(JsonSerializerOptions jsonSerializerSettings) : base(jsonSerializerSettings)
-        {
-            _jsonSerializerSettings = jsonSerializerSettings;
-        }
-
-        public ResourceConverter(IHypermediaResolver hypermediaConfiguration, JsonSerializerOptions jsonSerializerSettings) : this(jsonSerializerSettings)
-        {
-            if (hypermediaConfiguration == null)
-            {
-                throw new ArgumentNullException(nameof(hypermediaConfiguration));
-            }
-
-            HypermediaResolver = hypermediaConfiguration;
-        }
-
-        public IHypermediaResolver HypermediaResolver { get; }
+        public IHypermediaResolver HypermediaResolver { get; } = hypermediaConfiguration ?? throw new ArgumentNullException(nameof(hypermediaConfiguration));
 
         private HalJsonConverterContext GetResourceConverterContext()
         {
-            var context = (HypermediaResolver == null)
+            var context = HypermediaResolver == null
                 ? new HalJsonConverterContext()
                 : new HalJsonConverterContext(HypermediaResolver);
 
             return context;
         }
-
-
-
+        
         public override IResource Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             throw new NotImplementedException();
@@ -55,52 +36,17 @@ namespace WebApi.Hal.JsonConverters
                 resource.Links = null; // avoid serialization
 
             resource.ConverterContext = GetResourceConverterContext();
-            /*
-            var localJsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
-            {
-                CheckAdditionalContent = _jsonSerializerSettings.CheckAdditionalContent,
-                ConstructorHandling = _jsonSerializerSettings.ConstructorHandling,
-                Context = serializer.Context,
-                ContractResolver = _jsonSerializerSettings.ContractResolver,
-                Converters = _jsonSerializerSettings.Converters.Where(converter => converter != this).ToList(),
-                Culture = _jsonSerializerSettings.Culture,
-                DateFormatHandling = _jsonSerializerSettings.DateFormatHandling,
-                DateFormatString = _jsonSerializerSettings.DateFormatString,
-                DateParseHandling = _jsonSerializerSettings.DateParseHandling,
-                DateTimeZoneHandling = _jsonSerializerSettings.DateTimeZoneHandling,
-                DefaultValueHandling = _jsonSerializerSettings.DefaultValueHandling,
-                EqualityComparer = _jsonSerializerSettings.EqualityComparer,
-                Error = _jsonSerializerSettings.Error,
-                FloatFormatHandling = _jsonSerializerSettings.FloatFormatHandling,
-                FloatParseHandling = _jsonSerializerSettings.FloatParseHandling,
-                Formatting = _jsonSerializerSettings.Formatting,
-                MaxDepth = _jsonSerializerSettings.MaxDepth,
-                MetadataPropertyHandling = _jsonSerializerSettings.MetadataPropertyHandling,
-                MissingMemberHandling = _jsonSerializerSettings.MissingMemberHandling,
-                NullValueHandling = _jsonSerializerSettings.NullValueHandling,
-                ObjectCreationHandling = _jsonSerializerSettings.ObjectCreationHandling,
-                PreserveReferencesHandling = _jsonSerializerSettings.PreserveReferencesHandling,
-                ReferenceLoopHandling = _jsonSerializerSettings.ReferenceLoopHandling,
-                ReferenceResolverProvider = _jsonSerializerSettings.ReferenceResolverProvider,
-                SerializationBinder = _jsonSerializerSettings.SerializationBinder,
-                StringEscapeHandling = _jsonSerializerSettings.StringEscapeHandling,
-                TraceWriter = _jsonSerializerSettings.TraceWriter,
-                TypeNameAssemblyFormatHandling = _jsonSerializerSettings.TypeNameAssemblyFormatHandling,
-                TypeNameHandling = _jsonSerializerSettings.TypeNameHandling
-            });
-            localJsonSerializer.Serialize(writer, resource);
-            */
-            
-            writer.WriteRawValue(JsonSerializer.Serialize(resource, resource.GetType(), _jsonSerializerSettings));
+
+            writer.WriteRawValue(JsonSerializer.Serialize(resource, resource.GetType(), options));
 
             if (linksBackup.Count == 0)
                 resource.Links = linksBackup;
 		}
-
+        
 
         private const string HalLinksName = "_links";
         private const string HalEmbeddedName = "_embedded";
-
+        /*
         private static IResource CreateResource(JObject jObj, Type resourceType)
         {
             // remove _links and _embedded so those don't try to deserialize, because we know they will fail
@@ -205,7 +151,7 @@ namespace WebApi.Hal.JsonConverters
                     }
                 }
             }
-        }
+        }*/
 
         // this depends on IResource.Rel being set upon construction
         static readonly IDictionary<string, string> ResourceTypeToRel = new Dictionary<string, string>();

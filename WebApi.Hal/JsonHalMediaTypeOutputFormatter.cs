@@ -1,9 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using System;
 using System.Buffers;
 using System.IO;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Text.Json.Serialization.Metadata;
+using System.Threading;
+using System.Threading.Tasks;
+using WebApi.Hal.Interfaces;
 using WebApi.Hal.JsonConverters;
 using MediaTypeHeaderValue = Microsoft.Net.Http.Headers.MediaTypeHeaderValue;
 
@@ -30,7 +35,7 @@ namespace WebApi.Hal
                 throw new ArgumentNullException(nameof(hypermediaResolver));
             }
 
-            _resourceConverter = new ResourceConverter(hypermediaResolver, SerializerOptions);
+            _resourceConverter = new ResourceConverter(hypermediaResolver);
             Initialize();
         }
 
@@ -40,13 +45,18 @@ namespace WebApi.Hal
             MvcOptions mvcOptions) :
             base(serializerSettings)
         {
-            _resourceConverter = new ResourceConverter(SerializerOptions);
+            _resourceConverter = new ResourceConverter(null);
             Initialize();
         }
 
-        public void WriteObject(TextWriter stream, object value)
+        public void WriteObject(TextWriter stream, IResource value)
         {
-            CreateJsonSerializer().Serialize(stream, value);
+            // TODO make this slick. might need to update the unit tests as well.
+            
+            var ss = JsonSerializer.Serialize(value, SerializerOptions);
+            
+            stream.Write(ss);
+
         }
 
         private void Initialize()

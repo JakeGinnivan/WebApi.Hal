@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace WebApi.Hal.Web.Api.Resources
 {
@@ -36,7 +36,7 @@ namespace WebApi.Hal.Web.Api.Resources
             if (BreweryId != null)
                 Links.Add(LinkTemplates.Breweries.Brewery.CreateLink(new { id = BreweryId }));
 
-            if (ReviewIds != null && ReviewIds.Count > 0)
+            if (ReviewIds.Count > 0)
                 foreach (var rid in ReviewIds)
                     Links.Add(LinkTemplates.Reviews.GetBeerReview.CreateLink(new {id = Id, rid}));
         }
