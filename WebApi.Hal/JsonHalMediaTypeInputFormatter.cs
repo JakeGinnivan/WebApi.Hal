@@ -24,22 +24,12 @@ namespace WebApi.Hal
             }
 
             _resourceConverter = new ResourceConverter(hypermediaResolver);
-            Initialize();
         }
 
         public JsonHalMediaTypeInputFormatter(ILogger<JsonHalMediaTypeInputFormatter> logger, JsonSerializerOptions serializerSettings, ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider, MvcOptions mvcOptions, JsonOptions mvcJsonOptions)
             : base(mvcJsonOptions, logger) //: base(logger, serializerSettings, charPool, objectPoolProvider, mvcOptions, mvcJsonOptions)
         {
-            _resourceConverter = new ResourceConverter(null);
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-            SerializerOptions.Converters.Add(_linksConverter);
-            SerializerOptions.Converters.Add(_resourceConverter);
-            SerializerOptions.Converters.Add(_embeddedResourceConverter);
-            //SerializerOptions.NullValueHandling = NullValueHandling.Include;
+            _resourceConverter = new ResourceConverter();
         }
     }
 }

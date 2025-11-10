@@ -18,11 +18,6 @@ namespace WebApi.Hal
     {
         private const string _mediaTypeHeaderValueName = "application/hal+json";
 
-        private readonly LinksConverter _linksConverter = new LinksConverter();
-
-        private readonly ResourceConverter _resourceConverter;
-        private readonly EmbeddedResourceConverter _embeddedResourceConverter = new EmbeddedResourceConverter();
-
         public JsonHalMediaTypeOutputFormatter(
             JsonSerializerOptions serializerSettings, 
             ArrayPool<char> charPool,
@@ -34,9 +29,6 @@ namespace WebApi.Hal
             {
                 throw new ArgumentNullException(nameof(hypermediaResolver));
             }
-
-            _resourceConverter = new ResourceConverter(hypermediaResolver);
-            Initialize();
         }
 
         public JsonHalMediaTypeOutputFormatter(
@@ -45,8 +37,6 @@ namespace WebApi.Hal
             MvcOptions mvcOptions) :
             base(serializerSettings)
         {
-            _resourceConverter = new ResourceConverter(null);
-            Initialize();
         }
 
         public void WriteObject(TextWriter stream, IResource value)
@@ -59,14 +49,6 @@ namespace WebApi.Hal
 
         }
 
-        private void Initialize()
-        {
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue(_mediaTypeHeaderValueName));
-            SerializerOptions.Converters.Add(_linksConverter);
-            SerializerOptions.Converters.Add(_resourceConverter);
-            SerializerOptions.Converters.Add(_embeddedResourceConverter);
-            //SerializerOptions. NullValueHandling = NullValueHandling.Ignore;
-        }
         
         protected override bool CanWriteType(Type type)
         {

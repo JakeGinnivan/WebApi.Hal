@@ -23,7 +23,7 @@ namespace WebApi.Hal.Tests
         {
             // arrange
             var mediaFormatter = new JsonHalMediaTypeOutputFormatter(
-                new JsonSerializerOptions { WriteIndented = true }, ArrayPool<char>.Shared, new MvcOptions());
+                HalSerializerOptions.Default, ArrayPool<char>.Shared, new MvcOptions());
 
             // act
             using (var stream = new StringWriter())

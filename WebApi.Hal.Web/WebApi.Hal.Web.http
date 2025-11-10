@@ -1,6 +1,6 @@
-@WebApi.Hal.WebCore_HostAddress = http://localhost:5176
+@WebApi.Hal.Web_HostAddress = http://localhost:5176
 
-GET {{WebApi.Hal.WebCore_HostAddress}}/weatherforecast/
+GET {{WebApi.Hal.Web_HostAddress}}/beer/5
 Accept: application/json
 
 ###

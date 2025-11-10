@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,9 +10,19 @@ using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal.JsonConverters
 {
-    public class ResourceConverter(IHypermediaResolver hypermediaConfiguration) : JsonConverter<IResource>
+    public class ResourceConverter : JsonConverter<IResource>
     {
-        public IHypermediaResolver HypermediaResolver { get; } = hypermediaConfiguration ?? throw new ArgumentNullException(nameof(hypermediaConfiguration));
+        public ResourceConverter()
+        {
+
+        }
+        
+        public ResourceConverter(IHypermediaResolver hypermediaConfiguration)
+        {
+            HypermediaResolver = hypermediaConfiguration ?? throw new ArgumentNullException(nameof(hypermediaConfiguration));
+        }
+
+        public IHypermediaResolver HypermediaResolver { get; }
 
         private HalJsonConverterContext GetResourceConverterContext()
         {
@@ -21,10 +32,10 @@ namespace WebApi.Hal.JsonConverters
 
             return context;
         }
-        
+
         public override IResource Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            throw new NotImplementedException();
+            return JsonSerializer.Deserialize<IResource>(ref reader, options);
         }
 
         public override void Write(Utf8JsonWriter writer, IResource value, JsonSerializerOptions options)
