@@ -8,8 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi;
 using WebApi.Hal.Web.Data;
 
 namespace WebApi.Hal.Web
