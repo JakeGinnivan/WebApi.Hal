@@ -4,13 +4,14 @@
   
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Version>8.0.0</Version>
-    <PackageVersion>8.0.0</PackageVersion>
+    <Version>10.0.0</Version>
+    <PackageVersion>10.0.0</PackageVersion>
     <Copyright>Copyright © Jake Ginnivan 2020</Copyright>
     <Description>Adds support for the Hal Media Type (and Hypermedia) to Asp.net</Description>
     <ProjectUrl>https://github.com/JakeGinnivan/WebApi.Hal</ProjectUrl>
     <IsPackable>true</IsPackable>
     <PackageReleaseNotes>
+      10.0.0 update to support .NET 10.0
       8.0.0 update to support .NET 8.0
       4.0.1 ability to mark a link-rel as multi-link to ensure that it always serialzies to an array, even if there's only one link at runtime
       4.0.0 update to support .net core 3.1
