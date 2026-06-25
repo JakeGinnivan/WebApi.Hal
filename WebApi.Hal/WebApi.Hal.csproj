@@ -34,11 +34,11 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="[10.0.8,11.0.0)" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.300,11.0.0)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.3.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="[10.0.8,)" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="[4.7.0,)" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.300,)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="[2.3.10,)" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="[2.3.10,)" />
   </ItemGroup>
 
 </Project>
