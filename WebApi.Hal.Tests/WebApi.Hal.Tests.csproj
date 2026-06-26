@@ -3,7 +3,7 @@
   <Import Project=".\..\WebApi.Hal.Build\WebApi.Hal.Commons.props" />
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Version>3.0.0-pre-1</Version>
     <Authors>Jake Ginnivan, DotNetMedia Organizaion</Authors>
     <Copyright>Copyright © Jake Ginnvan 2017</Copyright>
@@ -12,12 +12,12 @@
 
   <ItemGroup>
     <PackageReference Include="Assent" Version="3.0.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[18.7.0,)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>
 
   <ItemGroup>

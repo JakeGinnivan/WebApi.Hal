@@ -3,14 +3,15 @@
   <Import Project=".\..\WebApi.Hal.Build\WebApi.Hal.Commons.props" />
   
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Version>8.0.0</Version>
-    <PackageVersion>8.0.0</PackageVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <Version>10.0.0</Version>
+    <PackageVersion>10.0.0</PackageVersion>
     <Copyright>Copyright © Jake Ginnivan 2020</Copyright>
     <Description>Adds support for the Hal Media Type (and Hypermedia) to Asp.net</Description>
     <ProjectUrl>https://github.com/JakeGinnivan/WebApi.Hal</ProjectUrl>
     <IsPackable>true</IsPackable>
     <PackageReleaseNotes>
+      10.0.0 update to support .NET 10.0
       8.0.0 update to support .NET 8.0
       4.0.1 ability to mark a link-rel as multi-link to ensure that it always serialzies to an array, even if there's only one link at runtime
       4.0.0 update to support .net core 3.1
@@ -33,12 +34,11 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="[8.0.20,9.0.0)" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[8.0.0, 9.0.0)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.3.0" />
-    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="[10.0.9,)" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="[4.7.0,)" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[10.0.300,)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="[2.3.11,)" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="[2.3.11,)" />
   </ItemGroup>
 
 </Project>
