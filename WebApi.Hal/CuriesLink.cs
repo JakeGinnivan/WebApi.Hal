@@ -54,7 +54,7 @@ namespace WebApi.Hal
 
         private static bool IsValidCuriesHref(string template)
         {
-            if (string.IsNullOrEmpty(template))
+            if (template is null)
                 return false;
 
             // only a single "rel" expression is allowed in this template ...
