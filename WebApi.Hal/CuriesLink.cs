@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    public class CuriesLink
+    public partial class CuriesLink
     {
-        private const string CuriesRelExpression = "rel";
-
         public CuriesLink(string name, string href)
         {
             if (string.IsNullOrEmpty(name))
@@ -18,7 +15,7 @@ namespace WebApi.Hal
             if (string.IsNullOrEmpty(href))
                 throw new ArgumentNullException(nameof(href));
 
-            if (!IsValidCuriesHref(href))
+            if (HrefRelRegex().Count(href) != 1)
                 throw new ArgumentException("The provided href is not a valid uri template: " + href, href);
 
             Name = name;
@@ -49,54 +46,8 @@ namespace WebApi.Hal
             return new Link<T>(CreateLinkRelation(name), href, this);
         }
 
-        private static bool IsValidCuriesHref(string template)
-        {
-            if (string.IsNullOrEmpty(template))
-                return false;
-
-            var expression = new StringBuilder();
-            var building = false;
-            var foundRel = false;
-
-            foreach (var c in template)
-            {
-                switch (c)
-                {
-                    case '{':
-                        if (foundRel)
-                            return false; // only a single "rel" expression is allowed in this template ...
-                        building = true;
-                        expression.Clear();
-                        break;
-                    case '}':
-                        if (!IsValidCuriesHrefRelExpression(expression.ToString()))
-                            return false; // only a single "rel" expression is allowed in this template ...
-                        building = false;
-                        foundRel = true;
-                        break;
-                    default:
-                        if (building)
-                            expression.Append(c);
-                        break;
-                }
-            }
-
-            return foundRel;
-        }
-
-        private static bool IsValidCuriesHrefRelExpression(string expression)
-        {
-            if (expression.Equals(CuriesRelExpression, StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            var operators = new[] { '+', ';', '/', '#', '&', '?', '.' };
-            var first = expression[0];
-
-            if (operators.Any(o => o == first))
-                return expression.Substring(1).Equals(CuriesRelExpression, StringComparison.OrdinalIgnoreCase);
-
-            return false; // only a single "rel" expression is allowed in this template ...
-        }
+        [GeneratedRegex(@"\{[+;/#&?.]?rel\}", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        private static partial Regex HrefRelRegex();
 
         public Link ToLink()
         {

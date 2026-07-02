@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.IO;
 using Assent;
 using Microsoft.AspNetCore.Mvc;
@@ -85,6 +86,13 @@ namespace WebApi.Hal.Tests
                 // assert
                 this.Assent(serialisedResult);
             }
+        }
+
+        [Fact]
+        public void CuriesLinkDisallowsMultipleRelsInHref()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                _ = new CuriesLink("example-namespace", "http://api.example.com/docs/{rel}{rel}"));
         }
 	}
 }
