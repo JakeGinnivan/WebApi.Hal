@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using WebApi.Hal.Interfaces;
 
 namespace WebApi.Hal
 {
-    public class CuriesLink
+    public partial class CuriesLink
     {
         private const string CuriesRelExpression = "rel";
 
@@ -49,39 +49,18 @@ namespace WebApi.Hal
             return new Link<T>(CreateLinkRelation(name), href, this);
         }
 
+        [GeneratedRegex(@"\{(.+?)\}", RegexOptions.Singleline)]
+        private static partial Regex TemplateRegex();
+
         private static bool IsValidCuriesHref(string template)
         {
             if (string.IsNullOrEmpty(template))
                 return false;
 
-            var expression = new StringBuilder();
-            var building = false;
-            var foundRel = false;
-
-            foreach (var c in template)
-            {
-                switch (c)
-                {
-                    case '{':
-                        if (foundRel)
-                            return false; // only a single "rel" expression is allowed in this template ...
-                        building = true;
-                        expression.Clear();
-                        break;
-                    case '}':
-                        if (!IsValidCuriesHrefRelExpression(expression.ToString()))
-                            return false; // only a single "rel" expression is allowed in this template ...
-                        building = false;
-                        foundRel = true;
-                        break;
-                    default:
-                        if (building)
-                            expression.Append(c);
-                        break;
-                }
-            }
-
-            return foundRel;
+            // only a single "rel" expression is allowed in this template ...
+            return
+                TemplateRegex().Matches(template) is [var match] 
+                && IsValidCuriesHrefRelExpression(match.Groups[1].Value);
         }
 
         private static bool IsValidCuriesHrefRelExpression(string expression)
