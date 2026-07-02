@@ -15,7 +15,7 @@ namespace WebApi.Hal
             if (string.IsNullOrEmpty(href))
                 throw new ArgumentNullException(nameof(href));
 
-            if (!IsValidCuriesHref(href))
+            if (HrefRelRegex().Count(href) != 1)
                 throw new ArgumentException("The provided href is not a valid uri template: " + href, href);
 
             Name = name;
@@ -48,15 +48,6 @@ namespace WebApi.Hal
 
         [GeneratedRegex(@"\{[+;/#&?.]?rel\}", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
         private static partial Regex HrefRelRegex();
-
-        private static bool IsValidCuriesHref(string template)
-        {
-            if (template is null)
-                return false;
-
-            // only a single "rel" expression is allowed in this template ...
-            return HrefRelRegex().Count(template) == 1;
-        }
 
         public Link ToLink()
         {
