@@ -349,9 +349,6 @@ namespace WebApi.Hal
                 }
                 else
                 {
-#if PCL
-                         result.Append(HexEscape(c));  
-#else
                     var s = c.ToString();
 
                     var chars = s.Normalize(NormalizationForm.FormC).ToCharArray();
@@ -359,8 +356,6 @@ namespace WebApi.Hal
                     {
                         result.Append(HexEscape(ch));
                     }
-#endif
-
                 }
             }
 
